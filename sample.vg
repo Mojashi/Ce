@@ -1,0 +1,110 @@
+
+
+
+struct int<N>{
+    bool a[N];
+
+}
+
+int<N> add(int<X> x, int<Y> y){
+    bool carry;
+    int<N> ret;
+    Loop(i,max(X, Y)){
+        carry = fullAdder(x.a[i], y.a[i], carry);
+    }
+    bool c;
+    CONST()
+    return ret;
+}
+
+Path<N> ShortestPath(){
+implement:
+     ~~~~
+     return path;
+}
+
+
+
+path<N> x = ShortestPath(g,s,t) : x => {
+    return g.getPath(s,t).cost() < x;
+}
+
+struct Graph<N>{
+    bool a[N][N];
+
+    void connect(int x, int y){
+        CONST(a[x][y], 0);
+    }
+
+
+}
+
+Graph g;
+Loop(i,N){
+    g.connect(0,i);
+}
+BipartiteGraph bg(g);
+
+
+import Graph
+
+int N,M;
+cond(N <= 100);
+cond(N <= M && M <= 100);
+
+Graph<N> g;
+cond(g.sumOfEdge() <= M);
+
+Graph<N> path = ShortestPath(g,0,1) : x => {
+    return g.getPath(s,t).cost() < x;
+};
+
+cond(path.sumOfEdge() >= N);
+
+cond(g.getCreeq().sumOfEdge() >= N);
+
+SATISFIABLE:
+    print(g);
+
+もしunsatisfyableならgの0から1の最短経路がN以上になるグラフの中でgの中にサイズNのクリークを含むようなgは存在しない
+
+
+import int
+
+int x,y;
+cond(1 <= x && x <= 200);
+cond(1 <= y && y <= x);
+
+cond(x * x == y);
+
+SATISFIABLE:
+    print(x);
+    print(y);
+
+
+
+import int
+
+int x;
+int sum = 0;
+
+cond(1 <= x <= 100);
+
+
+
+assert(x <= 40);
+
+
+
+Loop(x){
+    sum = x + sum;
+}
+
+if(sum < 0){
+    sum = -sum;
+}
+
+cond(sum == 100);
+
+SATISFIABLE:
+    print(x);

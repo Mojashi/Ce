@@ -1,9 +1,10 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <list>
 #include <memory>
 #include <variant>
-
+#include <utility>
 using std::string;
 using std::list;
 using std::map;
@@ -16,6 +17,7 @@ enum NodeType{
     DECLAREVAR,
     VARIABLE,
     VARIABLELIST,
+    STATEMENT,
     NONE
 };
 
@@ -38,15 +40,15 @@ class Structure{
 public:
     void addVariable(string name, shared_ptr<Structure> varType);
     void addStruct(string name, shared_ptr<Structure> memberStruct);
-    void addFunction(string name, shared_ptr<ASTNode> funcNode);
+    void addFunction(shared_ptr<Structure> retStruct, string name, list<shared_ptr<Structure>> argStruct ,shared_ptr<ASTNode> funcNode);
+    std::pair<MemberType, std::variant<shared_ptr<Structure>,shared_ptr<ASTNode>>> findMember(string name);
     MemberType isMember(string membName);
     shared_ptr<Structure> getStruct(string structName);
     shared_ptr<Structure> getVariable(string structName);
     shared_ptr<ASTNode> getFunction(string funcName);
 
-    std::variant
 
-    Variable getInstance();
+    shared_ptr<Variable> getInstance();
 };
 class Variable{
     shared_ptr<Structure> structure;
@@ -55,50 +57,52 @@ class Variable{
 public:
     shared_ptr<ASTNode> getFunction(string funcName);
     void assignMember(string membName);
-    shared_ptrVariable> getMember(string membName);
-    shared_ptrVariable> access(list<string>> varIdent);
+    shared_ptr<Variable> getMember(string membName);
+    shared_ptr<Variable> access(list<string> varIdent);
 };
 
 class ASTNode{
     shared_ptr<ASTNode> child[2];
+protected:
+    NodeType nodetype;
 public:
-    const NodeType nodetype;
-    virtual shared_ptr<Variable> eval() {return NULL;};
+    virtual shared_ptr<Variable> eval();
     void addChild(shared_ptr<ASTNode> node, int idx);
 };
 
-class ASTVariable{
+
+class ASTAssignment : ASTNode{
+    list<string> varIdent;
+    shared_ptr<ASTNode> expr;
+public:
+    ASTAssignment(list<string> varIdent, shared_ptr<ASTNode> expr);
+    shared_ptr<Variable> ASTAssignment::eval();
+};
+
+class ASTVariable : ASTNode{
 public:
     ASTVariable(list<string> varIdent);
-}
-
-class ASTVariableList{
-    list<list<string>> varList;
-public:
-    ASTVariable(list<list<string>> varList);
-}
+    shared_ptr<Variable> ASTVariable::eval();
+};
 
 class ASTCallFunction : ASTNode{
+    list<string> ident;
 public:
-    ASTCallFunction(list<string> funcIdent):nodetype(NodeType::CALLFUNCTION);
+    ASTCallFunction(list<string> funcIdent);
 
     shared_ptr<Variable> eval();
 };
 
-class ASTCallOperator : ASTNode{
-public:
-    ASTCallOperator(list<string> opeIdent):nodetype(NodeType::CALLOPERATOR);
-
-};
-
 class ASTIfStatement : ASTNode{
 public:
-    ASTIfStatement():nodetype(NodeType::IFSTATEMENT);
-
+    ASTIfStatement();
+    shared_ptr<Variable> eval();
 };
 
 class ASTDeclareVar : ASTNode{
+    list<string> names;
+    shared_ptr<Structure> type;
 public:
-    ASTDeclareVar(string typeName):nodetype(NodeType::DECLAREVAR);
-
+    ASTDeclareVar(string typeName);
+    shared_ptr<Variable> eval();
 };

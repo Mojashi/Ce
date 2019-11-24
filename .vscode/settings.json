@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "memory": "cpp"
+        "*.ml": "ocaml",
+        "*.mli": "ocaml",
+        "memory": "cpp",
+        "system_error": "cpp",
+        "xlocale": "cpp",
+        "list": "cpp",
+        "xtree": "cpp"
     }
 }

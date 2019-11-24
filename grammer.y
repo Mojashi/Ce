@@ -4,7 +4,9 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <utillity>
 #include <memory>
+#include <variant>
 
 using std::string;
 using std::list;
@@ -18,26 +20,53 @@ Structure godStruct;
 shared_ptr<Structure> curStruct(&godStruct);
 std::vector<shared_ptr<Structure>> scope;
 
-
-shared_ptr<ASTNode> findStruct(list<string> ident){
-	for (auto st = scope->rbegin(); st != scope.rend() && !ident.empty(); st++)
-		MeberType mtype = st->isMember(ident.front());
-		if(mtype != MemberType::STRUCT)
-			return shared_ptr<ASTNode>();
-		if()
-		ident.pop_front();
+std::pair<MemberType, variant<shared_ptr<Structure>,shared_ptr<ASTNode>>> findObj(list<string> ident){
+	std::variant<shared_ptr<Structure>,shared_ptr<ASTNode>> cur;
+	MemberType type = MemberType::NONE;
+	for(auto st = scope->rbegin(); st != scope->rend(); st++){
+		auto memb = st->findMember(ident.front());
+		if(memb.first != MemberType::NONE){
+			if (ident.size() == 1)
+				return memb;
+			else
+				cur = memb.second;
+		}
 	}
+
+	while(std::holds_alternative<std::Structure>(cur)){
+		auto buf = cur->findDirectObj(ident.front());
+		ident.pop_front();
+
+		cur = buf.second;
+		type = buf.first;
+	}
+
+	if(ident.empty())
+		return make_pair(type,cur);
+	else
+		return make_pair(MemberType::NONE, variant<shared_ptr<Structure>,shared_ptr<ASTNode>>());
 }
 
+shared_ptr<Structure> findStruct(list<string> ident){
+	auto obj = findObj(ident);
+	if(obj.first == MemberType::STRUCT)
+		return std::get<shared_ptr<Structure>>(obj.second);
+	else
+		return shared_ptr<Structure>();
+}
+shared_ptr<Structure> findVariable(list<string> ident){
+	auto obj = findObj(ident);
+	if(obj.first == MemberType::VARIABLE)
+		return std::get<shared_ptr<Structure>>(obj.second);
+	else
+		return shared_ptr<Structure>();
+}
 shared_ptr<ASTNode> findFunction(list<string> ident){
-	for (auto st = scope->rbegin(); st != scope.rend() && !ident.empty(); st++)
-		MeberType mtype = st->isMember(ident.front());
-		if(mtype != MemberType::STRUCT) {
-			if(mtype == MemberType::FUNCTION) return st->getFunction(ident.front());
-			else return shared_ptr<ASTNode>();
-		}
-		ident.pop_front();
-	}
+	auto obj = findObj(ident);
+	if(obj.first == MemberType::FUNCTION)
+		return std::get<shared_ptr<ASTNode>>(obj.second);
+	else
+		return shared_ptr<ASTNode>();
 }
 
 %}
@@ -46,7 +75,8 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
 		shared_ptr<Ast> ast;
 		int ival;
 		string name;
-		list<string> names;
+		list<string> ident;
+		list<list<string>> idents;
 	}
 
 	%token CR
@@ -89,8 +119,15 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
         | {;}
     ;
 
-	funcdef : IDENT NAME LPAREN var_list RPAREN LBRACE stmt RBRACE { 
-        functions[$2]
+	funcdef : IDENT NAME LPAREN var_list RPAREN LBRACE stmt RBRACE {
+		shared_ptr<Structure> retStruct = findStruct($1);
+		list<shared_ptr<Structure>> args;
+		for(list<string> ident : var_list){
+			auto buf = findStruct(ident);
+			if(buf.empty())
+			args.push_back();
+		}
+		curStruct->addFunction(retStruct, $2, $4);
 	}
 	;
 

@@ -20,6 +20,8 @@ Structure godStruct;
 shared_ptr<Structure> curStruct(&godStruct);
 std::vector<shared_ptr<Structure>> scope;
 
+map<shared_ptr<Structure>, shared_ptr<Structure>
+
 std::pair<MemberType, variant<shared_ptr<Structure>,shared_ptr<ASTNode>>> findObj(list<string> ident){
 	std::variant<shared_ptr<Structure>,shared_ptr<ASTNode>> cur;
 	MemberType type = MemberType::NONE;
@@ -72,7 +74,7 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
 %}
 
 	%union {
-		shared_ptr<Ast> ast;
+		shared_ptr<ASTNode> ast;
 		int ival;
 		string name;
 		list<string> ident;
@@ -97,6 +99,7 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
     %token STRUCT
 	%token SEMICOLON
     %token STRUCT
+	%token CONST
 
 	%left  PLUS MINUS
 	%left  MULT DIV MOD
@@ -136,6 +139,10 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
     }
     ;
 
+	decconst : CONST LPAREN var_list RPAREN SEMICOLON{
+
+	}
+	;
 
 	var_list 
 		: IDENT 	{	

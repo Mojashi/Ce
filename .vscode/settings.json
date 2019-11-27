@@ -6,6 +6,9 @@
         "system_error": "cpp",
         "xlocale": "cpp",
         "list": "cpp",
-        "xtree": "cpp"
-    }
+        "xtree": "cpp",
+        "string": "cpp",
+        "iosfwd": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

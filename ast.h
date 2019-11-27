@@ -5,6 +5,7 @@
 #include <memory>
 #include <variant>
 #include <utility>
+#include "CNF.h"
 using std::string;
 using std::list;
 using std::map;
@@ -33,6 +34,7 @@ enum MemberType{
 
 class Structure{
     string name;
+    Literal litNum;
     map<string, shared_ptr<Structure>> variable;
     map<string, shared_ptr<Structure>> structs;
     map<string, shared_ptr<ASTNode>> method;
@@ -48,16 +50,23 @@ public:
     shared_ptr<ASTNode> getFunction(string funcName);
 
 
-    shared_ptr<Variable> getInstance();
+    shared_ptr<Variable> getInstance(shared_ptr<Variable> parent);
 };
+
+class literalStruct : Structure{
+    public:
+        literalStruct(); // litNum割り振り
+}
+
 class Variable{
+    shared_ptr<Variable> parent;
     shared_ptr<Structure> structure;
     map<string, shared_ptr<Variable>> member;
 
 public:
     shared_ptr<ASTNode> getFunction(string funcName);
     void assignMember(string membName);
-    shared_ptr<Variable> getMember(string membName);
+    shared_ptr<Variable> getVariable(string membName);
     shared_ptr<Variable> access(list<string> varIdent);
 };
 
@@ -106,3 +115,10 @@ public:
     ASTDeclareVar(string typeName);
     shared_ptr<Variable> eval();
 };
+
+class ASTAddConst : ASTNode{
+    vector<shared_ptr<ASTNode>> exprs;
+public:
+    ASTAddConst(vector<shared_ptr<ASTNode>> exprs);
+
+}

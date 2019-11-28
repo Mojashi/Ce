@@ -135,7 +135,7 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
 	;
 
     structdef : STRUCT NAME LBRACE members RBRACE {
-
+		
     }
     ;
 
@@ -151,12 +151,16 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
         }
 		| { }
 	;
+	argument_list
+		: argument_list expr {}
+		| {}
+	;
 
 	stmt    
-		: stmt line SEMICOLON	{
+		: stmt line {
 			$$ = new AstNode('S', $1, $2);
 		}
-		| stmt selection SEMICOLON	{
+		| stmt selection {
 			$$ = new AstNode('S', $1, $2);
 		}
 		

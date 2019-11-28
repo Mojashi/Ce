@@ -56,13 +56,6 @@ shared_ptr<Structure> findStruct(list<string> ident){
 	else
 		return shared_ptr<Structure>();
 }
-shared_ptr<Structure> findVariable(list<string> ident){
-	auto obj = findObj(ident);
-	if(obj.first == MemberType::VARIABLE)
-		return std::get<shared_ptr<Structure>>(obj.second);
-	else
-		return shared_ptr<Structure>();
-}
 shared_ptr<ASTNode> findFunction(list<string> ident){
 	auto obj = findObj(ident);
 	if(obj.first == MemberType::FUNCTION)
@@ -79,6 +72,7 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
 		string name;
 		list<string> ident;
 		list<list<string>> idents;
+		list<pair<shared_ptr<Structure>, string> arg;
 	}
 
 	%token CR
@@ -114,7 +108,7 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
     members
         : members funcdef{;}
 		: members structdef{;}
-        | members IDENT var_list SEMICOLON{
+        | members IDENT name_list SEMICOLON{
 			for(string varname : $3){
 				curStruct->addMember(varname, curStruct->);
 			};
@@ -122,19 +116,15 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
         | {;}
     ;
 
-	funcdef : IDENT NAME LPAREN var_list RPAREN LBRACE stmt RBRACE {
+	funcdef : IDENT NAME LPAREN argument_list RPAREN LBRACE stmt RBRACE {
 		shared_ptr<Structure> retStruct = findStruct($1);
 		list<shared_ptr<Structure>> args;
-		for(list<string> ident : var_list){
-			auto buf = findStruct(ident);
-			if(buf.empty())
-			args.push_back();
-		}
-		curStruct->addFunction(retStruct, $2, $4);
+		curStruct->addFunction(retStruct, $2, $4, $7);
 	}
 	;
 
     structdef : STRUCT NAME LBRACE members RBRACE {
+		curStruct = shared_ptr<Structure>(new Structure($2));
 		
     }
     ;

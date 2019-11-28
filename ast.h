@@ -40,9 +40,10 @@ class Structure{
     map<string, shared_ptr<ASTNode>> method;
 
 public:
+    Structure(string name);
     void addVariable(string name, shared_ptr<Structure> varType);
     void addStruct(string name, shared_ptr<Structure> memberStruct);
-    void addFunction(shared_ptr<Structure> retStruct, string name, list<shared_ptr<Structure>> argStruct ,shared_ptr<ASTNode> funcNode);
+    void addFunction(shared_ptr<Structure> retStruct, string name, list<pair<shared_ptr<Structure>,string>> args ,shared_ptr<ASTNode> funcNode);
     std::pair<MemberType, std::variant<shared_ptr<Structure>,shared_ptr<ASTNode>>> findMember(string name);
     MemberType isMember(string membName);
     shared_ptr<Structure> getStruct(string structName);

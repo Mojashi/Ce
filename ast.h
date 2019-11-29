@@ -108,9 +108,9 @@ public:
 
 class ASTCallFunction : ASTNode{
     list<string> ident;
-    list<list<string>> args;
+    list<shared_ptr<ASTNode>> args;
 public:
-    ASTCallFunction(list<string> funcIdent, list<list<string>> args);
+    ASTCallFunction(list<string> funcIdent, list<shared_ptr<ASTNode>> args);
 
     shared_ptr<Variable> eval();
 };
@@ -125,7 +125,7 @@ class ASTDeclareVar : ASTNode{
     list<string> names;
     shared_ptr<Structure> type;
 public:
-    ASTDeclareVar(string typeName);
+    ASTDeclareVar(shared_ptr<Structure> type, list<string> names);
     shared_ptr<Variable> eval();
 };
 

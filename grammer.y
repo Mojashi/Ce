@@ -17,68 +17,25 @@ extern int yylex();
 void yyerror(const char * msg) { std::cout << msg << std::endl; }
 
 Structure godStruct;
-shared_ptr<Structure> curStruct(&godStruct);
-std::vector<shared_ptr<Structure>> scope;
 
-map<shared_ptr<Structure>, shared_ptr<Structure>
-
-std::pair<MemberType, variant<shared_ptr<Structure>,shared_ptr<ASTNode>>> findObj(list<string> ident){
-	std::variant<shared_ptr<Structure>,shared_ptr<ASTNode>> cur;
-	MemberType type = MemberType::NONE;
-	for(auto st = scope->rbegin(); st != scope->rend(); st++){
-		auto memb = st->findMember(ident.front());
-		if(memb.first != MemberType::NONE){
-			if (ident.size() == 1)
-				return memb;
-			else
-				cur = memb.second;
-		}
-	}
-
-	while(std::holds_alternative<std::Structure>(cur)){
-		auto buf = cur->findDirectObj(ident.front());
-		ident.pop_front();
-
-		cur = buf.second;
-		type = buf.first;
-	}
-
-	if(ident.empty())
-		return make_pair(type,cur);
-	else
-		return make_pair(MemberType::NONE, variant<shared_ptr<Structure>,shared_ptr<ASTNode>>());
-}
-
-shared_ptr<Structure> findStruct(list<string> ident){
-	auto obj = findObj(ident);
-	if(obj.first == MemberType::STRUCT)
-		return std::get<shared_ptr<Structure>>(obj.second);
-	else
-		return shared_ptr<Structure>();
-}
-shared_ptr<ASTNode> findFunction(list<string> ident){
-	auto obj = findObj(ident);
-	if(obj.first == MemberType::FUNCTION)
-		return std::get<shared_ptr<ASTNode>>(obj.second);
-	else
-		return shared_ptr<ASTNode>();
-}
+map<string, shared_ptr<Structure>> avStructure;
+map<string, shared_ptr<ASTNode>> avFcuntion;
 
 %}
 
 	%union {
-		shared_ptr<ASTNode> ast;
+		shared_ptr<Structure> memb;
+		shared_ptr<Function> func;
 		int ival;
 		string name;
 		list<string> ident;
 		list<list<string>> idents;
-		list<pair<shared_ptr<Structure>, string> arg;
+		list<pair<shared_ptr<Structure>, string> vars;
 	}
 
 	%token CR
 	%token ASSIGN
-	%token<id> NAME
-    %token IDENT
+	%token<name> NAME
 	%token<ival> NUMBER
 	%token LPAREN
 	%token RPAREN
@@ -106,43 +63,59 @@ shared_ptr<ASTNode> findFunction(list<string> ident){
 
 	%%
     members
-        : members funcdef{;}
-		: members structdef{;}
-        | members IDENT name_list SEMICOLON{
-			for(string varname : $3){
-				curStruct->addMember(varname, curStruct->);
-			};
+        : members funcdef{
+			$$ = $1;
+			$$.addFunction($2);
 		}
-        | {;}
+		: members structdef{
+			$$ = $1;
+			$$.addStruct($2);
+		}
+        | members NAME name_list SEMICOLON{
+			$$ = $1;
+			for(string name : name_list)
+				$$.addVariable(name, findStruct($2));
+		}
+        | {
+			$$ = shared_ptr<Structure>(new Structure());
+		}
     ;
 
-	funcdef : IDENT NAME LPAREN argument_list RPAREN LBRACE stmt RBRACE {
+	funcdef : NAME NAME LPAREN name_list RPAREN LBRACE stmt RBRACE {
 		shared_ptr<Structure> retStruct = findStruct($1);
-		list<shared_ptr<Structure>> args;
-		curStruct->addFunction(retStruct, $2, $4, $7);
+		$$ = shared_ptr<Function>(new Function(retStruct, $2, $4, $7));
 	}
 	;
 
     structdef : STRUCT NAME LBRACE members RBRACE {
-		curStruct = shared_ptr<Structure>(new Structure($2));
-		
+		$$ = $4;
+		$4->setName($2);
     }
     ;
 
-	decconst : CONST LPAREN var_list RPAREN SEMICOLON{
-
+	addconst : CONST LPAREN expr_list RPAREN SEMICOLON{
+		$$ = shared_ptr<ASTNode>(new ASTAddConst($3));
 	}
 	;
 
 	var_list 
-		: IDENT 	{	
+		: IDENT {
+
 		}
 		| IDENT COMMA var_list {
         }
-		| { }
+		| {$$ = }
 	;
 	argument_list
-		: argument_list expr {}
+		: NAME NAME{	
+		}
+		| argument_list COMMA NAME NAME {
+        }
+		| { }
+	;
+	expr_list
+		: expr{}
+		| expr_list COMMA expr {}
 		| {}
 	;
 

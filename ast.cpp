@@ -12,14 +12,26 @@ shared_ptr<Variable> currentScope;
 
 map<string, shared_ptr<Variable>> localVar;
 
-struct InstanceFunction{
+struct InsFunction{
     shared_ptr<Variable> scope;
-    shared_ptr<ASTNode> function;
-    shared_ptr<Variable> call(){
+    shared_ptr<Function> function;
+    shared_ptr<Variable> call(list<shared_ptr<Variable>> params){
+        map<string, shared_ptr<Variable>> cvLocalVar(localVar);
         shared_ptr<Variable> cvScope(currentScope);
+        localVar.clear();
         currentScope = scope;
-        shared_ptr<Variable> ret = function->eval();
+        auto args = function.getArgs();
+        if(args.size() != params.size()){
+            cerr << "Not enough params." << endl;
+            exit(0);
+        }
+        auto param = params.begin(), arg = args.begin();
+        for(;param != params.end(); param++, arg++){
+            localVar[arg->second] = *param;
+        }
+        shared_ptr<Variable> ret = function->getNode()->eval();
         currentScope = cvScope;
+        localVar = cvLocalVar;
         return ret;
     }
 };
@@ -39,7 +51,7 @@ shared_ptr<Variabel> findVariable(list<string> ident){
     return shared_ptr<Variable>();
 }
 
-InstanceFunction findFunction(list<string> ident){
+InsFunction findFunction(list<string> ident){
     if(ident.size() == 1){
         return currentScope.getFunction(ident.front());
     }
@@ -63,7 +75,7 @@ shared_ptr<Variable> ASTVariable::eval(){
 }
 
 shared_ptr<Variable> ASTCallFunction::eval(){
-    InstanceFunction func = findFunction(ident);
+    InsFunction func = findFunction(ident);
     if(!func.function){
         string conc;
         for(string str : ident) conc += str;

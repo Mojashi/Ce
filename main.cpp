@@ -8,6 +8,7 @@ CNF cnf;
 
 
 int main(){
+    yylex();
     godVar = godStruct.getInstance();
 
     std::cout << "Executing main function" << endl;

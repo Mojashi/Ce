@@ -19,7 +19,6 @@ return          return RETURN;
 for          return FOR;
 void          return VOID;
 if          return IF;
-sizeof      return SIZEOF;
     /* constants */
       /* decimal */
 [-+]?[0-9]+        return CONSTANTLITERAL;
@@ -41,6 +40,7 @@ sizeof      return SIZEOF;
 ;            return yytext[0];
 =            return yytext[0]; // means boolean variable-level equality
 
+<<EOF>>     return ENDOFFILE;
 
     /* skip new lines and blank spaces */
 [ \t\n]          return BLANK;

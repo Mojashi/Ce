@@ -16,7 +16,7 @@ using std::shared_ptr;
 extern int yylex();
 void yyerror(const char * msg) { std::cout << msg << std::endl; }
 
-Structure godStruct;
+extern shared_ptr<Structure> godStruct;
 
 map<string, shared_ptr<Structure>> avStructure;
 map<string, shared_ptr<ASTNode>> avFcuntion;
@@ -53,6 +53,8 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 	%token SEMICOLON
     %token STRUCT
 	%token CONST
+	%token COMMENT
+	%token ENDOFFILE
 
 	%left  PLUS MINUS
 	%left  MULT DIV MOD
@@ -60,7 +62,7 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 	%left  LESS LESSEQ GREAT GREATEQ EQ NOTEQ
 
 	%nonassoc ELSE
-	
+
 	%type<ast> expr line selection stmt addconst
 	%type<func> funcdef
 	%type<memb> members structdef
@@ -70,12 +72,16 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 	%type<exprs> expr_list
 
 	%%
+	program : members ENDOFFILE{
+			godStruct = shared_ptr<Structure>($1);
+		}
+	;
     members
         : members funcdef{
 			$$ = $1;
 			$$->addFunction(shared_ptr<Function>($2));
 		}
-		: members structdef{
+		| members structdef{
 			$$ = $1;
 			$$->addStruct(shared_ptr<Structure>($2));
 		}
@@ -235,7 +241,7 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 			$$ = new ASTCallFunction(list<string>("operator" + "-"), list<ASTNode>(shared_ptr<ASTNode>($2)));
 			}
 		| NUMBER	{ 
-			new ASTCallFunction(list<string>("Integer"), list<ASTNode>(shared_ptr<ASTNode>($1)));
+			new ASTInteger($1);
 		}
 		| FLOAT		{ }
 		| IDENT LBRACKET expr RBRACKET { }

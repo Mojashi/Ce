@@ -2,17 +2,16 @@
 #include "ast.h"
 #include "grammer.tab.h"
 #include "CNF.h"
-extern Structure godStruct;
-Variable godVar;
+shared_ptr<Structure> godStruct;
+shared_ptr<Variable> godVar;
 CNF cnf;
-
 
 int main(){
     yylex();
-    godVar = godStruct.getInstance();
+    godVar = godStruct->getInstance();
 
     std::cout << "Executing main function" << endl;
-    godVar.getFunction("main")->eval();
+    godVar->getFunction("main")->eval();
 
     std::vector<bool> ans(cnf.solve());
 

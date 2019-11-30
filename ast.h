@@ -66,9 +66,9 @@ public:
     shared_ptr<Variable> getInstance(shared_ptr<Variable> parent);
 };
 
-class literalStruct : Structure{
+class LiteralStruct : Structure{
     public:
-        literalStruct(); // litNum割り振り
+        LiteralStruct(); // litNum割り振り
 }
 
 class Variable{
@@ -134,4 +134,10 @@ class ASTAddConst : ASTNode{
 public:
     ASTAddConst(list<shared_ptr<ASTNode>> exprs);
 
+}
+
+class ASTInteger : ASTNode{
+    int num;
+public:
+    ASTInteger(int num);
 }

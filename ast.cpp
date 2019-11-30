@@ -6,6 +6,7 @@
 using std::cerr;
 using std::endl;
 
+extern Structure godStruct;
 extern Variable godVar;
 extern CNF cnf;
 shared_ptr<Variable> currentScope;

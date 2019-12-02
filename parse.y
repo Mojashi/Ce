@@ -4,22 +4,49 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <utillity>
+#include <utility>
 #include <memory>
-#include <variant>
 
 using std::string;
 using std::list;
 using std::map;
 using std::shared_ptr;
-
+using std::cerr;
+using std::endl;
 extern int yylex();
 void yyerror(const char * msg) { std::cout << msg << std::endl; }
 
 extern shared_ptr<Structure> godStruct;
-
+extern boolStruct;
 map<string, shared_ptr<Structure>> avStructure;
-map<string, shared_ptr<ASTNode>> avFcuntion;
+
+int readProgram(){
+	avStructure["Bool"] = boolStruct;
+	avStructure["void"] = shared_ptr<Structure>();
+	yylex();
+	godStruct->addStruct(boolStruct);
+	godStruct->addStruct(avStructure["void"]);
+}
+
+void addStruct(shared_ptr<Structure> stc){
+	if(avStructure.count(name) != 0){
+		cerr << "the same named structure exists in this scope." << endl;
+		exit(0);
+	}
+	avStructure[stc->getName()] = stc;
+}
+
+void remStruct(string name){
+	avStructure.
+}
+
+shared_ptr<Structure> findStruct(string name){
+	if(avStructure.count(name) == 0){
+		cerr << "not found structure named " + name << endl;
+		exit(0);
+	}
+	return avStructure[name];
+}
 
 %}
 
@@ -29,31 +56,29 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 		Function *func;
 		int ival;
 		string *name;
-		list<string> *ident;
+		list<string> *names;
 		list<list<string>> *idents;
 		list<pair<shared_ptr<Structure>, string> *vars;
 		list<shared_ptr<ASTNode>> *exprs;
 	}
 
-	%token CR
 	%token ASSIGN
 	%token<name> NAME
 	%token<ival> NUMBER
 	%token LPAREN
 	%token RPAREN
 	%token IF
+	%token COMMA
 	%token RETURN
 	%token LBRACKET
 	%token RBRACKET
 	%token LBRACE
 	%token RBRACE
-	%token PERIOD
 	%token LOOP
     %token STRUCT
 	%token SEMICOLON
-    %token STRUCT
+	%token PERIOD
 	%token CONST
-	%token COMMENT
 	%token ENDOFFILE
 
 	%left  PLUS MINUS
@@ -61,29 +86,31 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 	%left  DOUBLE_MULT
 	%left  LESS LESSEQ GREAT GREATEQ EQ NOTEQ
 
+	%nonassoc UMINUS
 	%nonassoc ELSE
 
 	%type<ast> expr line selection stmt addconst
 	%type<func> funcdef
 	%type<memb> members structdef
-	%type<ident> IDENT
-	%type<idents> name_list
+	%type<names> IDENT name_list
 	%type<vars> argument_list var_list
 	%type<exprs> expr_list
 
 	%%
 	program : members ENDOFFILE{
-			godStruct = shared_ptr<Structure>($1);
+			godStruct = $1->getPtr();
 		}
 	;
     members
         : members funcdef{
 			$$ = $1;
-			$$->addFunction(shared_ptr<Function>($2));
+			$$->addFunction($2->getPtr());
 		}
 		| members structdef{
 			$$ = $1;
-			$$->addStruct(shared_ptr<Structure>($2));
+			auto ptr = $2->getPtr();
+			$$->addStruct(ptr);
+			addStruct(ptr);
 		}
         | members NAME name_list SEMICOLON{
 			$$ = $1;
@@ -111,6 +138,9 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 		$$ = $4;
 		$4->setName(*$2);
 		delete $2;
+		for(auto stc : $4->getStructs){
+			remStruct(stc.first);
+		}
     }
     ;
 
@@ -132,6 +162,20 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 			delete $1;
         }
 		| {$$ = new list<list<string>>();}
+	;
+	
+	name_list 
+		: NAME {
+			$$ = new list<string>();
+			$$->push_front(*$1);
+			delete $1;
+		}
+		| NAME COMMA name_list {
+			$$ = $3;
+			$$->push_front(*$1);
+			delete $1;
+        }
+		| {$$ = new list<string>();}
 	;
 	argument_list
 		: NAME NAME{
@@ -174,7 +218,7 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 	
 	selection 
 		: IF LPAREN expr RPAREN LBRACE stmt RBRACE {
-			$$ = new AstNode(shared_ptr<ASTNode>($2), shared_ptr<ASTNode>($4));
+			$$ = new AstNode(shared_ptr<ASTNode>($3), shared_ptr<ASTNode>($6));
 		}
 		;
 
@@ -191,10 +235,10 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 		}
 
 		| RETURN expr SEMICOLON {
-			$$ = new ASTNode(shared_ptr<ASTNode>(), shared_ptr<ASTNode($2));
+			$$ = new ASTNode(shared_ptr<ASTNode>(), shared_ptr<ASTNode>($2));
 		}
         | NAME name_list SEMICOLON{ //variable declaration
-			$$ = new ASTDeclareVariable(findStruct(*$1, *$2));
+			$$ = (*ASTNode)(new ASTDeclareVariable(findStruct(*$1), *$2));
 			delete $1;
 			delete $2;
         }
@@ -202,53 +246,56 @@ map<string, shared_ptr<ASTNode>> avFcuntion;
 
 	expr    
 		: expr PLUS expr 	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "+"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "+"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr MINUS expr 	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "-"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "-"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr MULT expr 	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "*"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "*"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr DOUBLE_MULT expr	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "^"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "^"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr DIV expr		{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "/"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "/"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr MOD expr	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "%"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "%"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr LESS expr{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "<"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "<"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr LESSEQ expr{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "<="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "<="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr GREAT expr	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + ">"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + ">"), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr GREATEQ expr	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + ">="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + ">="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr EQ expr		{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| expr NOTEQ expr		{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "!="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "!="), list<ASTNode>(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3))));
 			}
 		| MINUS expr %prec UMINUS	{ 
-			$$ = new ASTCallFunction(list<string>("operator" + "-"), list<ASTNode>(shared_ptr<ASTNode>($2)));
+			$$ = (*ASTNode)(new ASTCallFunction(list<string>("operator" + "-"), list<ASTNode>(shared_ptr<ASTNode>($2))));
 			}
 		| NUMBER	{ 
-			new ASTInteger($1);
+			$$ = (*ASTNode)(new ASTInteger($1));
 		}
-		| FLOAT		{ }
 		| IDENT LBRACKET expr RBRACKET { }
+		| IDENT {
+			$$ = (*ASTNode)(new ASTVariable(*$1));
+			delete $1;
+		}
 		;
         
     IDENT
-        : IDENT COLON NAME {
+        : IDENT PERIOD NAME {
 			$$ = $1;
 			$$->push_back(*$3);
 			delete $3;

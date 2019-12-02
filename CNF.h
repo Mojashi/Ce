@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 #define rep(i,a,n) for(int i = a; n > i;i++)
 #define REP(i,n) rep(i,0,n)
@@ -67,7 +68,7 @@ public:
 	}
 
 	Literal Or(vector<Literal> vars) {
-		if (vars.size() == 0) return FALSE;
+		if (vars.size() == 0) return False;
 		if (vars.size() == 1) return vars.front();
 
 		Literal ret = getNewVar();
@@ -83,8 +84,8 @@ public:
 	}
 
 	pair<Literal, Literal> halfAdder(Literal a, Literal b) { // a+b return s=sum o=carry bit
-		if (a == None) return { b, FALSE };
-		if (b == None) return { a, TRUE };
+		if (a == None) return { b, False };
+		if (b == None) return { a, True };
 
 		int s = getNewVar(), o = getNewVar();
 		addClause({ -a,-b,o }); 
@@ -149,7 +150,7 @@ public:
 	}
 
 	vector<Literal> sum(vector<Literal> vars, int digit = 0) {
-		vector<Literal> ret = { FALSE };
+		vector<Literal> ret = { False };
 
 		for (auto itr : vars) {
 			ret = plus({ itr }, ret);

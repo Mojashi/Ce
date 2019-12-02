@@ -71,10 +71,6 @@ shared_ptr<Variable> ASTNode::eval(){
     return shared_ptr<Variable>();
 }
 
-shared_ptr<Variable> ASTVariable::eval(){
-    return findVariable(ident);
-}
-
 shared_ptr<Variable> ASTCallFunction::eval(){
     InsFunction func = findFunction(ident);
     if(!func.function){
@@ -95,11 +91,11 @@ shared_ptr<Variable> ASTIfStatement::eval(){
 
 shared_ptr<Variable> ASTDeclareVar::eval(){
     for(string name : names){
-        if(vars.count(name)){
+        if(localVar.count(name)){
             cerr << "a variable named \"" << name << "\" has already declared" << endl;
             exit(0);
         }
-        vars[name] = type->getInstance();
+        localVar[name] = type->getInstance(currentScope);
     }
     return shared_ptr<Variable>();
 
@@ -111,14 +107,20 @@ shared_ptr<Variable> ASTAssignment::eval(){
         cerr << "lvalue and rvalue types are different" << endl;
         exit(0);
     }
-    vars[name] = res;
-    return varIdent;
+    find
+    localVar[name] = res;
+    return res;
 }
 
 shared_ptr<Variable> ASTAddConst::eval(){
     vector<Literal> clause;
     for(shared_ptr<ASTNode> expr : exprs){
-        clause.push_back(expr->eval()->litNum);
+        clause.push_back((*BoolVariable)(expr->eval())->litNum);
     }
     cnf.addClause(clause);
+    return shared_ptr<Variable>();
+}
+
+shared_ptr<Variable> ASTVariable::eval(){
+    return findVariable(ident);
 }

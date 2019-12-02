@@ -8,7 +8,9 @@
         "list": "cpp",
         "xtree": "cpp",
         "string": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "map": "cpp",
+        "__tree": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

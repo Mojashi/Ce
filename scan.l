@@ -1,0 +1,74 @@
+%{
+extern void yyerror(const char *s);
+extern void yyerror(const char *s, const char ch);
+#include <iostream>
+#include <cstring>
+#include "ast.h"
+#include "parse.tab.h"
+%}
+letter      [a-zA-Z]
+name       {letter}({letter}|{digit})*
+digit       [0-9]
+digits      [0-9]+
+float       {digits}"."{digits}
+
+%x COMMENT
+%x OTHER_COMMENT
+%%
+
+
+"/*"                { BEGIN(COMMENT); }
+<COMMENT>"*/"       { BEGIN(0); }
+<COMMENT>.          { ; }
+
+"//"                { BEGIN(OTHER_COMMENT); }
+<OTHER_COMMENT>"\n"       { BEGIN(0); }
+<OTHER_COMMENT>.          { ; }
+
+"**"       { return DOUBLE_MULT; }
+"="        { return ASSIGN; }
+"+"        { return PLUS; }
+"-"        { return MINUS; }
+"*"        { return MULT; }
+"/"        { return DIV; }
+"%"        { return MOD; }
+"("        { return LPAREN; }
+")"        { return RPAREN; }
+":"        { return COLON; }
+","        { return COMMA; }
+"<"        { return LESS; }
+">"        { return GREAT; }
+"<="       { return LESSEQ; }
+">="       { return GREATEQ; }
+"=="       { return EQ; }
+"!="       { return NOTEQ; }
+"if"       { return IF; }
+"else"     { return ELSE; }
+"struct"     { return STRUCT; }
+"return"   { return RETURN; }
+"const"     {return CONST;}
+"["        { return LBRACKET; }
+"]"        { return RBRACKET; }
+"{"        { return LBRACE; }
+"}"        { return RBRACE; }
+"."        { return PERIOD; }
+";"        { return SEMICOLON; }
+
+{name}    {
+			yylval.name   = new char[strlen(yytext)+1];
+      yylval.name = new string(yytext);
+			return NAME; 
+		}
+
+{digits}   { 
+			yylval.ival = atoi(yytext);
+			return NUMBER; 
+		}
+"\n"       { ; }
+.          { ; }
+
+%%
+int yywrap() {
+  yylex_destroy();
+  return 1;
+}

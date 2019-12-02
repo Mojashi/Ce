@@ -1,13 +1,16 @@
 #include <iostream>
 #include "ast.h"
-#include "grammer.tab.h"
+#include "parse.tab.h"
 #include "CNF.h"
+
 shared_ptr<Structure> godStruct;
 shared_ptr<Variable> godVar;
 CNF cnf;
+BoolStructure boolStruct_;
+shared_ptr<Structure> boolStruct(boolStruct_);
 
 int main(){
-    yylex();
+    readProgram();
     godVar = godStruct->getInstance();
 
     std::cout << "Executing main function" << endl;

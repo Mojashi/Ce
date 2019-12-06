@@ -1,3 +1,4 @@
+%option noyywrap
 %{
 extern void yyerror(const char *s);
 extern void yyerror(const char *s, const char ch);
@@ -34,7 +35,6 @@ float       {digits}"."{digits}
 "%"        { return MOD; }
 "("        { return LPAREN; }
 ")"        { return RPAREN; }
-":"        { return COLON; }
 ","        { return COMMA; }
 "<"        { return LESS; }
 ">"        { return GREAT; }
@@ -53,10 +53,10 @@ float       {digits}"."{digits}
 "}"        { return RBRACE; }
 "."        { return PERIOD; }
 ";"        { return SEMICOLON; }
+<<EOF>>		{return ENDOFFILE;}
 
 {name}    {
-			yylval.name   = new char[strlen(yytext)+1];
-      yylval.name = new string(yytext);
+      		yylval.name = new string(yytext);
 			return NAME; 
 		}
 
@@ -64,11 +64,5 @@ float       {digits}"."{digits}
 			yylval.ival = atoi(yytext);
 			return NUMBER; 
 		}
-"\n"       { ; }
-.          { ; }
-
+.|"\n"         ;
 %%
-int yywrap() {
-  yylex_destroy();
-  return 1;
-}

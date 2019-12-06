@@ -124,41 +124,6 @@ public:
 
 		return { s,o };
 	}
-	Literal divTwo(vector<Literal> vars) {
-
-	}
-
-	vector<Literal> plus(vector<Literal> a, vector<Literal> b, int digit = 0) {
-		if (a.size() < b.size())
-			swap(a, b);
-
-		vector<int> ret(a.size() + 1);
-
-
-		b.resize(a.size(), None);
-
-		int carry = None;
-
-		REP(i, a.size()) {
-			pair<Literal, Literal> buf = fullAdder(a[i], b[i], carry);
-
-			carry = buf.second;
-			ret[i] = buf.first;
-		}
-		ret[ret.size() - 1] = carry;
-		return ret;
-	}
-
-	vector<Literal> sum(vector<Literal> vars, int digit = 0) {
-		vector<Literal> ret = { False };
-
-		for (auto itr : vars) {
-			ret = plus({ itr }, ret);
-		}
-
-		return ret;
-	}
-
 	void output(string filename) {
 		ofstream ofs(filename.c_str());
 
@@ -177,9 +142,10 @@ public:
 		output("cnf.dimacs");
 
 		//system("glucose-syrup -nthreads=2 cnf.dimacs out.txt");
-		system("\"..\\solver\\Maple\" cnf.dimacs out.txt");
 
-		ifstream ifs("out.txt");
+		system("Maple.exe cnf.dimacs result.txt > log.txt");
+
+		ifstream ifs("result.txt");
 
 		string aa;
 		ifs >> aa;

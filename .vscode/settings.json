@@ -10,7 +10,11 @@
         "string": "cpp",
         "iosfwd": "cpp",
         "map": "cpp",
-        "__tree": "cpp"
+        "__tree": "cpp",
+        "ostream": "cpp",
+        "iostream": "cpp",
+        "functional": "cpp",
+        "__functional_03": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

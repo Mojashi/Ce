@@ -1,0 +1,5 @@
+void main(){
+    Bool ar[3];
+    const(ar[1],ar[2]);
+    const(ar[0],ar[2]);
+}

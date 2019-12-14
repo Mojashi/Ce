@@ -1,8 +1,8 @@
 c This is MapleLCMDistChronoBT-DL.
 c ============================[ Problem Statistics ]=============================
 c |                                                                             |
-c |  Number of variables:             4                                         |
-c |  Number of clauses:               1                                         |
+c |  Number of variables:            10                                         |
+c |  Number of clauses:               0                                         |
 c |  Parse time:                   0.00 s                                       |
 c |  Eliminated clauses:           0.00 Mb                                      |
 c Reduced to 0 vars, 0 cls (grow=0)
@@ -19,10 +19,10 @@ c duplicate learnts_cnf : 0
 c duplicate learnts_min : 0
 c conflicts             : 0              (-nan /sec)
 c decisions             : 1              (0.00 % random) (inf /sec)
-c propagations          : 2              (inf /sec)
+c propagations          : 9              (inf /sec)
 c conflict literals     : 0              (-nan % deleted)
 c backtracks            : 0              (NCB -nan% , CB -nan%)
 c CPU time              : 0 s
 
 s SATISFIABLE
-v 1 2 -3 -4 0
+v 1 -2 3 4 5 6 7 8 9 10 0

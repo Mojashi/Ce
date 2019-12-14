@@ -4,8 +4,19 @@ Terminals unused in grammar
    ELSE
 
 
-状態 22 conflicts: 16 reduce/reduce
-状態 66 conflicts: 13 reduce/reduce
+状態 29 conflicts: 3 shift/reduce
+状態 53 conflicts: 3 shift/reduce
+状態 54 conflicts: 3 shift/reduce
+状態 55 conflicts: 3 shift/reduce
+状態 56 conflicts: 3 shift/reduce
+状態 57 conflicts: 3 shift/reduce
+状態 58 conflicts: 3 shift/reduce
+状態 59 conflicts: 3 shift/reduce
+状態 60 conflicts: 3 shift/reduce
+状態 61 conflicts: 3 shift/reduce
+状態 62 conflicts: 3 shift/reduce
+状態 63 conflicts: 3 shift/reduce
+状態 64 conflicts: 3 shift/reduce
 
 
 文法
@@ -23,88 +34,86 @@ Terminals unused in grammar
 
     7 structdef: STRUCT NAME LBRACE members RBRACE
 
-    8 ident: NAME
-    9      | ident PERIOD NAME
+    8 argument_list: NAME NAME
+    9              | NAME NAME COMMA argument_list
+   10              | %empty
 
-   10 argument_list: NAME NAME
-   11              | NAME NAME COMMA argument_list
-   12              | %empty
+   11 var_list: array_var
+   12         | var_list COMMA array_var
 
-   13 var_list: array_var
-   14         | var_list COMMA array_var
+   13 array_var: NAME
+   14          | array_var LBRACKET expr RBRACKET
 
-   15 array_var: NAME
-   16          | array_var LBRACKET expr RBRACKET
+   15 stmt: line stmt
+   16     | selection stmt
+   17     | %empty
 
-   17 stmt: line stmt
-   18     | selection stmt
-   19     | %empty
+   18 selection: IF LPAREN expr RPAREN LBRACE stmt RBRACE
 
-   20 selection: IF LPAREN expr RPAREN LBRACE stmt RBRACE
+   19 line: expr ASSIGN expr SEMICOLON
+   20     | CONST LPAREN expr_list RPAREN SEMICOLON
+   21     | RETURN expr SEMICOLON
+   22     | NAME var_list SEMICOLON
+   23     | expr SEMICOLON
 
-   21 line: ident ASSIGN expr SEMICOLON
-   22     | CONST LPAREN expr_list RPAREN SEMICOLON
-   23     | RETURN expr SEMICOLON
-   24     | NAME var_list SEMICOLON
-   25     | expr SEMICOLON
+   24 expr_list: expr
+   25          | expr_list COMMA expr
+   26          | %empty
 
-   26 expr_list: expr
-   27          | expr_list COMMA expr
-   28          | %empty
-
-   29 expr: expr PLUS expr
-   30     | expr MINUS expr
-   31     | expr MULT expr
-   32     | expr DOUBLE_MULT expr
-   33     | expr DIV expr
-   34     | expr MOD expr
-   35     | expr LESS expr
-   36     | expr LESSEQ expr
-   37     | expr GREAT expr
-   38     | expr GREATEQ expr
-   39     | expr EQ expr
-   40     | expr NOTEQ expr
-   41     | MINUS expr
-   42     | NUMBER
-   43     | ident LPAREN expr_list RPAREN
-   44     | ident
-   45     | array_var
+   27 expr: expr PLUS expr
+   28     | expr MINUS expr
+   29     | expr MULT expr
+   30     | expr DOUBLE_MULT expr
+   31     | expr DIV expr
+   32     | expr MOD expr
+   33     | expr LESS expr
+   34     | expr LESSEQ expr
+   35     | expr GREAT expr
+   36     | expr GREATEQ expr
+   37     | expr EQ expr
+   38     | expr NOTEQ expr
+   39     | MINUS expr
+   40     | NUMBER
+   41     | expr LPAREN expr_list RPAREN
+   42     | NAME
+   43     | expr PERIOD NAME
+   44     | expr LBRACKET expr RBRACKET
 
 
 出現位置の規則による終端
 
 $end (0) 0
 error (256)
-ASSIGN (258) 21
-NAME (259) 4 6 7 8 9 10 11 15 24
-NUMBER (260) 42
-LPAREN (261) 6 20 22 43
-RPAREN (262) 6 20 22 43
-IF (263) 20
-COMMA (264) 11 14 27
-RETURN (265) 23
-LBRACKET (266) 16
-RBRACKET (267) 16
-LBRACE (268) 6 7 20
-RBRACE (269) 6 7 20
+ASSIGN (258) 19
+NAME (259) 4 6 7 8 9 13 22 42 43
+NUMBER (260) 40
+LPAREN (261) 6 18 20 41
+RPAREN (262) 6 18 20 41
+IF (263) 18
+COMMA (264) 9 12 25
+RETURN (265) 21
+LBRACKET (266) 14 44
+RBRACKET (267) 14 44
+LBRACE (268) 6 7 18
+RBRACE (269) 6 7 18
 LOOP (270)
 STRUCT (271) 7
-SEMICOLON (272) 4 21 22 23 24 25
-PERIOD (273) 9
-CONST (274) 22
+SEMICOLON (272) 4 19 20 21 22 23
+PERIOD (273) 43
+CONST (274) 20
 ENDOFFILE (275) 1
-PLUS (276) 29
-MINUS (277) 30 41
-MULT (278) 31
-DIV (279) 33
-MOD (280) 34
-DOUBLE_MULT (281) 32
-LESS (282) 35
-LESSEQ (283) 36
-GREAT (284) 37
-GREATEQ (285) 38
-EQ (286) 39
-NOTEQ (287) 40
+PLUS (276) 27
+MINUS (277) 28 39
+MULT (278) 29
+DIV (279) 31
+MOD (280) 32
+DOUBLE_MULT (281) 30
+LESS (282) 33
+LESSEQ (283) 34
+GREAT (284) 35
+GREATEQ (285) 36
+EQ (286) 37
+NOTEQ (287) 38
 UMINUS (288)
 ELSE (289)
 
@@ -121,25 +130,24 @@ funcdef (38)
     左辺: 6, 右辺: 2
 structdef (39)
     左辺: 7, 右辺: 3
-ident (40)
-    左辺: 8 9, 右辺: 9 21 43 44
-argument_list (41)
-    左辺: 10 11 12, 右辺: 6 11
-var_list (42)
-    左辺: 13 14, 右辺: 4 14 24
-array_var (43)
-    左辺: 15 16, 右辺: 13 14 16 45
-stmt (44)
-    左辺: 17 18 19, 右辺: 6 17 18 20
-selection (45)
-    左辺: 20, 右辺: 18
-line (46)
-    左辺: 21 22 23 24 25, 右辺: 17
-expr_list (47)
-    左辺: 26 27 28, 右辺: 22 27 43
-expr (48)
-    左辺: 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45, 右辺:
-    16 20 21 23 25 26 27 29 30 31 32 33 34 35 36 37 38 39 40 41
+argument_list (40)
+    左辺: 8 9 10, 右辺: 6 9
+var_list (41)
+    左辺: 11 12, 右辺: 4 12 22
+array_var (42)
+    左辺: 13 14, 右辺: 11 12 14
+stmt (43)
+    左辺: 15 16 17, 右辺: 6 15 16 18
+selection (44)
+    左辺: 18, 右辺: 16
+line (45)
+    左辺: 19 20 21 22 23, 右辺: 15
+expr_list (46)
+    左辺: 24 25 26, 右辺: 20 25 41
+expr (47)
+    左辺: 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44,
+    右辺: 14 18 19 21 23 24 25 27 28 29 30 31 32 33 34 35 36 37 38
+    39 41 43 44
 
 
 State 0
@@ -192,10 +200,10 @@ State 4
 
     4 members: members NAME . var_list SEMICOLON
     6 funcdef: NAME . NAME LPAREN argument_list RPAREN LBRACE stmt RBRACE
-   13 var_list: . array_var
-   14         | . var_list COMMA array_var
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
+   11 var_list: . array_var
+   12         | . var_list COMMA array_var
+   13 array_var: . NAME
+   14          | . array_var LBRACKET expr RBRACKET
 
     NAME  shift, and go to state 9
 
@@ -234,17 +242,17 @@ State 8
 State 9
 
     6 funcdef: NAME NAME . LPAREN argument_list RPAREN LBRACE stmt RBRACE
-   15 array_var: NAME .  [COMMA, LBRACKET, SEMICOLON]
+   13 array_var: NAME .  [COMMA, LBRACKET, SEMICOLON]
 
     LPAREN  shift, and go to state 13
 
-    $default  reduce using rule 15 (array_var)
+    $default  reduce using rule 13 (array_var)
 
 
 State 10
 
     4 members: members NAME var_list . SEMICOLON
-   14 var_list: var_list . COMMA array_var
+   12 var_list: var_list . COMMA array_var
 
     COMMA      shift, and go to state 14
     SEMICOLON  shift, and go to state 15
@@ -252,12 +260,12 @@ State 10
 
 State 11
 
-   13 var_list: array_var .  [COMMA, SEMICOLON]
-   16 array_var: array_var . LBRACKET expr RBRACKET
+   11 var_list: array_var .  [COMMA, SEMICOLON]
+   14 array_var: array_var . LBRACKET expr RBRACKET
 
     LBRACKET  shift, and go to state 16
 
-    $default  reduce using rule 13 (var_list)
+    $default  reduce using rule 11 (var_list)
 
 
 State 12
@@ -270,22 +278,22 @@ State 12
 State 13
 
     6 funcdef: NAME NAME LPAREN . argument_list RPAREN LBRACE stmt RBRACE
-   10 argument_list: . NAME NAME
-   11              | . NAME NAME COMMA argument_list
-   12              | . %empty  [RPAREN]
+    8 argument_list: . NAME NAME
+    9              | . NAME NAME COMMA argument_list
+   10              | . %empty  [RPAREN]
 
     NAME  shift, and go to state 18
 
-    $default  reduce using rule 12 (argument_list)
+    $default  reduce using rule 10 (argument_list)
 
     argument_list  go to state 19
 
 
 State 14
 
-   14 var_list: var_list COMMA . array_var
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
+   12 var_list: var_list COMMA . array_var
+   13 array_var: . NAME
+   14          | . array_var LBRACKET expr RBRACKET
 
     NAME  shift, and go to state 20
 
@@ -301,36 +309,31 @@ State 15
 
 State 16
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   16          | array_var LBRACKET . expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   14 array_var: array_var LBRACKET . expr RBRACKET
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 27
+    expr  go to state 25
 
 
 State 17
@@ -343,177 +346,122 @@ State 17
 
     $default  reduce using rule 5 (members)
 
-    members  go to state 28
+    members  go to state 26
 
 
 State 18
 
-   10 argument_list: NAME . NAME
-   11              | NAME . NAME COMMA argument_list
+    8 argument_list: NAME . NAME
+    9              | NAME . NAME COMMA argument_list
 
-    NAME  shift, and go to state 29
+    NAME  shift, and go to state 27
 
 
 State 19
 
     6 funcdef: NAME NAME LPAREN argument_list . RPAREN LBRACE stmt RBRACE
 
-    RPAREN  shift, and go to state 30
+    RPAREN  shift, and go to state 28
 
 
 State 20
 
-   15 array_var: NAME .
+   13 array_var: NAME .
 
-    $default  reduce using rule 15 (array_var)
+    $default  reduce using rule 13 (array_var)
 
 
 State 21
 
-   14 var_list: var_list COMMA array_var .  [COMMA, SEMICOLON]
-   16 array_var: array_var . LBRACKET expr RBRACKET
+   12 var_list: var_list COMMA array_var .  [COMMA, SEMICOLON]
+   14 array_var: array_var . LBRACKET expr RBRACKET
 
     LBRACKET  shift, and go to state 16
 
-    $default  reduce using rule 14 (var_list)
+    $default  reduce using rule 12 (var_list)
 
 
 State 22
 
-    8 ident: NAME .  [LPAREN, RPAREN, COMMA, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   15 array_var: NAME .  [RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-
-    RPAREN       reduce using rule 8 (ident)
-    RPAREN       [reduce using rule 15 (array_var)]
-    COMMA        reduce using rule 8 (ident)
-    COMMA        [reduce using rule 15 (array_var)]
-    LBRACKET     reduce using rule 15 (array_var)
-    RBRACKET     reduce using rule 8 (ident)
-    RBRACKET     [reduce using rule 15 (array_var)]
-    SEMICOLON    reduce using rule 8 (ident)
-    SEMICOLON    [reduce using rule 15 (array_var)]
-    PLUS         reduce using rule 8 (ident)
-    PLUS         [reduce using rule 15 (array_var)]
-    MINUS        reduce using rule 8 (ident)
-    MINUS        [reduce using rule 15 (array_var)]
-    MULT         reduce using rule 8 (ident)
-    MULT         [reduce using rule 15 (array_var)]
-    DIV          reduce using rule 8 (ident)
-    DIV          [reduce using rule 15 (array_var)]
-    MOD          reduce using rule 8 (ident)
-    MOD          [reduce using rule 15 (array_var)]
-    DOUBLE_MULT  reduce using rule 8 (ident)
-    DOUBLE_MULT  [reduce using rule 15 (array_var)]
-    LESS         reduce using rule 8 (ident)
-    LESS         [reduce using rule 15 (array_var)]
-    LESSEQ       reduce using rule 8 (ident)
-    LESSEQ       [reduce using rule 15 (array_var)]
-    GREAT        reduce using rule 8 (ident)
-    GREAT        [reduce using rule 15 (array_var)]
-    GREATEQ      reduce using rule 8 (ident)
-    GREATEQ      [reduce using rule 15 (array_var)]
-    EQ           reduce using rule 8 (ident)
-    EQ           [reduce using rule 15 (array_var)]
-    NOTEQ        reduce using rule 8 (ident)
-    NOTEQ        [reduce using rule 15 (array_var)]
-    $default     reduce using rule 8 (ident)
-
-
-State 23
-
-   42 expr: NUMBER .
+   42 expr: NAME .
 
     $default  reduce using rule 42 (expr)
 
 
+State 23
+
+   40 expr: NUMBER .
+
+    $default  reduce using rule 40 (expr)
+
+
 State 24
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   41     | MINUS . expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   39     | MINUS . expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 31
+    expr  go to state 29
 
 
 State 25
 
-    9 ident: ident . PERIOD NAME
-   43 expr: ident . LPAREN expr_list RPAREN
-   44     | ident .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   14 array_var: array_var LBRACKET expr . RBRACKET
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    LPAREN  shift, and go to state 32
-    PERIOD  shift, and go to state 33
-
-    $default  reduce using rule 44 (expr)
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    RBRACKET     shift, and go to state 32
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
 
 State 26
-
-   16 array_var: array_var . LBRACKET expr RBRACKET
-   45 expr: array_var .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-
-    LBRACKET  shift, and go to state 16
-
-    $default  reduce using rule 45 (expr)
-
-
-State 27
-
-   16 array_var: array_var LBRACKET expr . RBRACKET
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
-
-    RBRACKET     shift, and go to state 34
-    PLUS         shift, and go to state 35
-    MINUS        shift, and go to state 36
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
-
-
-State 28
 
     2 members: members . funcdef
     3        | members . structdef
@@ -523,578 +471,549 @@ State 28
     7          | STRUCT NAME LBRACE members . RBRACE
 
     NAME    shift, and go to state 4
-    RBRACE  shift, and go to state 47
+    RBRACE  shift, and go to state 46
     STRUCT  shift, and go to state 5
 
     funcdef    go to state 7
     structdef  go to state 8
 
 
+State 27
+
+    8 argument_list: NAME NAME .  [RPAREN]
+    9              | NAME NAME . COMMA argument_list
+
+    COMMA  shift, and go to state 47
+
+    $default  reduce using rule 8 (argument_list)
+
+
+State 28
+
+    6 funcdef: NAME NAME LPAREN argument_list RPAREN . LBRACE stmt RBRACE
+
+    LBRACE  shift, and go to state 48
+
+
 State 29
 
-   10 argument_list: NAME NAME .  [RPAREN]
-   11              | NAME NAME . COMMA argument_list
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   39     | MINUS expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    COMMA  shift, and go to state 48
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
 
-    $default  reduce using rule 10 (argument_list)
+    LPAREN    [reduce using rule 39 (expr)]
+    LBRACKET  [reduce using rule 39 (expr)]
+    PERIOD    [reduce using rule 39 (expr)]
+    $default  reduce using rule 39 (expr)
+
+    Conflict between rule 39 and token PLUS resolved as reduce (PLUS < UMINUS).
+    Conflict between rule 39 and token MINUS resolved as reduce (MINUS < UMINUS).
+    Conflict between rule 39 and token MULT resolved as reduce (MULT < UMINUS).
+    Conflict between rule 39 and token DIV resolved as reduce (DIV < UMINUS).
+    Conflict between rule 39 and token MOD resolved as reduce (MOD < UMINUS).
+    Conflict between rule 39 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < UMINUS).
+    Conflict between rule 39 and token LESS resolved as reduce (LESS < UMINUS).
+    Conflict between rule 39 and token LESSEQ resolved as reduce (LESSEQ < UMINUS).
+    Conflict between rule 39 and token GREAT resolved as reduce (GREAT < UMINUS).
+    Conflict between rule 39 and token GREATEQ resolved as reduce (GREATEQ < UMINUS).
+    Conflict between rule 39 and token EQ resolved as reduce (EQ < UMINUS).
+    Conflict between rule 39 and token NOTEQ resolved as reduce (NOTEQ < UMINUS).
 
 
 State 30
 
-    6 funcdef: NAME NAME LPAREN argument_list RPAREN . LBRACE stmt RBRACE
-
-    LBRACE  shift, and go to state 49
-
-
-State 31
-
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
-   41     | MINUS expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-
-    $default  reduce using rule 41 (expr)
-
-    Conflict between rule 41 and token PLUS resolved as reduce (PLUS < UMINUS).
-    Conflict between rule 41 and token MINUS resolved as reduce (MINUS < UMINUS).
-    Conflict between rule 41 and token MULT resolved as reduce (MULT < UMINUS).
-    Conflict between rule 41 and token DIV resolved as reduce (DIV < UMINUS).
-    Conflict between rule 41 and token MOD resolved as reduce (MOD < UMINUS).
-    Conflict between rule 41 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < UMINUS).
-    Conflict between rule 41 and token LESS resolved as reduce (LESS < UMINUS).
-    Conflict between rule 41 and token LESSEQ resolved as reduce (LESSEQ < UMINUS).
-    Conflict between rule 41 and token GREAT resolved as reduce (GREAT < UMINUS).
-    Conflict between rule 41 and token GREATEQ resolved as reduce (GREATEQ < UMINUS).
-    Conflict between rule 41 and token EQ resolved as reduce (EQ < UMINUS).
-    Conflict between rule 41 and token NOTEQ resolved as reduce (NOTEQ < UMINUS).
-
-
-State 32
-
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   26 expr_list: . expr
-   27          | . expr_list COMMA expr
-   28          | . %empty  [RPAREN, COMMA]
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   43     | ident LPAREN . expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   24 expr_list: . expr
+   25          | . expr_list COMMA expr
+   26          | . %empty  [RPAREN, COMMA]
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   41     | expr LPAREN . expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    $default  reduce using rule 28 (expr_list)
+    $default  reduce using rule 26 (expr_list)
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr_list  go to state 50
-    expr       go to state 51
+    expr_list  go to state 49
+    expr       go to state 50
+
+
+State 31
+
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
+   44     | expr LBRACKET . expr RBRACKET
+
+    NAME    shift, and go to state 22
+    NUMBER  shift, and go to state 23
+    MINUS   shift, and go to state 24
+
+    expr  go to state 51
+
+
+State 32
+
+   14 array_var: array_var LBRACKET expr RBRACKET .
+
+    $default  reduce using rule 14 (array_var)
 
 
 State 33
 
-    9 ident: ident PERIOD . NAME
+   43 expr: expr PERIOD . NAME
 
     NAME  shift, and go to state 52
 
 
 State 34
 
-   16 array_var: array_var LBRACKET expr RBRACKET .
+   27 expr: . expr PLUS expr
+   27     | expr PLUS . expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
-    $default  reduce using rule 16 (array_var)
+    NAME    shift, and go to state 22
+    NUMBER  shift, and go to state 23
+    MINUS   shift, and go to state 24
+
+    expr  go to state 53
 
 
 State 35
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   29     | expr PLUS . expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   28     | expr MINUS . expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 53
+    expr  go to state 54
 
 
 State 36
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   30     | expr MINUS . expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   29     | expr MULT . expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 54
+    expr  go to state 55
 
 
 State 37
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   31     | expr MULT . expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   31     | expr DIV . expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 55
+    expr  go to state 56
 
 
 State 38
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   33     | expr DIV . expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   32     | expr MOD . expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 56
+    expr  go to state 57
 
 
 State 39
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   34     | expr MOD . expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   30     | expr DOUBLE_MULT . expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 57
+    expr  go to state 58
 
 
 State 40
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   32     | expr DOUBLE_MULT . expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   33     | expr LESS . expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 58
+    expr  go to state 59
 
 
 State 41
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   35     | expr LESS . expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   34     | expr LESSEQ . expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 59
+    expr  go to state 60
 
 
 State 42
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   36     | expr LESSEQ . expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   35     | expr GREAT . expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 60
+    expr  go to state 61
 
 
 State 43
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   37     | expr GREAT . expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   36     | expr GREATEQ . expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 61
+    expr  go to state 62
 
 
 State 44
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   38     | expr GREATEQ . expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   37     | expr EQ . expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 62
+    expr  go to state 63
 
 
 State 45
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   39     | expr EQ . expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   38     | expr NOTEQ . expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 63
+    expr  go to state 64
 
 
 State 46
-
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   40     | expr NOTEQ . expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
-
-    NAME    shift, and go to state 22
-    NUMBER  shift, and go to state 23
-    MINUS   shift, and go to state 24
-
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 64
-
-
-State 47
 
     7 structdef: STRUCT NAME LBRACE members RBRACE .
 
     $default  reduce using rule 7 (structdef)
 
 
-State 48
+State 47
 
-   10 argument_list: . NAME NAME
-   11              | . NAME NAME COMMA argument_list
-   11              | NAME NAME COMMA . argument_list
-   12              | . %empty  [RPAREN]
+    8 argument_list: . NAME NAME
+    9              | . NAME NAME COMMA argument_list
+    9              | NAME NAME COMMA . argument_list
+   10              | . %empty  [RPAREN]
 
     NAME  shift, and go to state 18
 
-    $default  reduce using rule 12 (argument_list)
+    $default  reduce using rule 10 (argument_list)
 
     argument_list  go to state 65
 
 
-State 49
+State 48
 
     6 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE . stmt RBRACE
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   17 stmt: . line stmt
-   18     | . selection stmt
-   19     | . %empty  [RBRACE]
-   20 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
-   21 line: . ident ASSIGN expr SEMICOLON
-   22     | . CONST LPAREN expr_list RPAREN SEMICOLON
-   23     | . RETURN expr SEMICOLON
-   24     | . NAME var_list SEMICOLON
-   25     | . expr SEMICOLON
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   15 stmt: . line stmt
+   16     | . selection stmt
+   17     | . %empty  [RBRACE]
+   18 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
+   19 line: . expr ASSIGN expr SEMICOLON
+   20     | . CONST LPAREN expr_list RPAREN SEMICOLON
+   21     | . RETURN expr SEMICOLON
+   22     | . NAME var_list SEMICOLON
+   23     | . expr SEMICOLON
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 66
     NUMBER  shift, and go to state 23
@@ -1103,333 +1022,522 @@ State 49
     CONST   shift, and go to state 69
     MINUS   shift, and go to state 24
 
-    $default  reduce using rule 19 (stmt)
+    $default  reduce using rule 17 (stmt)
 
-    ident      go to state 70
-    array_var  go to state 26
-    stmt       go to state 71
-    selection  go to state 72
-    line       go to state 73
-    expr       go to state 74
+    stmt       go to state 70
+    selection  go to state 71
+    line       go to state 72
+    expr       go to state 73
+
+
+State 49
+
+   25 expr_list: expr_list . COMMA expr
+   41 expr: expr LPAREN expr_list . RPAREN
+
+    RPAREN  shift, and go to state 74
+    COMMA   shift, and go to state 75
 
 
 State 50
 
-   27 expr_list: expr_list . COMMA expr
-   43 expr: ident LPAREN expr_list . RPAREN
+   24 expr_list: expr .  [RPAREN, COMMA]
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    RPAREN  shift, and go to state 75
-    COMMA   shift, and go to state 76
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
+
+    $default  reduce using rule 24 (expr_list)
 
 
 State 51
 
-   26 expr_list: expr .  [RPAREN, COMMA]
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
+   44     | expr LBRACKET expr . RBRACKET
 
-    PLUS         shift, and go to state 35
-    MINUS        shift, and go to state 36
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
-
-    $default  reduce using rule 26 (expr_list)
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    RBRACKET     shift, and go to state 76
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
 
 State 52
 
-    9 ident: ident PERIOD NAME .
+   43 expr: expr PERIOD NAME .
 
-    $default  reduce using rule 9 (ident)
+    $default  reduce using rule 43 (expr)
 
 
 State 53
 
-   29 expr: expr . PLUS expr
-   29     | expr PLUS expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS]
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   27     | expr PLUS expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS]
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
-    $default  reduce using rule 29 (expr)
+    LPAREN    [reduce using rule 27 (expr)]
+    LBRACKET  [reduce using rule 27 (expr)]
+    PERIOD    [reduce using rule 27 (expr)]
+    $default  reduce using rule 27 (expr)
 
-    Conflict between rule 29 and token PLUS resolved as reduce (%left PLUS).
-    Conflict between rule 29 and token MINUS resolved as reduce (%left MINUS).
-    Conflict between rule 29 and token MULT resolved as shift (PLUS < MULT).
-    Conflict between rule 29 and token DIV resolved as shift (PLUS < DIV).
-    Conflict between rule 29 and token MOD resolved as shift (PLUS < MOD).
-    Conflict between rule 29 and token DOUBLE_MULT resolved as shift (PLUS < DOUBLE_MULT).
-    Conflict between rule 29 and token LESS resolved as shift (PLUS < LESS).
-    Conflict between rule 29 and token LESSEQ resolved as shift (PLUS < LESSEQ).
-    Conflict between rule 29 and token GREAT resolved as shift (PLUS < GREAT).
-    Conflict between rule 29 and token GREATEQ resolved as shift (PLUS < GREATEQ).
-    Conflict between rule 29 and token EQ resolved as shift (PLUS < EQ).
-    Conflict between rule 29 and token NOTEQ resolved as shift (PLUS < NOTEQ).
+    Conflict between rule 27 and token PLUS resolved as reduce (%left PLUS).
+    Conflict between rule 27 and token MINUS resolved as reduce (%left MINUS).
+    Conflict between rule 27 and token MULT resolved as shift (PLUS < MULT).
+    Conflict between rule 27 and token DIV resolved as shift (PLUS < DIV).
+    Conflict between rule 27 and token MOD resolved as shift (PLUS < MOD).
+    Conflict between rule 27 and token DOUBLE_MULT resolved as shift (PLUS < DOUBLE_MULT).
+    Conflict between rule 27 and token LESS resolved as shift (PLUS < LESS).
+    Conflict between rule 27 and token LESSEQ resolved as shift (PLUS < LESSEQ).
+    Conflict between rule 27 and token GREAT resolved as shift (PLUS < GREAT).
+    Conflict between rule 27 and token GREATEQ resolved as shift (PLUS < GREATEQ).
+    Conflict between rule 27 and token EQ resolved as shift (PLUS < EQ).
+    Conflict between rule 27 and token NOTEQ resolved as shift (PLUS < NOTEQ).
 
 
 State 54
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   30     | expr MINUS expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS]
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   28     | expr MINUS expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS]
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
-    $default  reduce using rule 30 (expr)
+    LPAREN    [reduce using rule 28 (expr)]
+    LBRACKET  [reduce using rule 28 (expr)]
+    PERIOD    [reduce using rule 28 (expr)]
+    $default  reduce using rule 28 (expr)
 
-    Conflict between rule 30 and token PLUS resolved as reduce (%left PLUS).
-    Conflict between rule 30 and token MINUS resolved as reduce (%left MINUS).
-    Conflict between rule 30 and token MULT resolved as shift (MINUS < MULT).
-    Conflict between rule 30 and token DIV resolved as shift (MINUS < DIV).
-    Conflict between rule 30 and token MOD resolved as shift (MINUS < MOD).
-    Conflict between rule 30 and token DOUBLE_MULT resolved as shift (MINUS < DOUBLE_MULT).
-    Conflict between rule 30 and token LESS resolved as shift (MINUS < LESS).
-    Conflict between rule 30 and token LESSEQ resolved as shift (MINUS < LESSEQ).
-    Conflict between rule 30 and token GREAT resolved as shift (MINUS < GREAT).
-    Conflict between rule 30 and token GREATEQ resolved as shift (MINUS < GREATEQ).
-    Conflict between rule 30 and token EQ resolved as shift (MINUS < EQ).
-    Conflict between rule 30 and token NOTEQ resolved as shift (MINUS < NOTEQ).
+    Conflict between rule 28 and token PLUS resolved as reduce (%left PLUS).
+    Conflict between rule 28 and token MINUS resolved as reduce (%left MINUS).
+    Conflict between rule 28 and token MULT resolved as shift (MINUS < MULT).
+    Conflict between rule 28 and token DIV resolved as shift (MINUS < DIV).
+    Conflict between rule 28 and token MOD resolved as shift (MINUS < MOD).
+    Conflict between rule 28 and token DOUBLE_MULT resolved as shift (MINUS < DOUBLE_MULT).
+    Conflict between rule 28 and token LESS resolved as shift (MINUS < LESS).
+    Conflict between rule 28 and token LESSEQ resolved as shift (MINUS < LESSEQ).
+    Conflict between rule 28 and token GREAT resolved as shift (MINUS < GREAT).
+    Conflict between rule 28 and token GREATEQ resolved as shift (MINUS < GREATEQ).
+    Conflict between rule 28 and token EQ resolved as shift (MINUS < EQ).
+    Conflict between rule 28 and token NOTEQ resolved as shift (MINUS < NOTEQ).
 
 
 State 55
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   31     | expr MULT expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD]
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   29     | expr MULT expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD]
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
-    $default  reduce using rule 31 (expr)
+    LPAREN    [reduce using rule 29 (expr)]
+    LBRACKET  [reduce using rule 29 (expr)]
+    PERIOD    [reduce using rule 29 (expr)]
+    $default  reduce using rule 29 (expr)
 
-    Conflict between rule 31 and token PLUS resolved as reduce (PLUS < MULT).
-    Conflict between rule 31 and token MINUS resolved as reduce (MINUS < MULT).
-    Conflict between rule 31 and token MULT resolved as reduce (%left MULT).
-    Conflict between rule 31 and token DIV resolved as reduce (%left DIV).
-    Conflict between rule 31 and token MOD resolved as reduce (%left MOD).
-    Conflict between rule 31 and token DOUBLE_MULT resolved as shift (MULT < DOUBLE_MULT).
-    Conflict between rule 31 and token LESS resolved as shift (MULT < LESS).
-    Conflict between rule 31 and token LESSEQ resolved as shift (MULT < LESSEQ).
-    Conflict between rule 31 and token GREAT resolved as shift (MULT < GREAT).
-    Conflict between rule 31 and token GREATEQ resolved as shift (MULT < GREATEQ).
-    Conflict between rule 31 and token EQ resolved as shift (MULT < EQ).
-    Conflict between rule 31 and token NOTEQ resolved as shift (MULT < NOTEQ).
+    Conflict between rule 29 and token PLUS resolved as reduce (PLUS < MULT).
+    Conflict between rule 29 and token MINUS resolved as reduce (MINUS < MULT).
+    Conflict between rule 29 and token MULT resolved as reduce (%left MULT).
+    Conflict between rule 29 and token DIV resolved as reduce (%left DIV).
+    Conflict between rule 29 and token MOD resolved as reduce (%left MOD).
+    Conflict between rule 29 and token DOUBLE_MULT resolved as shift (MULT < DOUBLE_MULT).
+    Conflict between rule 29 and token LESS resolved as shift (MULT < LESS).
+    Conflict between rule 29 and token LESSEQ resolved as shift (MULT < LESSEQ).
+    Conflict between rule 29 and token GREAT resolved as shift (MULT < GREAT).
+    Conflict between rule 29 and token GREATEQ resolved as shift (MULT < GREATEQ).
+    Conflict between rule 29 and token EQ resolved as shift (MULT < EQ).
+    Conflict between rule 29 and token NOTEQ resolved as shift (MULT < NOTEQ).
 
 
 State 56
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   33     | expr DIV expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD]
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   31     | expr DIV expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD]
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
-    $default  reduce using rule 33 (expr)
+    LPAREN    [reduce using rule 31 (expr)]
+    LBRACKET  [reduce using rule 31 (expr)]
+    PERIOD    [reduce using rule 31 (expr)]
+    $default  reduce using rule 31 (expr)
 
-    Conflict between rule 33 and token PLUS resolved as reduce (PLUS < DIV).
-    Conflict between rule 33 and token MINUS resolved as reduce (MINUS < DIV).
-    Conflict between rule 33 and token MULT resolved as reduce (%left MULT).
-    Conflict between rule 33 and token DIV resolved as reduce (%left DIV).
-    Conflict between rule 33 and token MOD resolved as reduce (%left MOD).
-    Conflict between rule 33 and token DOUBLE_MULT resolved as shift (DIV < DOUBLE_MULT).
-    Conflict between rule 33 and token LESS resolved as shift (DIV < LESS).
-    Conflict between rule 33 and token LESSEQ resolved as shift (DIV < LESSEQ).
-    Conflict between rule 33 and token GREAT resolved as shift (DIV < GREAT).
-    Conflict between rule 33 and token GREATEQ resolved as shift (DIV < GREATEQ).
-    Conflict between rule 33 and token EQ resolved as shift (DIV < EQ).
-    Conflict between rule 33 and token NOTEQ resolved as shift (DIV < NOTEQ).
+    Conflict between rule 31 and token PLUS resolved as reduce (PLUS < DIV).
+    Conflict between rule 31 and token MINUS resolved as reduce (MINUS < DIV).
+    Conflict between rule 31 and token MULT resolved as reduce (%left MULT).
+    Conflict between rule 31 and token DIV resolved as reduce (%left DIV).
+    Conflict between rule 31 and token MOD resolved as reduce (%left MOD).
+    Conflict between rule 31 and token DOUBLE_MULT resolved as shift (DIV < DOUBLE_MULT).
+    Conflict between rule 31 and token LESS resolved as shift (DIV < LESS).
+    Conflict between rule 31 and token LESSEQ resolved as shift (DIV < LESSEQ).
+    Conflict between rule 31 and token GREAT resolved as shift (DIV < GREAT).
+    Conflict between rule 31 and token GREATEQ resolved as shift (DIV < GREATEQ).
+    Conflict between rule 31 and token EQ resolved as shift (DIV < EQ).
+    Conflict between rule 31 and token NOTEQ resolved as shift (DIV < NOTEQ).
 
 
 State 57
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   34     | expr MOD expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD]
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   32     | expr MOD expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD]
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
-    $default  reduce using rule 34 (expr)
+    LPAREN    [reduce using rule 32 (expr)]
+    LBRACKET  [reduce using rule 32 (expr)]
+    PERIOD    [reduce using rule 32 (expr)]
+    $default  reduce using rule 32 (expr)
 
-    Conflict between rule 34 and token PLUS resolved as reduce (PLUS < MOD).
-    Conflict between rule 34 and token MINUS resolved as reduce (MINUS < MOD).
-    Conflict between rule 34 and token MULT resolved as reduce (%left MULT).
-    Conflict between rule 34 and token DIV resolved as reduce (%left DIV).
-    Conflict between rule 34 and token MOD resolved as reduce (%left MOD).
-    Conflict between rule 34 and token DOUBLE_MULT resolved as shift (MOD < DOUBLE_MULT).
-    Conflict between rule 34 and token LESS resolved as shift (MOD < LESS).
-    Conflict between rule 34 and token LESSEQ resolved as shift (MOD < LESSEQ).
-    Conflict between rule 34 and token GREAT resolved as shift (MOD < GREAT).
-    Conflict between rule 34 and token GREATEQ resolved as shift (MOD < GREATEQ).
-    Conflict between rule 34 and token EQ resolved as shift (MOD < EQ).
-    Conflict between rule 34 and token NOTEQ resolved as shift (MOD < NOTEQ).
+    Conflict between rule 32 and token PLUS resolved as reduce (PLUS < MOD).
+    Conflict between rule 32 and token MINUS resolved as reduce (MINUS < MOD).
+    Conflict between rule 32 and token MULT resolved as reduce (%left MULT).
+    Conflict between rule 32 and token DIV resolved as reduce (%left DIV).
+    Conflict between rule 32 and token MOD resolved as reduce (%left MOD).
+    Conflict between rule 32 and token DOUBLE_MULT resolved as shift (MOD < DOUBLE_MULT).
+    Conflict between rule 32 and token LESS resolved as shift (MOD < LESS).
+    Conflict between rule 32 and token LESSEQ resolved as shift (MOD < LESSEQ).
+    Conflict between rule 32 and token GREAT resolved as shift (MOD < GREAT).
+    Conflict between rule 32 and token GREATEQ resolved as shift (MOD < GREATEQ).
+    Conflict between rule 32 and token EQ resolved as shift (MOD < EQ).
+    Conflict between rule 32 and token NOTEQ resolved as shift (MOD < NOTEQ).
 
 
 State 58
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   32     | expr DOUBLE_MULT expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT]
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   30     | expr DOUBLE_MULT expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT]
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    LESS     shift, and go to state 41
-    LESSEQ   shift, and go to state 42
-    GREAT    shift, and go to state 43
-    GREATEQ  shift, and go to state 44
-    EQ       shift, and go to state 45
-    NOTEQ    shift, and go to state 46
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
+    LESS      shift, and go to state 40
+    LESSEQ    shift, and go to state 41
+    GREAT     shift, and go to state 42
+    GREATEQ   shift, and go to state 43
+    EQ        shift, and go to state 44
+    NOTEQ     shift, and go to state 45
 
-    $default  reduce using rule 32 (expr)
+    LPAREN    [reduce using rule 30 (expr)]
+    LBRACKET  [reduce using rule 30 (expr)]
+    PERIOD    [reduce using rule 30 (expr)]
+    $default  reduce using rule 30 (expr)
 
-    Conflict between rule 32 and token PLUS resolved as reduce (PLUS < DOUBLE_MULT).
-    Conflict between rule 32 and token MINUS resolved as reduce (MINUS < DOUBLE_MULT).
-    Conflict between rule 32 and token MULT resolved as reduce (MULT < DOUBLE_MULT).
-    Conflict between rule 32 and token DIV resolved as reduce (DIV < DOUBLE_MULT).
-    Conflict between rule 32 and token MOD resolved as reduce (MOD < DOUBLE_MULT).
-    Conflict between rule 32 and token DOUBLE_MULT resolved as reduce (%left DOUBLE_MULT).
-    Conflict between rule 32 and token LESS resolved as shift (DOUBLE_MULT < LESS).
-    Conflict between rule 32 and token LESSEQ resolved as shift (DOUBLE_MULT < LESSEQ).
-    Conflict between rule 32 and token GREAT resolved as shift (DOUBLE_MULT < GREAT).
-    Conflict between rule 32 and token GREATEQ resolved as shift (DOUBLE_MULT < GREATEQ).
-    Conflict between rule 32 and token EQ resolved as shift (DOUBLE_MULT < EQ).
-    Conflict between rule 32 and token NOTEQ resolved as shift (DOUBLE_MULT < NOTEQ).
+    Conflict between rule 30 and token PLUS resolved as reduce (PLUS < DOUBLE_MULT).
+    Conflict between rule 30 and token MINUS resolved as reduce (MINUS < DOUBLE_MULT).
+    Conflict between rule 30 and token MULT resolved as reduce (MULT < DOUBLE_MULT).
+    Conflict between rule 30 and token DIV resolved as reduce (DIV < DOUBLE_MULT).
+    Conflict between rule 30 and token MOD resolved as reduce (MOD < DOUBLE_MULT).
+    Conflict between rule 30 and token DOUBLE_MULT resolved as reduce (%left DOUBLE_MULT).
+    Conflict between rule 30 and token LESS resolved as shift (DOUBLE_MULT < LESS).
+    Conflict between rule 30 and token LESSEQ resolved as shift (DOUBLE_MULT < LESSEQ).
+    Conflict between rule 30 and token GREAT resolved as shift (DOUBLE_MULT < GREAT).
+    Conflict between rule 30 and token GREATEQ resolved as shift (DOUBLE_MULT < GREATEQ).
+    Conflict between rule 30 and token EQ resolved as shift (DOUBLE_MULT < EQ).
+    Conflict between rule 30 and token NOTEQ resolved as shift (DOUBLE_MULT < NOTEQ).
 
 
 State 59
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   35     | expr LESS expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   33     | expr LESS expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
+
+    LPAREN    [reduce using rule 33 (expr)]
+    LBRACKET  [reduce using rule 33 (expr)]
+    PERIOD    [reduce using rule 33 (expr)]
+    $default  reduce using rule 33 (expr)
+
+    Conflict between rule 33 and token PLUS resolved as reduce (PLUS < LESS).
+    Conflict between rule 33 and token MINUS resolved as reduce (MINUS < LESS).
+    Conflict between rule 33 and token MULT resolved as reduce (MULT < LESS).
+    Conflict between rule 33 and token DIV resolved as reduce (DIV < LESS).
+    Conflict between rule 33 and token MOD resolved as reduce (MOD < LESS).
+    Conflict between rule 33 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < LESS).
+    Conflict between rule 33 and token LESS resolved as reduce (%left LESS).
+    Conflict between rule 33 and token LESSEQ resolved as reduce (%left LESSEQ).
+    Conflict between rule 33 and token GREAT resolved as reduce (%left GREAT).
+    Conflict between rule 33 and token GREATEQ resolved as reduce (%left GREATEQ).
+    Conflict between rule 33 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 33 and token NOTEQ resolved as reduce (%left NOTEQ).
+
+
+State 60
+
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   34     | expr LESSEQ expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
+
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
+
+    LPAREN    [reduce using rule 34 (expr)]
+    LBRACKET  [reduce using rule 34 (expr)]
+    PERIOD    [reduce using rule 34 (expr)]
+    $default  reduce using rule 34 (expr)
+
+    Conflict between rule 34 and token PLUS resolved as reduce (PLUS < LESSEQ).
+    Conflict between rule 34 and token MINUS resolved as reduce (MINUS < LESSEQ).
+    Conflict between rule 34 and token MULT resolved as reduce (MULT < LESSEQ).
+    Conflict between rule 34 and token DIV resolved as reduce (DIV < LESSEQ).
+    Conflict between rule 34 and token MOD resolved as reduce (MOD < LESSEQ).
+    Conflict between rule 34 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < LESSEQ).
+    Conflict between rule 34 and token LESS resolved as reduce (%left LESS).
+    Conflict between rule 34 and token LESSEQ resolved as reduce (%left LESSEQ).
+    Conflict between rule 34 and token GREAT resolved as reduce (%left GREAT).
+    Conflict between rule 34 and token GREATEQ resolved as reduce (%left GREATEQ).
+    Conflict between rule 34 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 34 and token NOTEQ resolved as reduce (%left NOTEQ).
+
+
+State 61
+
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   35     | expr GREAT expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
+
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
+
+    LPAREN    [reduce using rule 35 (expr)]
+    LBRACKET  [reduce using rule 35 (expr)]
+    PERIOD    [reduce using rule 35 (expr)]
     $default  reduce using rule 35 (expr)
 
-    Conflict between rule 35 and token PLUS resolved as reduce (PLUS < LESS).
-    Conflict between rule 35 and token MINUS resolved as reduce (MINUS < LESS).
-    Conflict between rule 35 and token MULT resolved as reduce (MULT < LESS).
-    Conflict between rule 35 and token DIV resolved as reduce (DIV < LESS).
-    Conflict between rule 35 and token MOD resolved as reduce (MOD < LESS).
-    Conflict between rule 35 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < LESS).
+    Conflict between rule 35 and token PLUS resolved as reduce (PLUS < GREAT).
+    Conflict between rule 35 and token MINUS resolved as reduce (MINUS < GREAT).
+    Conflict between rule 35 and token MULT resolved as reduce (MULT < GREAT).
+    Conflict between rule 35 and token DIV resolved as reduce (DIV < GREAT).
+    Conflict between rule 35 and token MOD resolved as reduce (MOD < GREAT).
+    Conflict between rule 35 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < GREAT).
     Conflict between rule 35 and token LESS resolved as reduce (%left LESS).
     Conflict between rule 35 and token LESSEQ resolved as reduce (%left LESSEQ).
     Conflict between rule 35 and token GREAT resolved as reduce (%left GREAT).
@@ -1438,30 +1546,40 @@ State 59
     Conflict between rule 35 and token NOTEQ resolved as reduce (%left NOTEQ).
 
 
-State 60
+State 62
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   36     | expr LESSEQ expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   36     | expr GREATEQ expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
+
+    LPAREN    [reduce using rule 36 (expr)]
+    LBRACKET  [reduce using rule 36 (expr)]
+    PERIOD    [reduce using rule 36 (expr)]
     $default  reduce using rule 36 (expr)
 
-    Conflict between rule 36 and token PLUS resolved as reduce (PLUS < LESSEQ).
-    Conflict between rule 36 and token MINUS resolved as reduce (MINUS < LESSEQ).
-    Conflict between rule 36 and token MULT resolved as reduce (MULT < LESSEQ).
-    Conflict between rule 36 and token DIV resolved as reduce (DIV < LESSEQ).
-    Conflict between rule 36 and token MOD resolved as reduce (MOD < LESSEQ).
-    Conflict between rule 36 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < LESSEQ).
+    Conflict between rule 36 and token PLUS resolved as reduce (PLUS < GREATEQ).
+    Conflict between rule 36 and token MINUS resolved as reduce (MINUS < GREATEQ).
+    Conflict between rule 36 and token MULT resolved as reduce (MULT < GREATEQ).
+    Conflict between rule 36 and token DIV resolved as reduce (DIV < GREATEQ).
+    Conflict between rule 36 and token MOD resolved as reduce (MOD < GREATEQ).
+    Conflict between rule 36 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < GREATEQ).
     Conflict between rule 36 and token LESS resolved as reduce (%left LESS).
     Conflict between rule 36 and token LESSEQ resolved as reduce (%left LESSEQ).
     Conflict between rule 36 and token GREAT resolved as reduce (%left GREAT).
@@ -1470,30 +1588,40 @@ State 60
     Conflict between rule 36 and token NOTEQ resolved as reduce (%left NOTEQ).
 
 
-State 61
+State 63
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   37     | expr GREAT expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   37     | expr EQ expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
+
+    LPAREN    [reduce using rule 37 (expr)]
+    LBRACKET  [reduce using rule 37 (expr)]
+    PERIOD    [reduce using rule 37 (expr)]
     $default  reduce using rule 37 (expr)
 
-    Conflict between rule 37 and token PLUS resolved as reduce (PLUS < GREAT).
-    Conflict between rule 37 and token MINUS resolved as reduce (MINUS < GREAT).
-    Conflict between rule 37 and token MULT resolved as reduce (MULT < GREAT).
-    Conflict between rule 37 and token DIV resolved as reduce (DIV < GREAT).
-    Conflict between rule 37 and token MOD resolved as reduce (MOD < GREAT).
-    Conflict between rule 37 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < GREAT).
+    Conflict between rule 37 and token PLUS resolved as reduce (PLUS < EQ).
+    Conflict between rule 37 and token MINUS resolved as reduce (MINUS < EQ).
+    Conflict between rule 37 and token MULT resolved as reduce (MULT < EQ).
+    Conflict between rule 37 and token DIV resolved as reduce (DIV < EQ).
+    Conflict between rule 37 and token MOD resolved as reduce (MOD < EQ).
+    Conflict between rule 37 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < EQ).
     Conflict between rule 37 and token LESS resolved as reduce (%left LESS).
     Conflict between rule 37 and token LESSEQ resolved as reduce (%left LESSEQ).
     Conflict between rule 37 and token GREAT resolved as reduce (%left GREAT).
@@ -1502,30 +1630,40 @@ State 61
     Conflict between rule 37 and token NOTEQ resolved as reduce (%left NOTEQ).
 
 
-State 62
+State 64
 
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   38     | expr GREATEQ expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   38     | expr NOTEQ expr .  [ASSIGN, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
+    LPAREN    shift, and go to state 30
+    LBRACKET  shift, and go to state 31
+    PERIOD    shift, and go to state 33
+
+    LPAREN    [reduce using rule 38 (expr)]
+    LBRACKET  [reduce using rule 38 (expr)]
+    PERIOD    [reduce using rule 38 (expr)]
     $default  reduce using rule 38 (expr)
 
-    Conflict between rule 38 and token PLUS resolved as reduce (PLUS < GREATEQ).
-    Conflict between rule 38 and token MINUS resolved as reduce (MINUS < GREATEQ).
-    Conflict between rule 38 and token MULT resolved as reduce (MULT < GREATEQ).
-    Conflict between rule 38 and token DIV resolved as reduce (DIV < GREATEQ).
-    Conflict between rule 38 and token MOD resolved as reduce (MOD < GREATEQ).
-    Conflict between rule 38 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < GREATEQ).
+    Conflict between rule 38 and token PLUS resolved as reduce (PLUS < NOTEQ).
+    Conflict between rule 38 and token MINUS resolved as reduce (MINUS < NOTEQ).
+    Conflict between rule 38 and token MULT resolved as reduce (MULT < NOTEQ).
+    Conflict between rule 38 and token DIV resolved as reduce (DIV < NOTEQ).
+    Conflict between rule 38 and token MOD resolved as reduce (MOD < NOTEQ).
+    Conflict between rule 38 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < NOTEQ).
     Conflict between rule 38 and token LESS resolved as reduce (%left LESS).
     Conflict between rule 38 and token LESSEQ resolved as reduce (%left LESSEQ).
     Conflict between rule 38 and token GREAT resolved as reduce (%left GREAT).
@@ -1534,117 +1672,25 @@ State 62
     Conflict between rule 38 and token NOTEQ resolved as reduce (%left NOTEQ).
 
 
-State 63
-
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   39     | expr EQ expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   40     | expr . NOTEQ expr
-
-    $default  reduce using rule 39 (expr)
-
-    Conflict between rule 39 and token PLUS resolved as reduce (PLUS < EQ).
-    Conflict between rule 39 and token MINUS resolved as reduce (MINUS < EQ).
-    Conflict between rule 39 and token MULT resolved as reduce (MULT < EQ).
-    Conflict between rule 39 and token DIV resolved as reduce (DIV < EQ).
-    Conflict between rule 39 and token MOD resolved as reduce (MOD < EQ).
-    Conflict between rule 39 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < EQ).
-    Conflict between rule 39 and token LESS resolved as reduce (%left LESS).
-    Conflict between rule 39 and token LESSEQ resolved as reduce (%left LESSEQ).
-    Conflict between rule 39 and token GREAT resolved as reduce (%left GREAT).
-    Conflict between rule 39 and token GREATEQ resolved as reduce (%left GREATEQ).
-    Conflict between rule 39 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 39 and token NOTEQ resolved as reduce (%left NOTEQ).
-
-
-State 64
-
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
-   40     | expr NOTEQ expr .  [RPAREN, COMMA, RBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-
-    $default  reduce using rule 40 (expr)
-
-    Conflict between rule 40 and token PLUS resolved as reduce (PLUS < NOTEQ).
-    Conflict between rule 40 and token MINUS resolved as reduce (MINUS < NOTEQ).
-    Conflict between rule 40 and token MULT resolved as reduce (MULT < NOTEQ).
-    Conflict between rule 40 and token DIV resolved as reduce (DIV < NOTEQ).
-    Conflict between rule 40 and token MOD resolved as reduce (MOD < NOTEQ).
-    Conflict between rule 40 and token DOUBLE_MULT resolved as reduce (DOUBLE_MULT < NOTEQ).
-    Conflict between rule 40 and token LESS resolved as reduce (%left LESS).
-    Conflict between rule 40 and token LESSEQ resolved as reduce (%left LESSEQ).
-    Conflict between rule 40 and token GREAT resolved as reduce (%left GREAT).
-    Conflict between rule 40 and token GREATEQ resolved as reduce (%left GREATEQ).
-    Conflict between rule 40 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 40 and token NOTEQ resolved as reduce (%left NOTEQ).
-
-
 State 65
 
-   11 argument_list: NAME NAME COMMA argument_list .
+    9 argument_list: NAME NAME COMMA argument_list .
 
-    $default  reduce using rule 11 (argument_list)
+    $default  reduce using rule 9 (argument_list)
 
 
 State 66
 
-    8 ident: NAME .  [ASSIGN, LPAREN, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   13 var_list: . array_var
-   14         | . var_list COMMA array_var
-   15 array_var: . NAME
-   15          | NAME .  [LBRACKET, SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
-   16          | . array_var LBRACKET expr RBRACKET
-   24 line: NAME . var_list SEMICOLON
+   11 var_list: . array_var
+   12         | . var_list COMMA array_var
+   13 array_var: . NAME
+   14          | . array_var LBRACKET expr RBRACKET
+   22 line: NAME . var_list SEMICOLON
+   42 expr: NAME .  [ASSIGN, LPAREN, LBRACKET, SEMICOLON, PERIOD, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
 
     NAME  shift, and go to state 20
 
-    LBRACKET     reduce using rule 15 (array_var)
-    SEMICOLON    reduce using rule 8 (ident)
-    SEMICOLON    [reduce using rule 15 (array_var)]
-    PLUS         reduce using rule 8 (ident)
-    PLUS         [reduce using rule 15 (array_var)]
-    MINUS        reduce using rule 8 (ident)
-    MINUS        [reduce using rule 15 (array_var)]
-    MULT         reduce using rule 8 (ident)
-    MULT         [reduce using rule 15 (array_var)]
-    DIV          reduce using rule 8 (ident)
-    DIV          [reduce using rule 15 (array_var)]
-    MOD          reduce using rule 8 (ident)
-    MOD          [reduce using rule 15 (array_var)]
-    DOUBLE_MULT  reduce using rule 8 (ident)
-    DOUBLE_MULT  [reduce using rule 15 (array_var)]
-    LESS         reduce using rule 8 (ident)
-    LESS         [reduce using rule 15 (array_var)]
-    LESSEQ       reduce using rule 8 (ident)
-    LESSEQ       [reduce using rule 15 (array_var)]
-    GREAT        reduce using rule 8 (ident)
-    GREAT        [reduce using rule 15 (array_var)]
-    GREATEQ      reduce using rule 8 (ident)
-    GREATEQ      [reduce using rule 15 (array_var)]
-    EQ           reduce using rule 8 (ident)
-    EQ           [reduce using rule 15 (array_var)]
-    NOTEQ        reduce using rule 8 (ident)
-    NOTEQ        [reduce using rule 15 (array_var)]
-    $default     reduce using rule 8 (ident)
+    $default  reduce using rule 42 (expr)
 
     var_list   go to state 77
     array_var  go to state 11
@@ -1652,106 +1698,130 @@ State 66
 
 State 67
 
-   20 selection: IF . LPAREN expr RPAREN LBRACE stmt RBRACE
+   18 selection: IF . LPAREN expr RPAREN LBRACE stmt RBRACE
 
     LPAREN  shift, and go to state 78
 
 
 State 68
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   23 line: RETURN . expr SEMICOLON
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   21 line: RETURN . expr SEMICOLON
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 79
+    expr  go to state 79
 
 
 State 69
 
-   22 line: CONST . LPAREN expr_list RPAREN SEMICOLON
+   20 line: CONST . LPAREN expr_list RPAREN SEMICOLON
 
     LPAREN  shift, and go to state 80
 
 
 State 70
 
-    9 ident: ident . PERIOD NAME
-   21 line: ident . ASSIGN expr SEMICOLON
-   43 expr: ident . LPAREN expr_list RPAREN
-   44     | ident .  [SEMICOLON, PLUS, MINUS, MULT, DIV, MOD, DOUBLE_MULT, LESS, LESSEQ, GREAT, GREATEQ, EQ, NOTEQ]
+    6 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE stmt . RBRACE
 
-    ASSIGN  shift, and go to state 81
-    LPAREN  shift, and go to state 32
-    PERIOD  shift, and go to state 33
-
-    $default  reduce using rule 44 (expr)
+    RBRACE  shift, and go to state 81
 
 
 State 71
 
-    6 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE stmt . RBRACE
+   15 stmt: . line stmt
+   16     | . selection stmt
+   16     | selection . stmt
+   17     | . %empty  [RBRACE]
+   18 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
+   19 line: . expr ASSIGN expr SEMICOLON
+   20     | . CONST LPAREN expr_list RPAREN SEMICOLON
+   21     | . RETURN expr SEMICOLON
+   22     | . NAME var_list SEMICOLON
+   23     | . expr SEMICOLON
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
-    RBRACE  shift, and go to state 82
+    NAME    shift, and go to state 66
+    NUMBER  shift, and go to state 23
+    IF      shift, and go to state 67
+    RETURN  shift, and go to state 68
+    CONST   shift, and go to state 69
+    MINUS   shift, and go to state 24
+
+    $default  reduce using rule 17 (stmt)
+
+    stmt       go to state 82
+    selection  go to state 71
+    line       go to state 72
+    expr       go to state 73
 
 
 State 72
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   17 stmt: . line stmt
-   18     | . selection stmt
-   18     | selection . stmt
-   19     | . %empty  [RBRACE]
-   20 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
-   21 line: . ident ASSIGN expr SEMICOLON
-   22     | . CONST LPAREN expr_list RPAREN SEMICOLON
-   23     | . RETURN expr SEMICOLON
-   24     | . NAME var_list SEMICOLON
-   25     | . expr SEMICOLON
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   15 stmt: . line stmt
+   15     | line . stmt
+   16     | . selection stmt
+   17     | . %empty  [RBRACE]
+   18 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
+   19 line: . expr ASSIGN expr SEMICOLON
+   20     | . CONST LPAREN expr_list RPAREN SEMICOLON
+   21     | . RETURN expr SEMICOLON
+   22     | . NAME var_list SEMICOLON
+   23     | . expr SEMICOLON
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 66
     NUMBER  shift, and go to state 23
@@ -1760,143 +1830,100 @@ State 72
     CONST   shift, and go to state 69
     MINUS   shift, and go to state 24
 
-    $default  reduce using rule 19 (stmt)
+    $default  reduce using rule 17 (stmt)
 
-    ident      go to state 70
-    array_var  go to state 26
     stmt       go to state 83
-    selection  go to state 72
-    line       go to state 73
-    expr       go to state 74
+    selection  go to state 71
+    line       go to state 72
+    expr       go to state 73
 
 
 State 73
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   17 stmt: . line stmt
-   17     | line . stmt
-   18     | . selection stmt
-   19     | . %empty  [RBRACE]
-   20 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
-   21 line: . ident ASSIGN expr SEMICOLON
-   22     | . CONST LPAREN expr_list RPAREN SEMICOLON
-   23     | . RETURN expr SEMICOLON
-   24     | . NAME var_list SEMICOLON
-   25     | . expr SEMICOLON
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   19 line: expr . ASSIGN expr SEMICOLON
+   23     | expr . SEMICOLON
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
-    NAME    shift, and go to state 66
-    NUMBER  shift, and go to state 23
-    IF      shift, and go to state 67
-    RETURN  shift, and go to state 68
-    CONST   shift, and go to state 69
-    MINUS   shift, and go to state 24
-
-    $default  reduce using rule 19 (stmt)
-
-    ident      go to state 70
-    array_var  go to state 26
-    stmt       go to state 84
-    selection  go to state 72
-    line       go to state 73
-    expr       go to state 74
+    ASSIGN       shift, and go to state 84
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    SEMICOLON    shift, and go to state 85
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
 
 State 74
 
-   25 line: expr . SEMICOLON
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   41 expr: expr LPAREN expr_list RPAREN .
 
-    SEMICOLON    shift, and go to state 85
-    PLUS         shift, and go to state 35
-    MINUS        shift, and go to state 36
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    $default  reduce using rule 41 (expr)
 
 
 State 75
 
-   43 expr: ident LPAREN expr_list RPAREN .
-
-    $default  reduce using rule 43 (expr)
-
-
-State 76
-
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   27 expr_list: expr_list COMMA . expr
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   25 expr_list: expr_list COMMA . expr
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 86
+    expr  go to state 86
+
+
+State 76
+
+   44 expr: expr LBRACKET expr RBRACKET .
+
+    $default  reduce using rule 44 (expr)
 
 
 State 77
 
-   14 var_list: var_list . COMMA array_var
-   24 line: NAME var_list . SEMICOLON
+   12 var_list: var_list . COMMA array_var
+   22 line: NAME var_list . SEMICOLON
 
     COMMA      shift, and go to state 14
     SEMICOLON  shift, and go to state 87
@@ -1904,342 +1931,348 @@ State 77
 
 State 78
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   20 selection: IF LPAREN . expr RPAREN LBRACE stmt RBRACE
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   18 selection: IF LPAREN . expr RPAREN LBRACE stmt RBRACE
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 88
+    expr  go to state 88
 
 
 State 79
 
-   23 line: RETURN expr . SEMICOLON
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   21 line: RETURN expr . SEMICOLON
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
     SEMICOLON    shift, and go to state 89
-    PLUS         shift, and go to state 35
-    MINUS        shift, and go to state 36
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
 
 State 80
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   22 line: CONST LPAREN . expr_list RPAREN SEMICOLON
-   26 expr_list: . expr
-   27          | . expr_list COMMA expr
-   28          | . %empty  [RPAREN, COMMA]
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   20 line: CONST LPAREN . expr_list RPAREN SEMICOLON
+   24 expr_list: . expr
+   25          | . expr_list COMMA expr
+   26          | . %empty  [RPAREN, COMMA]
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 22
     NUMBER  shift, and go to state 23
     MINUS   shift, and go to state 24
 
-    $default  reduce using rule 28 (expr_list)
+    $default  reduce using rule 26 (expr_list)
 
-    ident      go to state 25
-    array_var  go to state 26
     expr_list  go to state 90
-    expr       go to state 51
+    expr       go to state 50
 
 
 State 81
-
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   21 line: ident ASSIGN . expr SEMICOLON
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
-
-    NAME    shift, and go to state 22
-    NUMBER  shift, and go to state 23
-    MINUS   shift, and go to state 24
-
-    ident      go to state 25
-    array_var  go to state 26
-    expr       go to state 91
-
-
-State 82
 
     6 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE stmt RBRACE .
 
     $default  reduce using rule 6 (funcdef)
 
 
+State 82
+
+   16 stmt: selection stmt .
+
+    $default  reduce using rule 16 (stmt)
+
+
 State 83
 
-   18 stmt: selection stmt .
+   15 stmt: line stmt .
 
-    $default  reduce using rule 18 (stmt)
+    $default  reduce using rule 15 (stmt)
 
 
 State 84
 
-   17 stmt: line stmt .
+   19 line: expr ASSIGN . expr SEMICOLON
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
-    $default  reduce using rule 17 (stmt)
+    NAME    shift, and go to state 22
+    NUMBER  shift, and go to state 23
+    MINUS   shift, and go to state 24
+
+    expr  go to state 91
 
 
 State 85
 
-   25 line: expr SEMICOLON .
-
-    $default  reduce using rule 25 (line)
-
-
-State 86
-
-   27 expr_list: expr_list COMMA expr .  [RPAREN, COMMA]
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
-
-    PLUS         shift, and go to state 35
-    MINUS        shift, and go to state 36
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
-
-    $default  reduce using rule 27 (expr_list)
-
-
-State 87
-
-   24 line: NAME var_list SEMICOLON .
-
-    $default  reduce using rule 24 (line)
-
-
-State 88
-
-   20 selection: IF LPAREN expr . RPAREN LBRACE stmt RBRACE
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
-
-    RPAREN       shift, and go to state 92
-    PLUS         shift, and go to state 35
-    MINUS        shift, and go to state 36
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
-
-
-State 89
-
-   23 line: RETURN expr SEMICOLON .
+   23 line: expr SEMICOLON .
 
     $default  reduce using rule 23 (line)
 
 
+State 86
+
+   25 expr_list: expr_list COMMA expr .  [RPAREN, COMMA]
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
+
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
+
+    $default  reduce using rule 25 (expr_list)
+
+
+State 87
+
+   22 line: NAME var_list SEMICOLON .
+
+    $default  reduce using rule 22 (line)
+
+
+State 88
+
+   18 selection: IF LPAREN expr . RPAREN LBRACE stmt RBRACE
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
+
+    LPAREN       shift, and go to state 30
+    RPAREN       shift, and go to state 92
+    LBRACKET     shift, and go to state 31
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
+
+
+State 89
+
+   21 line: RETURN expr SEMICOLON .
+
+    $default  reduce using rule 21 (line)
+
+
 State 90
 
-   22 line: CONST LPAREN expr_list . RPAREN SEMICOLON
-   27 expr_list: expr_list . COMMA expr
+   20 line: CONST LPAREN expr_list . RPAREN SEMICOLON
+   25 expr_list: expr_list . COMMA expr
 
     RPAREN  shift, and go to state 93
-    COMMA   shift, and go to state 76
+    COMMA   shift, and go to state 75
 
 
 State 91
 
-   21 line: ident ASSIGN expr . SEMICOLON
-   29 expr: expr . PLUS expr
-   30     | expr . MINUS expr
-   31     | expr . MULT expr
-   32     | expr . DOUBLE_MULT expr
-   33     | expr . DIV expr
-   34     | expr . MOD expr
-   35     | expr . LESS expr
-   36     | expr . LESSEQ expr
-   37     | expr . GREAT expr
-   38     | expr . GREATEQ expr
-   39     | expr . EQ expr
-   40     | expr . NOTEQ expr
+   19 line: expr ASSIGN expr . SEMICOLON
+   27 expr: expr . PLUS expr
+   28     | expr . MINUS expr
+   29     | expr . MULT expr
+   30     | expr . DOUBLE_MULT expr
+   31     | expr . DIV expr
+   32     | expr . MOD expr
+   33     | expr . LESS expr
+   34     | expr . LESSEQ expr
+   35     | expr . GREAT expr
+   36     | expr . GREATEQ expr
+   37     | expr . EQ expr
+   38     | expr . NOTEQ expr
+   41     | expr . LPAREN expr_list RPAREN
+   43     | expr . PERIOD NAME
+   44     | expr . LBRACKET expr RBRACKET
 
+    LPAREN       shift, and go to state 30
+    LBRACKET     shift, and go to state 31
     SEMICOLON    shift, and go to state 94
-    PLUS         shift, and go to state 35
-    MINUS        shift, and go to state 36
-    MULT         shift, and go to state 37
-    DIV          shift, and go to state 38
-    MOD          shift, and go to state 39
-    DOUBLE_MULT  shift, and go to state 40
-    LESS         shift, and go to state 41
-    LESSEQ       shift, and go to state 42
-    GREAT        shift, and go to state 43
-    GREATEQ      shift, and go to state 44
-    EQ           shift, and go to state 45
-    NOTEQ        shift, and go to state 46
+    PERIOD       shift, and go to state 33
+    PLUS         shift, and go to state 34
+    MINUS        shift, and go to state 35
+    MULT         shift, and go to state 36
+    DIV          shift, and go to state 37
+    MOD          shift, and go to state 38
+    DOUBLE_MULT  shift, and go to state 39
+    LESS         shift, and go to state 40
+    LESSEQ       shift, and go to state 41
+    GREAT        shift, and go to state 42
+    GREATEQ      shift, and go to state 43
+    EQ           shift, and go to state 44
+    NOTEQ        shift, and go to state 45
 
 
 State 92
 
-   20 selection: IF LPAREN expr RPAREN . LBRACE stmt RBRACE
+   18 selection: IF LPAREN expr RPAREN . LBRACE stmt RBRACE
 
     LBRACE  shift, and go to state 95
 
 
 State 93
 
-   22 line: CONST LPAREN expr_list RPAREN . SEMICOLON
+   20 line: CONST LPAREN expr_list RPAREN . SEMICOLON
 
     SEMICOLON  shift, and go to state 96
 
 
 State 94
 
-   21 line: ident ASSIGN expr SEMICOLON .
+   19 line: expr ASSIGN expr SEMICOLON .
 
-    $default  reduce using rule 21 (line)
+    $default  reduce using rule 19 (line)
 
 
 State 95
 
-    8 ident: . NAME
-    9      | . ident PERIOD NAME
-   15 array_var: . NAME
-   16          | . array_var LBRACKET expr RBRACKET
-   17 stmt: . line stmt
-   18     | . selection stmt
-   19     | . %empty  [RBRACE]
-   20 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
-   20          | IF LPAREN expr RPAREN LBRACE . stmt RBRACE
-   21 line: . ident ASSIGN expr SEMICOLON
-   22     | . CONST LPAREN expr_list RPAREN SEMICOLON
-   23     | . RETURN expr SEMICOLON
-   24     | . NAME var_list SEMICOLON
-   25     | . expr SEMICOLON
-   29 expr: . expr PLUS expr
-   30     | . expr MINUS expr
-   31     | . expr MULT expr
-   32     | . expr DOUBLE_MULT expr
-   33     | . expr DIV expr
-   34     | . expr MOD expr
-   35     | . expr LESS expr
-   36     | . expr LESSEQ expr
-   37     | . expr GREAT expr
-   38     | . expr GREATEQ expr
-   39     | . expr EQ expr
-   40     | . expr NOTEQ expr
-   41     | . MINUS expr
-   42     | . NUMBER
-   43     | . ident LPAREN expr_list RPAREN
-   44     | . ident
-   45     | . array_var
+   15 stmt: . line stmt
+   16     | . selection stmt
+   17     | . %empty  [RBRACE]
+   18 selection: . IF LPAREN expr RPAREN LBRACE stmt RBRACE
+   18          | IF LPAREN expr RPAREN LBRACE . stmt RBRACE
+   19 line: . expr ASSIGN expr SEMICOLON
+   20     | . CONST LPAREN expr_list RPAREN SEMICOLON
+   21     | . RETURN expr SEMICOLON
+   22     | . NAME var_list SEMICOLON
+   23     | . expr SEMICOLON
+   27 expr: . expr PLUS expr
+   28     | . expr MINUS expr
+   29     | . expr MULT expr
+   30     | . expr DOUBLE_MULT expr
+   31     | . expr DIV expr
+   32     | . expr MOD expr
+   33     | . expr LESS expr
+   34     | . expr LESSEQ expr
+   35     | . expr GREAT expr
+   36     | . expr GREATEQ expr
+   37     | . expr EQ expr
+   38     | . expr NOTEQ expr
+   39     | . MINUS expr
+   40     | . NUMBER
+   41     | . expr LPAREN expr_list RPAREN
+   42     | . NAME
+   43     | . expr PERIOD NAME
+   44     | . expr LBRACKET expr RBRACKET
 
     NAME    shift, and go to state 66
     NUMBER  shift, and go to state 23
@@ -2248,32 +2281,30 @@ State 95
     CONST   shift, and go to state 69
     MINUS   shift, and go to state 24
 
-    $default  reduce using rule 19 (stmt)
+    $default  reduce using rule 17 (stmt)
 
-    ident      go to state 70
-    array_var  go to state 26
     stmt       go to state 97
-    selection  go to state 72
-    line       go to state 73
-    expr       go to state 74
+    selection  go to state 71
+    line       go to state 72
+    expr       go to state 73
 
 
 State 96
 
-   22 line: CONST LPAREN expr_list RPAREN SEMICOLON .
+   20 line: CONST LPAREN expr_list RPAREN SEMICOLON .
 
-    $default  reduce using rule 22 (line)
+    $default  reduce using rule 20 (line)
 
 
 State 97
 
-   20 selection: IF LPAREN expr RPAREN LBRACE stmt . RBRACE
+   18 selection: IF LPAREN expr RPAREN LBRACE stmt . RBRACE
 
     RBRACE  shift, and go to state 98
 
 
 State 98
 
-   20 selection: IF LPAREN expr RPAREN LBRACE stmt RBRACE .
+   18 selection: IF LPAREN expr RPAREN LBRACE stmt RBRACE .
 
-    $default  reduce using rule 20 (selection)
+    $default  reduce using rule 18 (selection)

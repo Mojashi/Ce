@@ -20,8 +20,10 @@ class ASTNode;
 class BoolVariable;
 
 extern shared_ptr<Structure> boolStruct;
+extern shared_ptr<Structure> integerStruct;
 
 string concatIdent(list<string> ident);
+bool argumentTypeCheck(list<pair<shared_ptr<Structure>, string>> args, list<shared_ptr<Variable>> params);
 
 class Function{
     shared_ptr<Structure> retStruct;
@@ -60,9 +62,9 @@ enum MemberType{
     string name;
     map<string, shared_ptr<Structure>> variables;
     map<string, shared_ptr<Structure>> structs;
-    map<string, shared_ptr<Function>> functions;
-
-    BuiltInStructs builtInType = NORMALVARIABLE;
+    map<string, list<shared_ptr<Function>>> functions;
+    list<ASTNode> constructArgs;
+    BuiltInStructs builtInType = NORMALSTRUCT;
 public:
     shared_ptr<Structure> getPtr(){
         if(!selfPtr.expired()) return selfPtr.lock();
@@ -73,13 +75,13 @@ public:
     BuiltInStructs getBuiltInType(){return builtInType;}
     map<string, shared_ptr<Structure>> getStructs(){return structs;}
     map<string, shared_ptr<Structure>> getVariables(){return variables;}
-    map<string, shared_ptr<Function>> getFunctions(){return functions;}
-    
+    map<string, list<shared_ptr<Function>>> getFunctions(){return functions;}
+    void setConstructArgs(list<ASTNode> _constructArgs){constructArgs = _constructArgs;}
     void setName(string name) {Structure::name = name;}
     string getName(){return name;}
     void addVariable(string name, shared_ptr<Structure> varType) {variables[name] = varType;}
     void addStruct(shared_ptr<Structure> memberStruct){structs[memberStruct->getName()] = memberStruct;}
-    void addFunction(shared_ptr<Function> func){functions[func->getName()] = func;}
+    void addFunction(shared_ptr<Function> func){functions[func->getName()].push_back(func);}
     MemberType isMember(string membName) {
         if(variables.count(membName)) return MemberType::VARIABLE;
         if(structs.count(membName)) return MemberType::STRUCT;
@@ -93,8 +95,18 @@ public:
         if(variables.count(varName)) return variables[varName];
         return shared_ptr<Structure>();
     }
-    shared_ptr<Function> getFunction(string funcName){
+    list<shared_ptr<Function>> getFunction(string funcName){
         if(functions.count(funcName)) return functions[funcName];
+        return list<shared_ptr<Function>>();
+    }
+    shared_ptr<Function> getFunction(string funcName, list<shared_ptr<Variable>> params){
+        if(functions.count(funcName)){
+            for(auto func : functions[funcName]){
+                if(argumentTypeCheck(func->getArgs(), params))
+                    return func;
+                
+            }
+        }
         return shared_ptr<Function>();
     }
     void assign(shared_ptr<Variable> var);
@@ -102,6 +114,7 @@ public:
 };
 
 class Variable{
+protected:
     shared_ptr<Variable> parent;
     shared_ptr<Structure> structure;
     map<string, shared_ptr<Variable>> variables;
@@ -124,7 +137,8 @@ public:
         selfPtr = ptr;
         return ptr;
     }
-    shared_ptr<Function> getFunction(string funcName){return structure->getFunction(funcName);}
+    list<shared_ptr<Function>> getFunction(string funcName){return structure->getFunction(funcName);}
+    shared_ptr<Function> getFunction(string funcName, list<shared_ptr<Variable>> params){return structure->getFunction(funcName, params);}
     shared_ptr<Variable> getVariable(string varName){
         if(variables.count(varName)) return variables[varName];
         return shared_ptr<Variable>();
@@ -138,6 +152,7 @@ public:
         }
         return shared_ptr<Variable>();
     }
+    void sameConst(shared_ptr<Variable> var);
     shared_ptr<Structure> getType(){return structure;}
     void assign(shared_ptr<Variable> var);
     
@@ -161,7 +176,8 @@ class ArrayStructure : public Structure{
     vector<shared_ptr<Structure>> vars;
     shared_ptr<ASTNode> size;
 public:
-    ArrayStructure(shared_ptr<Structure> _stc, shared_ptr<ASTNode> _size):stc(elemStc),size(_size){builtInType = ARRAYSTRUCT;}
+    ArrayStructure(shared_ptr<Structure> _elemStc, shared_ptr<ASTNode> _size)
+    :elemStc(_elemStc),size(_size){builtInType = ARRAYSTRUCT;}
     shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent);
 };
 
@@ -176,59 +192,62 @@ public:
 class ArrayVariable : public Variable{
     using Variable::Variable;
     shared_ptr<Structure> elemStc;
-    vector<shared_ptr<Variable>> vars;
 public:
     void setElemStructure(shared_ptr<Structure> _stc){elemStc = _stc;}
     void resize(int n){
-        vars.resize();
-        if(vars.size() < n){
-            for(int i = vars.size(); n > i; i++)
-                vars[i] = elemStc->getInstance(getPtr());
+        if((int)variables.size() < n){
+            for(int i = variables.size(); n > i; i++)
+                variables[to_string(i)] = elemStc->getInstance(getPtr());
         }
     }
+    int getSize(){return variables.size();}
     shared_ptr<Variable> get(int idx){
-        if(vars.size() < idx){
+        if((int)variables.size() < idx){
             cerr<<"access violation" << endl;
             exit(0);
         }
-        return vars[idx];
+        return variables[to_string(idx)];
     }
     shared_ptr<Variable> get(list<int> idxs){
-        if(vars.size() < idxs.front()){
+        if((int)variables.size() < idxs.front()){
             cerr<<"access violation" << endl;
             exit(0);
         }
-        if(idxs.size() == 1) return vars[idx];
-        if(vars[idx]->getType()->getBuiltInType() != ARRAYSTRUCT){
+        if(idxs.size() == 1) return variables[to_string(idxs.front())];
+        if(variables[to_string(idxs.front())]->getType()->getBuiltInType() != ARRAYSTRUCT){
             cerr << "invalid access" << endl;
             exit(0);
         }
-        return vars[idx];
+        return ((ArrayVariable*)(variables[to_string(idxs.front())].get()))->get(list<int>(++idxs.begin(), idxs.end()));
     }
 };
 
 enum NodeType{
     ASTNODE,
     ASSIGNMENTNODE,
+    SAMENODE,
     CALLFUNCNODE,
     IFSTATENODE,
     DECLARENODE,
     CONSTNODE,
     INTEGERNODE,
     VARIABLENODE,
-    LAMBDANODE
+    LAMBDANODE,
+    FORNODE
 };
 
 static const char nodeTypeNames[][20] = {
     "ASTNODE",
     "ASSIGNMENTNODE",
+    "SAMENODE",
     "CALLFUNCNODE",
     "IFSTATENODE",
     "DECLARENODE",
     "CONSTNODE",
     "INTEGERNODE",
     "VARIABLENODE",
-    "LAMBDANODE"
+    "LAMBDANODE",
+    "FORNODE"
 };
 
 class ASTNode{
@@ -238,6 +257,7 @@ protected:
 public:
     ASTNode(){nodetype = ASTNODE;}
     ASTNode(list<shared_ptr<ASTNode>> ch) {child = ch;nodetype = ASTNODE;}
+    void setChild(list<shared_ptr<ASTNode>> _child){child = _child;}
     int getNodeType(){return nodetype;}
     list<shared_ptr<ASTNode>> getChilds(){return child;};
     virtual shared_ptr<Variable> eval();
@@ -245,22 +265,34 @@ public:
 };
 
 class ASTAssignment : public ASTNode{
-    list<string> varIdent;
+    shared_ptr<ASTNode> lval;
 public:
-    ASTAssignment(list<string> _varIdent, shared_ptr<ASTNode> _expr):varIdent(_varIdent){child = {_expr};nodetype=ASSIGNMENTNODE;}
+    ASTAssignment(shared_ptr<ASTNode> _lval, shared_ptr<ASTNode> _expr):lval(_lval){
+        child = {_expr};nodetype=ASSIGNMENTNODE;}
     shared_ptr<Variable> eval();
-    string getDescription(){return concatIdent(varIdent);}
+    string getDescription(){return "";}
+};
+
+class ASTSame : public ASTNode{
+public:
+    ASTSame(shared_ptr<ASTNode> _lval, shared_ptr<ASTNode> _expr){
+        child = {_lval,_expr};nodetype=SAMENODE;}
+    shared_ptr<Variable> eval();
+    string getDescription(){return "";}
 };
 
 class ASTCallFunction : public ASTNode{
-    list<string> ident;
-    
+    shared_ptr<ASTNode> ident;
+    string name;
 public:
-    ASTCallFunction(list<string> funcIdent, list<shared_ptr<ASTNode>> _args):ident(funcIdent)
+    ASTCallFunction(string _name, list<shared_ptr<ASTNode>> _args):name(_name)
+    {child = _args;
+        nodetype=CALLFUNCNODE;}
+    ASTCallFunction(shared_ptr<ASTNode> funcIdent, string _name, list<shared_ptr<ASTNode>> _args):ident(funcIdent),name(_name)
     {child = _args;
         nodetype=CALLFUNCNODE;}
     shared_ptr<Variable> eval();
-    string getDescription(){return concatIdent(ident);}
+    string getDescription(){return "";}
 };
 
 class ASTIfStatement : public ASTNode{
@@ -275,7 +307,14 @@ class ASTDeclareVar : public ASTNode{
 public:
     ASTDeclareVar(list<shared_ptr<Structure>> _types, list<string> _names):names(_names),types(_types){nodetype=DECLARENODE;}
     shared_ptr<Variable> eval();
-    string getDescription(){return type->getName() + ":" + concatIdent(names);}
+    string getDescription(){
+        string ret;
+        auto name = names.begin();
+        auto type = types.begin();
+        for(;name != names.end();name++,type++)
+            ret += (*type)->getName() + ":" + *name + ",";
+        return ret;
+    }
 };
 
 class ASTAddConst : public ASTNode{
@@ -284,25 +323,25 @@ public:
     shared_ptr<Variable> eval();
 };
 
-class ASTInteger : public ASTNode{
-    int num;
+class ASTVariable : public ASTNode{
+    string name;
+    shared_ptr<ASTNode> idx;
 public:
-    ASTInteger(int _num):num(_num){nodetype=INTEGERNODE;}
+    ASTVariable(string _name):name(_name){
+        nodetype=VARIABLENODE;}
+    ASTVariable(shared_ptr<ASTNode> _idx):idx(_idx){
+        nodetype=VARIABLENODE;}
     shared_ptr<Variable> eval();
-    int getNum(){return num;}
-    string getDescription(){return std::to_string(num);}
+    shared_ptr<ASTNode> getIdx(){return idx;}
+    string getDescription(){return name;}
 };
 
-class ASTVariable : public ASTNode{
-    list<string> ident;
-    list<shared_ptr<ASTNode>> idxs;
+class ASTInteger : public ASTNode{
+    int n;
 public:
-    ASTVariable(list<string> _ident):ident(_ident){
-        nodetype=VARIABLENODE;}
-    ASTVariable(list<string> _ident, list<ASTNode> _idxs):ident(_ident),idxs(_idxs){
-        nodetype=VARIABLENODE;}
+    ASTInteger(int _n):n(_n){nodetype = INTEGERNODE;}
     shared_ptr<Variable> eval();
-    string getDescription(){return concatIdent(ident);}
+    string getDescription(){return to_string(n);}
 };
 
 class ASTLambda : public ASTNode{
@@ -312,4 +351,17 @@ public:
     :proc(_proc){nodetype = LAMBDANODE;}
     shared_ptr<Variable> eval();
 };
+
+class ASTFor : public ASTNode{
+    string ctname;
+public:
+    ASTFor(string _ctname, shared_ptr<ASTNode> nExpr, shared_ptr<ASTNode> stmt):ctname(_ctname){
+        shared_ptr<ASTNode> decCt(new ASTDeclareVar({integerStruct}, {ctname}));
+
+        setChild({decCt, nExpr, stmt});
+        nodetype = FORNODE;
+    }
+    shared_ptr<Variable> eval();
+};
+
 #endif

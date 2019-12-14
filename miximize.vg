@@ -109,14 +109,6 @@ Integer toInteger(SysInt n){
 }
 
 Integer x;
-Bool mat[10][10];
 void main(){
-    x = toInteger(0);
-    for(i,10){
-        for(j,10){
-            x := x + mat[i][j];
-        }
-    }
-    [-x.overflow];
     maximize(x);
 }

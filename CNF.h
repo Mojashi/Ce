@@ -20,10 +20,15 @@ public:
 	vector<Clause> cls;
 	int varCount = 0;
 
-	void addClause(const Clause& cl) {
+	int addClause(const Clause& cl) {
 		if (find(cl.begin(), cl.end(), 0) != cl.end())
 			cout << "Assert literal zero" << endl;
 		cls.push_back(cl);
+		return cls.size() - 1;
+	}
+
+	void remClause(int clNum){
+		cls.erase(cls.begin() + clNum);
 	}
 
 	CNF() {
@@ -143,13 +148,14 @@ public:
 
 		//system("glucose-syrup -nthreads=2 cnf.dimacs out.txt");
 
-		system("Maple.exe cnf.dimacs result.txt > log.txt");
+		system("Maple.exe cnf.dimacs result.txt > log.txt 2>&1");
 
 		ifstream ifs("result.txt");
 
 		string aa;
 		ifs >> aa;
 		if (aa == "SAT") ifs >> aa;
+		else return {};
 		int num = atoi(aa.c_str());
 		while (1) {
 			if (num == 0) break;

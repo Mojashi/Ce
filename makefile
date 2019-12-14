@@ -28,7 +28,7 @@ Debug: all
 .PHONY	: Release
 Release	: CFLAGS+=$(CRELEASEFLAGS)
 Release	: OUTDIR=$(RELEASEDIR)
-Release	: $(TARGET)
+Release: all
 
 all : $(TARGET)
 $(TARGET) : $(OBJS)

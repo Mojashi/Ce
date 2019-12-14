@@ -20,8 +20,19 @@ string concatIdent(list<string> ident){
 }
 
 shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent){
-    return (new Variable(parent, getPtr()))->getPtr();
+    auto ret = (new Variable(parent, getPtr()))->getPtr();
+    list<variables> params;
+    for(auto arg : constructArgs){
+        params.push_back(arg.eval());
+    }
+    shared_ptr<Function> constructor = ret->getFunction(name, params);
+    if(constructor){
+        InsFunction ins{ret, constructor};
+        ins.call(params);
+    }
+    return ret;
 }
+
 void Variable::assign(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
     if(getType() == boolStruct){
@@ -30,6 +41,20 @@ void Variable::assign(shared_ptr<Variable> var){
     else{
         for(auto memb : variables){
             memb.second->assign(var->getVariable(memb.first));
+        }
+    }
+}
+
+void Variable::sameConst(shared_ptr<Variable> var){
+    if(var->getType() != getType()) return;
+    if(getType() == boolStruct){
+        Literal a = ((BoolVariable*)this)->getlitNum(),b = ((BoolVariable*)(var.get()))->getlitNum();
+        cnf.addClause({a,-b});
+        cnf.addClause({-a,b});
+    }
+    else{
+        for(auto memb : variables){
+            memb.second->sameConst(var->getVariable(memb.first));
         }
     }
 }
@@ -48,7 +73,7 @@ shared_ptr<Variable> ArrayStructure::getInstance(shared_ptr<Variable> parent){
     var->setElemStructure(elemStc);
     shared_ptr<Variable> sv = size->eval();
     if(sv->getType()->getBuiltInType() != INTEGERSTRUCT){
-        cerr << "size must be pre-calcuatable object." << endl;
+        cerr << "size must be Integer Variable." << endl;
         exit(0);
     }
     var->resize(((BoolVariable*)sv.get())->getlitNum());
@@ -109,26 +134,26 @@ InsFunction findFunction(list<string> ident,list<shared_ptr<Variable>> params){
     if(ident.size() == 1){
         shared_ptr<Variable> cur(currentScope);
         while(cur){
-            shared_ptr<Function> fv = cur->getFunction(ident.front());
-            if(fv && argumentTypeCheck(fv->getArgs(), params))
+            shared_ptr<Function> fv = cur->getFunction(ident.front(), params);
+            if(fv)
                 return {cur, fv};
             cur = cur->getParent();
         }
 
         if(ident.size() == 1 && ident.front().substr(0,8) == "operator"){
             for(shared_ptr<Variable> param : params){
-                shared_ptr<Function> func = param->getFunction(ident.front());
-                if(func && argumentTypeCheck(func->getArgs(), params)){
+                shared_ptr<Function> func = param->getFunction(ident.front(), params);
+                if(func)
                     return {param, func};
-                }
+                
             }
         }
     }
     else{
         shared_ptr<Variable> scope = findVariable(list<string>(ident.begin(), --ident.end()));
         if(scope){
-            shared_ptr<Function> func = scope->getFunction(ident.back());
-            if(func && argumentTypeCheck(func->getArgs(), params))
+            shared_ptr<Function> func = scope->getFunction(ident.back(), params);
+            if(func)
                 return {scope, func};
         }
     }
@@ -156,12 +181,17 @@ shared_ptr<Variable> ASTCallFunction::eval(){
     for(auto param : child){
         params.push_back(param->eval());
     }
-
-    InsFunction func = findFunction(ident, params);
+    InsFunction func;
+    if(ident){
+        shared_ptr<Variable> sc = ident->eval();
+        func = {sc,sc->getFunction(name, params)};
+    }
+    else{
+        func = findFunction({name}, params);
+    }
+    
     if(!func.function){
-        string conc;
-        for(string str : ident) conc += str;
-        cerr << "not found function " << conc << endl;
+        cerr << "not found function named "<<name << endl;
         exit(0);
     }
     return func.call(params);
@@ -195,13 +225,27 @@ shared_ptr<Variable> ASTAssignment::eval(){
 #ifdef DEBUG
     cerr<<nodeTypeNames[getNodeType()]<<endl;
 #endif
-    shared_ptr<Variable> res = child.front()->eval(), leftVal = findVariable(varIdent);
+    shared_ptr<Variable> res = child.front()->eval(), leftVal = lval->eval();
     if(leftVal->getType() != res->getType()){
         cerr << "lvalue and rvalue types are different" << endl;
         exit(0);
     }
     leftVal->assign(res);
     return res;
+}
+
+
+shared_ptr<Variable> ASTSame::eval(){
+#ifdef DEBUG
+    cerr<<nodeTypeNames[getNodeType()]<<endl;
+#endif
+    shared_ptr<Variable> l(child.front()->eval()),r((*(child.rbegin()))->eval()); 
+    if(l->getType() != r->getType()){
+        cerr << "lvalue and rvalue types are different" << endl;
+        exit(0);
+    }
+    l->sameConst(r);
+    return shared_ptr<Variable>();
 }
 
 shared_ptr<Variable> ASTAddConst::eval(){
@@ -225,27 +269,36 @@ shared_ptr<Variable> ASTVariable::eval(){
 #ifdef DEBUG
     cerr<<nodeTypeNames[getNodeType()]<<endl;
 #endif
-    auto ret = findVariable(ident);
-    if(ret) {
-        if(idxs.size() == 0)
-            return ret;
-
-        list<int> ridxs;
-        for(shared_ptr<ASTNode> idx : idxs){
-            shared_ptr<Variable> ret = idx->eval();
-            if(ret->getType()->getBuiltInType() != INTEGERSTRUCT){
-                cerr << "index must be SysInt" << endl;
+    shared_ptr<Variable> ret;
+    if(child.size() == 0){
+        ret = findVariable({name});
+    }
+    else{
+        for(shared_ptr<ASTNode> node : child){
+            ret = node->eval();
+        }
+        if(name == ""){
+            if(ret->getType()->getBuiltInType() != ARRAYSTRUCT){
+                cerr << "this variable doesnt have index." << endl;
                 exit(0);
             }
-            ridxs.push_back(((BoolVariable*)ret.get())->getlitNum());
-        }
-        return ((ArrayVariable*)ret->getPtr().get())->get(ridxs);
-    }
+            shared_ptr<Variable> ridx = idx->eval();
+            if(ridx->getType()->getBuiltInType() != INTEGERSTRUCT){
+                cerr << "index must be Integer Variable." << endl;
+                exit(0);
+            }
 
-    cerr << "not found variable named ";
+            int iidx = ((BoolVariable*)ridx.get())->getlitNum();
+            
+            ret = ((ArrayVariable*)ret.get())->get(iidx);
+        }
+        else
+            ret = ret->getVariable(name);
+    }
+    if(ret) return ret;
+    cerr << "variable doesnt exist.";
 #ifdef DEBUG
-    for(string name : ident) cerr << name << ".";
-    cerr << endl;
+    cerr << name << "." << endl;
 #endif
     exit(0);
 }
@@ -254,9 +307,10 @@ shared_ptr<Variable> ASTInteger::eval(){
 #ifdef DEBUG
     cerr<<nodeTypeNames[getNodeType()]<<endl;
 #endif
-    return shared_ptr<Variable>();
+    shared_ptr<Variable> ret = integerStruct->getInstance(currentScope);
+    ((BoolVariable*)ret.get())->setlitNum(n);
+    return ret;
 }
-
 
 shared_ptr<Variable> ASTLambda::eval(){
 #ifdef DEBUG
@@ -265,3 +319,25 @@ shared_ptr<Variable> ASTLambda::eval(){
     return proc(currentScope,localVar);
 }
 
+shared_ptr<Variable> ASTFor::eval(){
+#ifdef DEBUG
+    cerr<<nodeTypeNames[getNodeType()]<<endl;
+#endif
+    vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
+    cv[0]->eval();
+    shared_ptr<Variable> var = cv[1]->eval();
+    if(var->getType()->getBuiltInType() != INTEGERSTRUCT){
+        cerr << "this expression must be SysInt" << endl;
+        exit(0);
+    }
+    int numOfLoop = ((BoolVariable*)(var.get()))->getlitNum();
+
+    for(int i = 0; numOfLoop > i; i++){
+        map<string, shared_ptr<Variable>> cvLocalVar(localVar);
+        ((BoolVariable*)(localVar[ctname].get()))->setlitNum(i);
+        cv[2]->eval();
+        localVar = cvLocalVar;
+    }
+    localVar.erase(ctname);
+    return shared_ptr<Variable>();
+}

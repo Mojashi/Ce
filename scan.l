@@ -1,4 +1,5 @@
 %option noyywrap
+%option yylineno
 %{
 extern void yyerror(const char *s);
 extern void yyerror(const char *s, const char ch);
@@ -27,7 +28,8 @@ float       {digits}"."{digits}
 <OTHER_COMMENT>.          { ; }
 
 "**"       { return DOUBLE_MULT; }
-"="        { return ASSIGN; }
+":="        { return ASSIGN; }
+"="			{return SAME;}
 "+"        { return PLUS; }
 "-"        { return MINUS; }
 "*"        { return MULT; }
@@ -44,6 +46,7 @@ float       {digits}"."{digits}
 "!="       { return NOTEQ; }
 "if"       { return IF; }
 "else"     { return ELSE; }
+"for"		{return FOR;}
 "struct"     { return STRUCT; }
 "return"   { return RETURN; }
 "const"     {return CONST;}
@@ -55,7 +58,7 @@ float       {digits}"."{digits}
 ";"        { return SEMICOLON; }
 <<EOF>>		{return ENDOFFILE;}
 
-{name}    {
+{name}|"operator"[+-/*%><=][=]?    {
       		yylval.name = new string(yytext);
 			return NAME; 
 		}

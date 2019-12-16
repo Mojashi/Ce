@@ -19,7 +19,6 @@ string concatIdent(list<string> ident){
     return ret;
 }
 
-
 void Variable::assign(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
     if(getType() == boolStruct){
@@ -46,30 +45,61 @@ void Variable::sameConst(shared_ptr<Variable> var){
     }
 }
 
-shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> tempPara){
-    auto ret = (new Variable(parent, getPtr()))->getPtr();
+void Variable::makeMembs(){
+    for(auto stc : structure->getVariables()){
+        list<shared_ptr<Variable>> params;
+        for(auto param : stc.second.second){
+            params.push_back(param->eval());
+        }
+        variables[stc.first] = stc.second.first->getInstance(getPtr(), params);
+    }
+}
+
+shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams){
+    shared_ptr<Variable> ret = (new Variable(parent, getPtr()))->getPtr();
     
+    map<string, shared_ptr<Variable>> cvLocalVar(localVar);
+    shared_ptr<Variable> cvScope(currentScope);
+    localVar.clear();
+    currentScope = ret;
+
+    if(thParams.size() != thArgs.size()){
+        cout << "insufficient arguments" << endl;
+        exit(0);
+    }
+    auto itrArg = thArgs.begin();
+    auto itrPar = thParams.begin();
+    for(;itrArg != thArgs.end(); itrArg++, itrPar++){
+        if(!isSameType(itrArg->first,(*itrPar)->getType())){
+            cout << "invalid type" << endl;
+            exit(0);
+        }
+        ret->setVariable(itrArg->second,*itrPar);
+    }
+    ret->makeMembs();
     shared_ptr<Function> propFunc = ret->getFunction("PROPERTYFUNCTION", {});
     if(propFunc){
         InsFunction ins{ret, propFunc};
         ins.call({});
     }
+    localVar = cvLocalVar;
+    currentScope = cvScope;
     return ret;
 }
 
-shared_ptr<Variable> BoolStructure::getInstance(shared_ptr<Variable> parent){
+shared_ptr<Variable> BoolStructure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams){
     BoolVariable* var = new BoolVariable(parent, getPtr());
     var->setlitNum(cnf.getNewVar());
     return var->getPtr();
 }
-shared_ptr<Variable> IntegerStructure::getInstance(shared_ptr<Variable> parent){
+shared_ptr<Variable> IntegerStructure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams){
     BoolVariable* var = new BoolVariable(parent, getPtr());
     var->setlitNum(0);
     return var->getPtr();
 }
-shared_ptr<Variable> ArrayStructure::getInstance(shared_ptr<Variable> parent){
+shared_ptr<Variable> ArrayStructure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams){
     ArrayVariable* var = new ArrayVariable(parent, getPtr());
-    var->setElemStructure(elemStc);
+    var->setElemStructure(elemStc, thParams);
     shared_ptr<Variable> sv = size->eval();
     if(sv->getType()->getBuiltInType() != INTEGERSTRUCT){
         cerr << "size must be Integer Variable." << endl;
@@ -94,7 +124,9 @@ shared_ptr<Variable> InsFunction::call(list<shared_ptr<Variable>> params){
     for(;param != params.end(); param++, arg++){
             localVar[arg->second] = *param;
     }
-    shared_ptr<Variable> ret = function->getNode()->eval();
+    shared_ptr<Variable> ret;
+    if(function->getNode())
+        ret = function->getNode()->eval();
     currentScope = cvScope;
     localVar = cvLocalVar;
     return ret;
@@ -117,13 +149,16 @@ shared_ptr<Variable> findVariable(list<string> ident){
     }
     return shared_ptr<Variable>();
 }
-
+bool isSameType(shared_ptr<Structure> a, shared_ptr<Structure> b){
+    if(a == b) return true;
+    return false;
+}
 bool argumentTypeCheck(list<pair<shared_ptr<Structure>, string>> args, list<shared_ptr<Variable>> params){
     if(args.size() != params.size()) return false;
     auto itr1 = args.begin();
     auto itr2 = params.begin();
     for(;itr1 != args.end();itr1++,itr2++){
-        if(itr1->first != (*itr2)->getType())
+        if(!isSameType(itr1->first , (*itr2)->getType()))
             return false;
     }
     return true;
@@ -208,6 +243,12 @@ shared_ptr<Variable> ASTDeclareVar::eval(){
 #ifdef DEBUG
     cerr<<nodeTypeNames[getNodeType()]<<endl;
 #endif
+    list<shared_ptr<Variable>> evedParams;
+
+    for(shared_ptr<ASTNode> node : thParams){
+        evedParams.push_back(node->eval());
+    }
+
     auto name = names.begin();
     auto type = types.begin();
     for(;name != names.end();name++,type++){
@@ -215,7 +256,7 @@ shared_ptr<Variable> ASTDeclareVar::eval(){
             cerr << "a variable named \"" << *name << "\" has already declared" << endl;
             exit(0);
         }
-        localVar[*name] = (*type)->getInstance(currentScope);
+        localVar[*name] = (*type)->getInstance(currentScope, evedParams);
     }
     return shared_ptr<Variable>();
 }
@@ -295,7 +336,7 @@ shared_ptr<Variable> ASTVariable::eval(){
             ret = ret->getVariable(name);
     }
     if(ret) return ret;
-    cerr << "variable doesnt exist.";
+    cerr << "variable " << name << " doesnt exist.";
 #ifdef DEBUG
     cerr << name << "." << endl;
 #endif
@@ -306,7 +347,7 @@ shared_ptr<Variable> ASTInteger::eval(){
 #ifdef DEBUG
     cerr<<nodeTypeNames[getNodeType()]<<endl;
 #endif
-    shared_ptr<Variable> ret = integerStruct->getInstance(currentScope);
+    shared_ptr<Variable> ret = integerStruct->getInstance(currentScope, {});
     ((BoolVariable*)ret.get())->setlitNum(n);
     return ret;
 }

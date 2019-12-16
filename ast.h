@@ -19,10 +19,13 @@ class Variable;
 class ASTNode;
 class BoolVariable;
 
+typedef pair<shared_ptr<Structure>, list<shared_ptr<ASTNode>>> pedStruct;
+
 extern shared_ptr<Structure> boolStruct;
 extern shared_ptr<Structure> integerStruct;
 
 string concatIdent(list<string> ident);
+bool isSameType(shared_ptr<Structure> a, shared_ptr<Structure> b);
 bool argumentTypeCheck(list<pair<shared_ptr<Structure>, string>> args, list<shared_ptr<Variable>> params);
 
 class Function{
@@ -60,10 +63,10 @@ enum MemberType{
 };
     weak_ptr<Structure> selfPtr;
     string name;
-    map<string, shared_ptr<Structure>> variables;
+    map<string, pedStruct> variables;
+    list<pair<shared_ptr<Structure>, string>> thArgs;
     map<string, shared_ptr<Structure>> structs;
     map<string, list<shared_ptr<Function>>> functions;
-    list<ASTNode> constructArgs;
     BuiltInStructs builtInType = NORMALSTRUCT;
 public:
     shared_ptr<Structure> getPtr(){
@@ -74,12 +77,13 @@ public:
     }
     BuiltInStructs getBuiltInType(){return builtInType;}
     map<string, shared_ptr<Structure>> getStructs(){return structs;}
-    map<string, shared_ptr<Structure>> getVariables(){return variables;}
+    map<string, pedStruct> getVariables(){return variables;}
     map<string, list<shared_ptr<Function>>> getFunctions(){return functions;}
-    void setConstructArgs(list<ASTNode> _constructArgs){constructArgs = _constructArgs;}
+    void setThroughArgs(list<pair<shared_ptr<Structure>, string>> _thArgs){thArgs = _thArgs;}
+    list<pair<shared_ptr<Structure>, string>> getThroughArgs(){return thArgs;}
     void setName(string name) {Structure::name = name;}
     string getName(){return name;}
-    void addVariable(string name, shared_ptr<Structure> varType) {variables[name] = varType;}
+    void addVariable(string name, pedStruct varType) {variables[name] = varType;}
     void addStruct(shared_ptr<Structure> memberStruct){structs[memberStruct->getName()] = memberStruct;}
     void addFunction(shared_ptr<Function> func){functions[func->getName()].push_back(func);}
     MemberType isMember(string membName) {
@@ -92,7 +96,7 @@ public:
         return shared_ptr<Structure>();
     }
     shared_ptr<Structure> getVariableType(string varName){
-        if(variables.count(varName)) return variables[varName];
+        if(variables.count(varName)) return variables[varName].first;
         return shared_ptr<Structure>();
     }
     list<shared_ptr<Function>> getFunction(string funcName){
@@ -110,7 +114,7 @@ public:
         return shared_ptr<Function>();
     }
     void assign(shared_ptr<Variable> var);
-    virtual shared_ptr<Variable> getInstance(shared_ptr<Variable> parent);
+    virtual shared_ptr<Variable> getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams);
 };
 
 class Variable{
@@ -125,12 +129,20 @@ public:
 #ifdef DEBUG
         cerr << "gen instance " + structure->getName() << endl;
 #endif
-        for(auto stc : structure->getVariables()){
-            variables[stc.first] = stc.second->getInstance(getPtr());
-        }
     }
+
     shared_ptr<Variable> getParent(){return parent;}
-    
+    void makeMembs();
+    virtual shared_ptr<Variable> copy(){
+        Variable* ret = new Variable(parent, structure);
+        for(auto var : variables){
+            ret->setVariable(var.first, var.second->copy());
+        }
+        return ret->getPtr();
+    }
+    void setVariable(string name, shared_ptr<Variable> var){
+        variables[name] = var;
+    }
     shared_ptr<Variable> getPtr(){
         if(!selfPtr.expired()) return selfPtr.lock();
         shared_ptr<Variable> ptr(this);
@@ -162,13 +174,13 @@ public:
 class BoolStructure : public Structure{
 public:
     BoolStructure(){builtInType = BOOLSTRUCT;}
-    shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent);
+    shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent, list<shared_ptr<Variable>> thParams);
 };
 
 class IntegerStructure : public Structure{
 public:
     IntegerStructure(){builtInType = INTEGERSTRUCT;}
-    shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent);
+    shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent, list<shared_ptr<Variable>> thParams);
 };
 
 class ArrayStructure : public Structure{
@@ -178,7 +190,7 @@ class ArrayStructure : public Structure{
 public:
     ArrayStructure(shared_ptr<Structure> _elemStc, shared_ptr<ASTNode> _size)
     :elemStc(_elemStc),size(_size){builtInType = ARRAYSTRUCT;}
-    shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent);
+    shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent, list<shared_ptr<Variable>> thParams);
 };
 
 class BoolVariable : public Variable{
@@ -187,17 +199,23 @@ class BoolVariable : public Variable{
 public:
     void setlitNum(Literal num){litNum = num;}
     Literal getlitNum(){return litNum;}
+    shared_ptr<Variable> copy(){
+        BoolVariable* ret = new BoolVariable(parent, structure);
+        ret->setlitNum(litNum);
+        return ret->getPtr();
+    }
 };
 
 class ArrayVariable : public Variable{
     using Variable::Variable;
+    list<shared_ptr<Variable>> stcParams;
     shared_ptr<Structure> elemStc;
 public:
-    void setElemStructure(shared_ptr<Structure> _stc){elemStc = _stc;}
+    void setElemStructure(shared_ptr<Structure> _stc, list<shared_ptr<Variable>> _stcParams){stcParams=_stcParams;elemStc = _stc;}
     void resize(int n){
         if((int)variables.size() < n){
             for(int i = variables.size(); n > i; i++)
-                variables[to_string(i)] = elemStc->getInstance(getPtr());
+                variables[to_string(i)] = elemStc->getInstance(getPtr(), stcParams);
         }
     }
     int getSize(){return variables.size();}
@@ -303,9 +321,10 @@ public:
 
 class ASTDeclareVar : public ASTNode{
     list<string> names;
+    list<shared_ptr<ASTNode>> thParams;
     list<shared_ptr<Structure>> types;
 public:
-    ASTDeclareVar(list<shared_ptr<Structure>> _types, list<string> _names):names(_names),types(_types){nodetype=DECLARENODE;}
+    ASTDeclareVar(list<shared_ptr<Structure>> _types,list<shared_ptr<ASTNode>> _thParams, list<string> _names):names(_names),thParams(_thParams),types(_types){nodetype=DECLARENODE;}
     shared_ptr<Variable> eval();
     string getDescription(){
         string ret;
@@ -356,7 +375,7 @@ class ASTFor : public ASTNode{
     string ctname;
 public:
     ASTFor(string _ctname, shared_ptr<ASTNode> nExpr, shared_ptr<ASTNode> stmt):ctname(_ctname){
-        shared_ptr<ASTNode> decCt(new ASTDeclareVar({integerStruct}, {ctname}));
+        shared_ptr<ASTNode> decCt(new ASTDeclareVar({integerStruct}, {},{ctname}));
 
         setChild({decCt, nExpr, stmt});
         nodetype = FORNODE;

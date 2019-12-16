@@ -28,13 +28,15 @@ int makeGraph(shared_ptr<Structure> stc){
     for(auto childs : stc->getFunctions()){
         for(auto child : childs.second){
             int funcNode = getNode(childs.first, "cds", "#f0e68c");
-            int astNode = makeGraph(child->getNode());
-            ofs << funcNode << "->" << astNode<<";";
+            if(child->getNode()){
+                int astNode = makeGraph(child->getNode());
+                ofs << funcNode << "->" << astNode<<";";
+            }
             nodes.push_back(funcNode);
         }
     }
     for(auto child : stc->getVariables()){
-        nodes.push_back(getNode(child.first + ":" + child.second->getName(), "egg", "#f5deb3"));
+        nodes.push_back(getNode(child.first + ":" + child.second.first->getName(), "egg", "#f5deb3"));
     }
     for(int child : nodes){
         ofs << curNode << "->" << child << ";";

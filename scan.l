@@ -57,6 +57,7 @@ float       {digits}"."{digits}
 "}"        { return RBRACE; }
 "."        { return PERIOD; }
 ";"        { return SEMICOLON; }
+":"			{return COLON;}
 <<EOF>>		{return ENDOFFILE;}
 
 {name}|"operator"[+-/*%><=][=]?    {

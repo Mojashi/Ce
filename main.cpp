@@ -20,10 +20,31 @@ void builtIn(){
     
     integerStruct = (new IntegerStructure())->getPtr();
     integerStruct->setName("SysInt");
+    shared_ptr<ASTNode> intPlusAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()+((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> plusFunc(new Function(integerStruct, "operator+",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intPlusAST));
+    integerStruct->addFunction(plusFunc);
+    shared_ptr<ASTNode> intMinusAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()-((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> minusFunc(new Function(integerStruct, "operator-",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intMinusAST));
+    integerStruct->addFunction(minusFunc);
+    
 
     shared_ptr<ASTNode> notFuncAst(new ASTLambda(
         [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
-            shared_ptr<Variable> ret = boolStruct->getInstance(curScope);
+            shared_ptr<Variable> ret = boolStruct->getInstance(curScope,{});
             localVar["ret"] = ret;
             ((BoolVariable*)ret.get())->setlitNum(-((BoolVariable*)(localVar["x"].get()))->getlitNum());
             return ret;
@@ -38,7 +59,7 @@ void builtInFuncs(){
     
     shared_ptr<ASTNode> getBitAst(new ASTLambda(
         [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
-            shared_ptr<Variable> ret = boolStruct->getInstance(curScope);
+            shared_ptr<Variable> ret = boolStruct->getInstance(curScope,{});
             localVar["ret"] = ret;
             int x = ((BoolVariable*)(localVar["x"].get()))->getlitNum(), idx = ((BoolVariable*)(localVar["idx"].get()))->getlitNum();
 
@@ -109,7 +130,7 @@ int main(int argc, char const *argv[]){
     builtInFuncs();
     GraphViz gviz(godStruct, "graph.dot");
     cout << "output graph.dot" << endl;
-    godVar = godStruct->getInstance(shared_ptr<Variable>());
+    godVar = godStruct->getInstance(shared_ptr<Variable>(),{});
 
     std::cout << "Executing main function" << endl;
     InsFunction mainFunc = {godVar, godVar->getFunction("main").front()};

@@ -51,15 +51,43 @@ struct SC{
         return ret;
     }
 
-struct Integer{
-    Bool val[8];
+struct Integer:(SysInt SIZE){
+    Bool val[SIZE];
     Bool overflow;
-    
+    Integer lshift(){
+        Integer:(SIZE) ret;
+        for(i,SIZE - 1){
+            ret.val[i + 1] := val[i];
+        }
+        [-ret.val[0]];
+        ret.overflow := or(val[SIZE - 1], overflow);
+        return ret;
+    }
+    Integer operator*(Integer a, Bool b){
+        Integer:(a.SIZE) ret;
+        for(i,a.SIZE){
+            ret.val[i] := and(a.val[i],b);
+        }
+        ret.overflow := and(a.overflow,b);
+        return ret;
+    }
+    Integer operator*(Integer a, Integer b){
+        Integer:(a.SIZE) ret;
+        Integer:(a.SIZE) buf, buff;
+        buf := a;
+        ret.getInteger(0);
+        for(i,b.SIZE){
+            buff := buf * b.val[i];
+            ret := ret + buff;
+            buf:=buf.lshift();
+        }
+        return ret;
+    }
     Integer operator+(Integer a, Integer b){
         Bool carry;
-        Integer ret;
+        Integer:(a.SIZE) ret;
         [-carry];
-        for(i,8){
+        for(i,SIZE){
             SC sc;
             sc := fulladder(a.val[i],b.val[i],carry);
             carry := sc.c;
@@ -70,9 +98,9 @@ struct Integer{
     }
     Integer operator+(Integer a, Bool b){
         Bool carry;
-        Integer ret;
+        Integer:(a.SIZE) ret;
         carry := b;
-        for(i,8){
+        for(i,a.SIZE){
             SC sc;
             sc := halfadder(a.val[i],carry);
             carry := sc.c;
@@ -84,7 +112,7 @@ struct Integer{
     Bool operator==(Integer a, Integer b){
         Bool ret;
         [-ret];
-        for(i,8){
+        for(i,SIZE){
             ret := or(ret,xor(a.val[i],b.val[i]));
         }
         ret := or(ret,xor(a.overflow,b.overflow));
@@ -92,29 +120,27 @@ struct Integer{
     }
     
     void getInteger(SysInt n){
-        for(i,8){
+        for(i,SIZE){
             val[i] := getBit(n,i);
         }
         [-overflow];
     }
 }
 
-Integer toInteger(SysInt n){
-    Integer ret;
-    for(i,8){
+Integer toInteger(SysInt n, SysInt size){
+    Integer:(size) ret;
+    for(i,size){
         ret.val[i] := getBit(n,i);
     }
     [-ret.overflow];
     return ret;
 }
-
-struct TEST{
-    Integer x;
-prop {
-    x.getInteger(102);
-}
-}
-TEST x;
+Integer:(13) x,y,z;
 void main(){
-    return x;
+    SysInt a;
+    a := 13;
+    Integer:(a) aa;
+    z := aa;
+    y.getInteger(68);
+    y = x * x * x + x;
 }

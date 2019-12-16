@@ -71,6 +71,7 @@ shared_ptr<Structure> findStruct(string name){
 		list<shared_ptr<ASTNode>> *exprs;
 		pair<list<string>, list<shared_ptr<ASTNode>>> *ary; 
 		list<pair<list<string>, list<shared_ptr<ASTNode>>>> *arys;
+		pedStruct *pedtypes;
 	}
 
 	%token ASSIGN
@@ -88,6 +89,7 @@ shared_ptr<Structure> findStruct(string name){
 	%token RBRACE
     %token STRUCT
 	%token SEMICOLON
+	%token COLON
 	%token PERIOD
 	%token CONST
 	%token ENDOFFILE
@@ -111,6 +113,7 @@ shared_ptr<Structure> findStruct(string name){
 	%type<memb> members structdef structdec
 	%type<vars> argument_list
 	%type<exprs> expr_list
+	%type<pedtypes> ped_types
 
 	%%
 	program : members ENDOFFILE{
@@ -137,10 +140,24 @@ shared_ptr<Structure> findStruct(string name){
 				for(shared_ptr<ASTNode> ix : var.second){
 					stc = (new ArrayStructure(stc, ix))->getPtr();
 				}
-				$$->addVariable(var.first.front(), stc);
+				$$->addVariable(var.first.front(), {stc,{}});
 			}
 			delete $2;
 			delete $3;
+		}
+		| members NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON{
+			$$ = $1;
+			for(pair<list<string>, list<shared_ptr<ASTNode>>> var : *$7){
+				if(var.first.size() != 1) yyerror("syntax error");
+				shared_ptr<Structure> stc = findStruct(*$2);
+				for(shared_ptr<ASTNode> ix : var.second){
+					stc = (new ArrayStructure(stc, ix))->getPtr();
+				}
+				$$->addVariable(var.first.front(), {stc, *$5});
+			}
+			delete $2;
+			delete $5;
+			delete $7;
 		}
 		| members PROP LBRACE stmt RBRACE{
 			$$ = $1;
@@ -167,8 +184,18 @@ shared_ptr<Structure> findStruct(string name){
 		addStruct($$->getPtr());
 		delete $2;
 	}
+	| STRUCT NAME COLON LPAREN argument_list RPAREN{
+		$$ = new Structure();
+		$$->setName(*$2);
+		$$->setThroughArgs(*$5);
+		addStruct($$->getPtr());
+		delete $2;
+		delete $5;
+	}
+	;
     structdef : structdec LBRACE members RBRACE {
 		$3->setName($1->getName());
+		$3->setThroughArgs($1->getThroughArgs());
 		*$1 = *$3;
 		$$ = $1;
 		for(auto stc : $3->getStructs()){
@@ -259,9 +286,26 @@ shared_ptr<Structure> findStruct(string name){
 				names.push_back(var.first.front());
 				stcs.push_back(stc);
 			}
-			$$ = (ASTNode*)(new ASTDeclareVar(stcs, names));
+			$$ = (ASTNode*)(new ASTDeclareVar(stcs, {}, names));
 			delete $1;
 			delete $2;
+        }
+		| NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON{ //variable declaration
+			list<string> names;
+			list<shared_ptr<Structure>> stcs;
+			for(pair<list<string>, list<shared_ptr<ASTNode>>> var : *$6){
+				if(var.first.size() != 1) yyerror(("variable name mustn't contain peirod." + concatIdent(names)).c_str());
+				shared_ptr<Structure> stc = findStruct(*$1);
+				for(shared_ptr<ASTNode> ix : var.second){
+					stc = (new ArrayStructure(stc, ix))->getPtr();
+				}
+				names.push_back(var.first.front());
+				stcs.push_back(stc);
+			}
+			$$ = (ASTNode*)(new ASTDeclareVar(stcs, *$4, names));
+			delete $1;
+			delete $4;
+			delete $6;
         }
 		| expr SEMICOLON{
 			$$ = $1;

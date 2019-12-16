@@ -19,19 +19,6 @@ string concatIdent(list<string> ident){
     return ret;
 }
 
-shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent){
-    auto ret = (new Variable(parent, getPtr()))->getPtr();
-    list<variables> params;
-    for(auto arg : constructArgs){
-        params.push_back(arg.eval());
-    }
-    shared_ptr<Function> constructor = ret->getFunction(name, params);
-    if(constructor){
-        InsFunction ins{ret, constructor};
-        ins.call(params);
-    }
-    return ret;
-}
 
 void Variable::assign(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
@@ -58,6 +45,18 @@ void Variable::sameConst(shared_ptr<Variable> var){
         }
     }
 }
+
+shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> tempPara){
+    auto ret = (new Variable(parent, getPtr()))->getPtr();
+    
+    shared_ptr<Function> propFunc = ret->getFunction("PROPERTYFUNCTION", {});
+    if(propFunc){
+        InsFunction ins{ret, propFunc};
+        ins.call({});
+    }
+    return ret;
+}
+
 shared_ptr<Variable> BoolStructure::getInstance(shared_ptr<Variable> parent){
     BoolVariable* var = new BoolVariable(parent, getPtr());
     var->setlitNum(cnf.getNewVar());

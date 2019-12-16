@@ -108,15 +108,13 @@ Integer toInteger(SysInt n){
     return ret;
 }
 
-Integer x;
-Bool mat[10][10];
+struct TEST{
+    Integer x;
+prop {
+    x.getInteger(102);
+}
+}
+TEST x;
 void main(){
-    x = toInteger(0);
-    for(i,10){
-        for(j,10){
-            x := x + mat[i][j];
-        }
-    }
-    [-x.overflow];
-    maximize(x);
+    return x;
 }

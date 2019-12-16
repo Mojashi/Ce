@@ -94,6 +94,7 @@ shared_ptr<Structure> findStruct(string name){
 	%token FOR
 	%token MAXIMIZE
 	%token MINIMIZE
+	%token PROP
 
 	%left  PLUS MINUS
 	%left  MULT DIV MOD
@@ -140,6 +141,11 @@ shared_ptr<Structure> findStruct(string name){
 			}
 			delete $2;
 			delete $3;
+		}
+		| members PROP LBRACE stmt RBRACE{
+			$$ = $1;
+			shared_ptr<Function> propertyFunc(new Function(shared_ptr<Structure>(), "PROPERTYFUNCTION", {}, shared_ptr<ASTNode>($4)));
+			$$->addFunction(propertyFunc);
 		}
         | {
 			$$ = new Structure();

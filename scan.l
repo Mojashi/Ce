@@ -50,6 +50,7 @@ float       {digits}"."{digits}
 "struct"     { return STRUCT; }
 "return"   { return RETURN; }
 "const"     {return CONST;}
+"prop"		{return PROP;}
 "["        { return LBRACKET; }
 "]"        { return RBRACKET; }
 "{"        { return LBRACE; }

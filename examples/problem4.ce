@@ -1,0 +1,17 @@
+import "stl/integer.ce"
+import "stl/boolop.ce"
+
+Integer:(22) a,b,p;
+DecStr:(6) str;
+void main(){
+    [-a.overflow];
+    [-b.overflow];
+    a <= toInteger(999,22);
+    a >= toInteger(100,22);
+    b <= toInteger(999,22);
+    b >= toInteger(100,22);
+    p := a*b;
+    [-p.overflow];
+    str.get(p);
+    str.setPalindrome();
+}

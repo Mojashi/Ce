@@ -4,7 +4,9 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <stack>
 #include <utility>
+#include <set>
 #include <memory>
 #include <list>
 
@@ -20,6 +22,7 @@ extern int yylex();
 extern int yylex_destroy();
 extern int yyparse();
 extern int yylineno;
+extern FILE* yyin;
 void yyerror(const char * msg) { 
 	std::cout << msg << " line:" << yylineno << std::endl; exit(0);
 }
@@ -27,7 +30,9 @@ void yyerror(const char * msg) {
 extern shared_ptr<Structure> godStruct;
 extern shared_ptr<Structure> boolStruct;
 extern shared_ptr<Structure> integerStruct;
+	extern stack<FILE*> fstack;
 map<string, shared_ptr<Structure>> avStructure;
+
 
 int readProgram(){
 	avStructure["Bool"] = boolStruct;
@@ -75,7 +80,6 @@ shared_ptr<Structure> findStruct(string name){
 	}
 
 	%token ASSIGN
-	%token SAME
 	%token<name> NAME
 	%token<ival> NUMBER
 	%token LPAREN
@@ -98,10 +102,14 @@ shared_ptr<Structure> findStruct(string name){
 	%token MINIMIZE
 	%token PROP
 
-	%left  PLUS MINUS
-	%left  MULT DIV MOD
-	%left  DOUBLE_MULT
-	%left  LESS LESSEQ GREAT GREATEQ EQ NOTEQ
+	%left SAME
+	%left<name> OP7
+	%left<name> OP6
+	%left<name> OP5
+	%left<name> OP4
+	%left<name> OP3 MINUS
+	%left<name> OP2
+	%left<name> OP1
 
 	%nonassoc UMINUS
 	%nonassoc ELSE
@@ -164,6 +172,7 @@ shared_ptr<Structure> findStruct(string name){
 			shared_ptr<Function> propertyFunc(new Function(shared_ptr<Structure>(), "PROPERTYFUNCTION", {}, shared_ptr<ASTNode>($4)));
 			$$->addFunction(propertyFunc);
 		}
+		| members structdec SEMICOLON{} //just declare
         | {
 			$$ = new Structure();
 		}
@@ -179,28 +188,32 @@ shared_ptr<Structure> findStruct(string name){
 	}
 	;
 	structdec : STRUCT NAME{
-		$$ = new Structure();
-		$$->setName(*$2);
-		addStruct($$->getPtr());
+		if(avStructure.count(*$2) == 0){
+			$$ = new Structure();
+			$$->setName(*$2);
+			addStruct($$->getPtr());
+		}
+		else $$ = findStruct(*$2).get();
 		delete $2;
-	}
-	| STRUCT NAME COLON LPAREN argument_list RPAREN{
-		$$ = new Structure();
-		$$->setName(*$2);
-		$$->setThroughArgs(*$5);
-		addStruct($$->getPtr());
-		delete $2;
-		delete $5;
 	}
 	;
     structdef : structdec LBRACE members RBRACE {
 		$3->setName($1->getName());
-		$3->setThroughArgs($1->getThroughArgs());
 		*$1 = *$3;
 		$$ = $1;
 		for(auto stc : $3->getStructs()){
 			remStruct(stc.first);
 		}
+    }
+	|structdec COLON LPAREN argument_list RPAREN LBRACE members RBRACE {
+		$7->setName($1->getName());
+		$7->setThroughArgs(*$4);
+		*$1 = *$7;
+		$$ = $1;
+		for(auto stc : $7->getStructs()){
+			remStruct(stc.first);
+		}
+		delete $4;
     }
     ;
 	argument_list
@@ -311,7 +324,11 @@ shared_ptr<Structure> findStruct(string name){
 			$$ = $1;
 		}
 		| FOR LPAREN NAME COMMA expr RPAREN LBRACE stmt RBRACE{
-			$$ = (ASTNode*) (new ASTFor(*$3, shared_ptr<ASTNode>($5), shared_ptr<ASTNode>($8)));
+			$$ = (ASTNode*) (new ASTFor(*$3, shared_ptr<ASTNode>(), shared_ptr<ASTNode>($5), shared_ptr<ASTNode>($8)));
+			delete $3;
+		}
+		| FOR LPAREN NAME COMMA expr COMMA expr RPAREN LBRACE stmt RBRACE{
+			$$ = (ASTNode*) (new ASTFor(*$3, shared_ptr<ASTNode>($5), shared_ptr<ASTNode>($7), shared_ptr<ASTNode>($10)));
 			delete $3;
 		}
 	;
@@ -319,11 +336,11 @@ shared_ptr<Structure> findStruct(string name){
 	expr_list
 		: expr  {
 			$$ = new list<shared_ptr<ASTNode>>();
-			$$->push_front(shared_ptr<ASTNode>($1));	
+			$$->push_back(shared_ptr<ASTNode>($1));	
 		}
 		| expr_list COMMA expr {
 			$$ = $1;
-			$$->push_front(shared_ptr<ASTNode>($3));
+			$$->push_back(shared_ptr<ASTNode>($3));
 		}
 		| {$$ = new list<shared_ptr<ASTNode>>();}
 	;
@@ -331,41 +348,29 @@ shared_ptr<Structure> findStruct(string name){
 		: expr SAME expr 	{ 
 			$$ = (ASTNode*)(new ASTSame(shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)));
 		}
-		| expr PLUS expr 	{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator+", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+		| expr OP1 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+			}
+		| expr OP2 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+			}
+		| expr OP3 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+			}
+		| expr OP4 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+			}
+		| expr OP5 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+			}
+		| expr OP6 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+			}
+		| expr OP7 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
 			}
 		| expr MINUS expr 	{ 
 			$$ = (ASTNode*)(new ASTCallFunction("operator-", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr MULT expr 	{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator*", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr DOUBLE_MULT expr	{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator^", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr DIV expr		{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator/", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr MOD expr	{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator%", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr LESS expr{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator<", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr LESSEQ expr{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator<=", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr GREAT expr	{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator>", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr GREATEQ expr	{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator>=", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr EQ expr		{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator==", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
-			}
-		| expr NOTEQ expr		{ 
-			$$ = (ASTNode*)(new ASTCallFunction("operator!=", {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
 			}
 		| MINUS expr %prec UMINUS	{ 
 			$$ = (ASTNode*)(new ASTCallFunction("operator-", {shared_ptr<ASTNode>($2)}));

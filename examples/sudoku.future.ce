@@ -1,0 +1,46 @@
+
+import "stl/integer.ce"
+
+
+/* todo 
+    ar[ st: end: step]
+    all_distinct
+    initializer list
+    function broad cast
+*/
+
+struct Sudoku{
+    Integer:(4) mat[9][9];
+    prop{
+        for(i,9){
+            for(j,9){
+                [-mat[i][j].overflow];
+            }
+            all_distinct(mat[i]);
+            all_distinct(mat[::][i]);
+        }
+        
+        for(x,3){for(y,3){
+            all_distinct(mat[x*3 : x*3 + 3 : 1][y*3 : y*3 + 3 : 1]);
+        }}
+    }
+    
+    void set(SysInt i, SysInt j, Integer x){
+        mat[i][j] = x;
+    }
+}
+
+Sudoku sudoku;
+void main(){
+    sudoku.mat = toInteger({
+        {0,  , 1, 2, 3,  , 5,  ,  },
+        {9,  ,  ,  , 4, 5,  ,  ,  },
+        { ,  ,  ,  ,  ,  ,  ,  ,  },
+        { ,  ,  ,  ,  ,  ,  ,  ,  },
+        { , 3, 4,  ,  , 8, 7,  ,  },
+        { ,  , 8,  ,  ,  ,  ,  , 7},
+        { , 2,  ,  ,  ,  ,  ,  ,  },
+        { ,  ,  ,  ,  , 6,  ,  ,  },
+        { ,  ,  ,  ,  ,  ,  , 3,  }
+    });
+}

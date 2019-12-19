@@ -21,7 +21,7 @@ string concatIdent(list<string> ident){
 
 void Variable::assign(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
-    if(getType() == boolStruct){
+    if(getType() == boolStruct || getType() == integerStruct){
         reinterpret_cast<BoolVariable*>(this)->setlitNum(reinterpret_cast<BoolVariable*>(var.get())->getlitNum());
     }
     else{
@@ -49,7 +49,7 @@ void Variable::makeMembs(){
     for(auto stc : structure->getVariables()){
         list<shared_ptr<Variable>> params;
         for(auto param : stc.second.second){
-            params.push_back(param->eval());
+            params.push_back(param->eval()->copy());
         }
         variables[stc.first] = stc.second.first->getInstance(getPtr(), params);
     }
@@ -213,7 +213,7 @@ shared_ptr<Variable> ASTCallFunction::eval(){
 #endif
     list<shared_ptr<Variable>> params;
     for(auto param : child){
-        params.push_back(param->eval());
+        params.push_back(param->eval()->copy());
     }
     InsFunction func;
     if(ident){
@@ -246,7 +246,7 @@ shared_ptr<Variable> ASTDeclareVar::eval(){
     list<shared_ptr<Variable>> evedParams;
 
     for(shared_ptr<ASTNode> node : thParams){
-        evedParams.push_back(node->eval());
+        evedParams.push_back(node->eval()->copy());
     }
 
     auto name = names.begin();
@@ -365,17 +365,17 @@ shared_ptr<Variable> ASTFor::eval(){
 #endif
     vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
     cv[0]->eval();
-    shared_ptr<Variable> var = cv[1]->eval();
+    shared_ptr<Variable> var = cv[2]->eval();
     if(var->getType()->getBuiltInType() != INTEGERSTRUCT){
         cerr << "this expression must be SysInt" << endl;
         exit(0);
     }
-    int numOfLoop = ((BoolVariable*)(var.get()))->getlitNum();
-
-    for(int i = 0; numOfLoop > i; i++){
+    int st = 0,numOfLoop = ((BoolVariable*)(var.get()))->getlitNum();
+    if(cv[1]) st = ((BoolVariable*)(cv[1]->eval().get()))->getlitNum();
+    for(int i = st; numOfLoop > i; i++){
         map<string, shared_ptr<Variable>> cvLocalVar(localVar);
         ((BoolVariable*)(localVar[ctname].get()))->setlitNum(i);
-        cv[2]->eval();
+        cv[3]->eval();
         localVar = cvLocalVar;
     }
     localVar.erase(ctname);

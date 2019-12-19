@@ -1,0 +1,60 @@
+import "stl/integer.ce"
+
+struct Graph{ //単純無向グラフ　自己閉路なし
+    Bool matrix[10][10];
+    
+    void constructor(){
+        for(i,10){
+            for(j,10){
+                matrix[i][j] := matrix[j][i];
+            }
+            [-matrix[i][i]];
+        }
+    }
+
+    void addEdge(SysInt from, SysInt to){
+        [matrix[from][to]];
+        [matrix[to][from]];
+    }
+
+    Integer countEdge(){
+        Integer num;
+        num.getInteger(0);
+        for(i,10){
+            for(j,i){
+                num := num + matrix[i][j];
+            }
+        }
+        return num;
+    }
+
+    Graph getMatching(){
+        Graph ret;
+        ret.constructor();
+        
+        for(i,10){
+            for(j,10){
+                [-ret.matrix[i][j],matrix[i][j]]; //マッチングで辺があるのに元のグラフで辺がないのはおかしい。
+                for(k,j){
+                    [-ret.matrix[i][j], -ret.matrix[i][k]]; //同じ頂点からは1本だけ
+                }
+            }
+        }
+        return ret;
+    }
+
+    Integer getVertexCoverSize(){
+        Bool ar[10];
+        Integer count;
+        count.getInteger(0);
+        for(i, 10){
+            for(j,i){
+                [-matrix[i][j], ar[i],ar[j]];
+            }
+        }
+        for(i,10){
+            count := count + ar[i];
+        }
+        return count;
+    }
+}

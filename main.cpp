@@ -40,6 +40,36 @@ void builtIn(){
     ));
     shared_ptr<Function> minusFunc(new Function(integerStruct, "operator-",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intMinusAST));
     integerStruct->addFunction(minusFunc);
+    shared_ptr<ASTNode> intMulAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()*((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> mulFunc(new Function(integerStruct, "operator*",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intMulAST));
+    integerStruct->addFunction(mulFunc);
+    shared_ptr<ASTNode> intdivAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()/((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> divFunc(new Function(integerStruct, "operator/",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intdivAST));
+    integerStruct->addFunction(divFunc);
+    shared_ptr<ASTNode> intmodAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()%((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> modFunc(new Function(integerStruct, "operator%",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intmodAST));
+    integerStruct->addFunction(modFunc);
     
 
     shared_ptr<ASTNode> notFuncAst(new ASTLambda(
@@ -67,7 +97,7 @@ void builtInFuncs(){
             return ret;
         }
     ));
-    getBitFunc = shared_ptr<Function>(new Function(boolStruct, "getBit", {std::make_pair(integerStruct, "idx"),std::make_pair(integerStruct, "x")}, getBitAst));
+    getBitFunc = shared_ptr<Function>(new Function(boolStruct, "getBit", {std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "idx")}, getBitAst));
 	godStruct->addFunction(getBitFunc);
 	
     shared_ptr<ASTNode> setMaxAst(new ASTLambda(
@@ -94,7 +124,7 @@ void builtInFuncs(){
 
 void outputResult(shared_ptr<Variable> var, vector<bool>& ans, string ident){
     if(var->getType()->getBuiltInType() == BOOLSTRUCT){
-        cout << ident << ":" << ans[((BoolVariable*)(var->getPtr().get()))->getlitNum()] << endl;
+        cout << ident << ":" << ans[abs(((BoolVariable*)(var->getPtr().get()))->getlitNum())] << endl;
         return;
     }
     if(var->getType()->getName() == "Integer"){
@@ -114,6 +144,22 @@ void outputResult(shared_ptr<Variable> var, vector<bool>& ans, string ident){
         outputResult(var.second, ans, ident + var.first);
     }
 }
+
+
+void banSolution(shared_ptr<Variable> var, vector<bool>& ans, Clause& cl){
+    if(var->getType()->getBuiltInType() == BOOLSTRUCT){
+        int num = abs(((BoolVariable*)(var->getPtr().get()))->getlitNum());
+        int an= ans[num];
+        an = an * 2 - 1;
+        cl.push_back(-num * an);
+    }
+    else{
+        for(auto var : var->getVariables()){
+            banSolution(var.second, ans, cl);
+        }
+    }
+}
+
 int main(int argc, char const *argv[]){
 #ifdef DEBUG
 	extern int yydebug;
@@ -136,27 +182,48 @@ int main(int argc, char const *argv[]){
     InsFunction mainFunc = {godVar, godVar->getFunction("main").front()};
     mainFunc.call({});
     
-    if(objType == 0){
-        std::vector<bool> ans(cnf.solve());
-        if(ans.size()){
-            cout << "solved!" << endl;
-            outputResult(godVar, ans, "");
-        }
-        else cout << "UNSAT" << endl;
-    }
-    else if(objType == 1){
+    while(1){
         std::vector<bool> ans;
-        int sz = objVar->getVariable("val")->getVariables().size();
-        for(int i = sz - 1;0 <= i; i--){
-            int clNum = cnf.addClause({(Literal)((BoolVariable*)(objVar->getVariable("val")->getVariable(to_string(i)).get()))->getlitNum()});
+        if(objType == 0){
             ans = cnf.solve();
-            cout << (ans.size() > 0 )<< endl;
-            if(!ans.size()) cnf.remClause(clNum);
+            if(ans.size()){
+                cout << "solved!" << endl;
+                outputResult(godVar, ans, "");
+            }
+            else {
+                cout << "UNSAT" << endl;
+                break;
+            }
         }
-        ans = cnf.solve();
-        outputResult(godVar, ans, "");
-        cout << "objVar:";
-        outputResult(objVar, ans, "");
-    }
+        else if(objType == 1){
+            CNF cnf2 = cnf;
+            int sz = objVar->getVariable("val")->getVariables().size();
+            for(int i = sz - 1;0 <= i; i--){
+                int clNum = cnf2.addClause({(Literal)((BoolVariable*)(objVar->getVariable("val")->getVariable(to_string(i)).get()))->getlitNum()});
+                ans = cnf2.solve();
+                cout << (ans.size() > 0 )<< endl;
+                if(!ans.size()) cnf2.remClause(clNum);
+            }
+            ans = cnf2.solve();
+            if(ans.size()){
+                outputResult(godVar, ans, "");
+                cout << "objVar:";
+                outputResult(objVar, ans, "");
+            }
+            else {
+                cout << "UNSAT" << endl;
+                break;
+            }
+        }
+
+        int retry = 0;
+        cout << "exit->0   get another solution->1 : ";
+        cin >> retry;
+        if(!retry) break;
+
+        Clause cl;
+        banSolution(godVar, ans, cl);
+        cnf.addClause(cl);
+    };
     return 0;
 }

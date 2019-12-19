@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Debug/Ce.exe",
-            "args": ["test.vg"],
+            "args": ["test.ce"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

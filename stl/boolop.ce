@@ -1,0 +1,33 @@
+Bool and(Bool a, Bool b){
+    Bool ret;
+    [-a,-b,ret];
+    [a,-ret];
+    [b,-ret];
+    return ret;
+}
+Bool or(Bool a, Bool b){
+    Bool ret;
+    [a,b,-ret];
+    [-a,ret];
+    [-b,ret];
+    return ret;
+}
+Bool xor(Bool a, Bool b){
+    Bool ret;
+    [a,b,-ret];
+    [-a,-b,-ret];
+    [-a,b,ret];
+    [a,-b,ret];
+    return ret;
+}
+Bool operator:>(Bool a, Bool b){
+    Bool ret;
+    [-b, -ret];
+    [a,  b, -ret];
+    [-a, b, ret];
+    return ret;
+}
+
+Bool operator:<(Bool a, Bool b){
+    return b :> a;
+}

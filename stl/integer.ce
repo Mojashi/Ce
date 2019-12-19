@@ -1,0 +1,283 @@
+import "stl/boolop.ce"
+struct SC{
+    Bool s, c;
+}
+    SC halfadder(Bool a, Bool b){
+        SC ret;
+        ret.s := xor(a,b);
+        ret.c := and(a,b);
+        return ret;
+    }
+    SC halfsuber(Bool a, Bool b){
+        SC ret;
+        ret.s := xor(a,b);
+        [a, -b, ret.c];
+        [-a, -ret.c];
+        [a, b, -ret.c];
+        return ret;
+    }
+    SC fullsuber(Bool a, Bool b, Bool c){
+        SC ret;
+        [a,b,c,-ret.s];
+        [a,b,-c,ret.s];
+        [a,-b,c,ret.s];
+        [a,-b,-c,-ret.s];
+        [-a,b,c,ret.s];
+        [-a,b,-c,-ret.s];
+        [-a,-b,c,-ret.s];
+        [-a,-b,-c,ret.s];
+        
+        [a,b,c,-ret.c];
+        [a,b,-c,ret.c];
+        [a,-b,c,ret.c];
+        [a,-b,-c,ret.c];
+        [-a,b,c,-ret.c];
+        [-a,b,-c,-ret.c];
+        [-a,-b,c,-ret.c];
+        [-a,-b,-c,ret.c];
+        return ret;
+    }
+    SC fulladder(Bool a, Bool b, Bool c){
+        SC ret;
+        [-a,-b,-c,ret.s];
+        [-a,b,c,ret.s];
+        [a,b,-c,ret.s];
+        [a,-b,c,ret.s];
+        [a,b,c, -ret.s];
+        [-a,-b,c,-ret.s];
+        [-a,b,-c,-ret.s];
+        [a,-b,-c,-ret.s];
+        
+        [-b,-c,ret.c];
+        [-a,-c,ret.c];
+        [-b,-a,ret.c];
+        [b,c,-ret.c];
+        [a,c,-ret.c];
+        [b,a,-ret.c];
+        return ret;
+    }
+
+
+struct PairInt;
+
+struct Integer:(SysInt SIZE){
+    Bool val[SIZE];
+    Bool overflow;
+    
+    Integer rshift(){
+        Integer:(SIZE) ret;
+        for(i,SIZE - 1){
+            ret.val[SIZE - 2 - i] := val[SIZE - 1 - i];
+        }
+        [-ret.val[SIZE - 1]];
+        ret.overflow := overflow;
+        return ret;
+    }
+    Integer lshift(){
+        Integer:(SIZE) ret;
+        for(i,SIZE - 1){
+            ret.val[i + 1] := val[i];
+        }
+        [-ret.val[0]];
+        ret.overflow := or(val[SIZE - 1], overflow);
+        return ret;
+    }
+    Integer lshift(SysInt n){
+        Integer:(SIZE) ret;
+        for(i,SIZE - n){
+            ret.val[i + n] := val[i];
+        }
+        ret.overflow := overflow;
+        for(i,n){
+            [-ret.val[i]];
+            ret.overflow := or(val[SIZE - i - 1], ret.overflow);
+        }
+        return ret;
+    }
+    Integer upCast(SysInt nSIZE){
+        Integer:(nSIZE) ret;
+        for(i,SIZE){
+            ret.val[i] := val[i];
+        }
+        for(i,nSIZE - SIZE){
+            [-ret.val[i + SIZE]];
+        }
+        [-ret.overflow];
+        return ret;
+    }
+    Integer operator/(Integer a,Integer b){
+        PairInt:(a.SIZE) ret;
+        ret = divide(a,b);
+        return ret.d;
+    }
+    
+    Integer operator%(Integer a,Integer b){
+        PairInt:(a.SIZE) ret;
+        ret = divide(a,b);
+        return ret.r;
+    }
+    Integer operator*(Integer a, Bool b){
+        Integer:(a.SIZE) ret;
+        for(i,a.SIZE){
+            ret.val[i] := and(a.val[i],b);
+        }
+        ret.overflow := and(a.overflow,b);
+        return ret;
+    }
+    Integer operator*(Integer a, Integer b){
+        Integer:(a.SIZE) ret;
+        ret.getInteger(0);
+        for(i,b.SIZE){
+            ret := ret + a * b.val[i];
+            a:=a.lshift();
+        }
+        return ret;
+    }
+    Integer operator-(Integer a, Integer b){
+        Integer:(a.SIZE) ret;
+        Bool carry;
+        [-carry];
+        for(i, a.SIZE){
+            SC sc;
+            sc := fullsuber(a.val[i], carry, b.val[i]);
+            carry := sc.c;
+            ret.val[i] := sc.s;
+        }
+        [-ret.overflow];
+        return ret;
+    }
+    Integer operator+(Integer a, Integer b){
+        Bool carry;
+        Integer:(a.SIZE) ret;
+        [-carry];
+        for(i,SIZE){
+            SC sc;
+            sc := fulladder(a.val[i],b.val[i],carry);
+            carry := sc.c;
+            ret.val[i] := sc.s;
+        }
+        ret.overflow := or(or(carry,a.overflow),b.overflow);
+        return ret;
+    }
+    Integer operator+(Integer a, Bool b){
+        Bool carry;
+        Integer:(a.SIZE) ret;
+        carry := b;
+        for(i,a.SIZE){
+            SC sc;
+            sc := halfadder(a.val[i],carry);
+            carry := sc.c;
+            ret.val[i] := sc.s;
+        }
+        ret.overflow := or(carry,a.overflow);
+        return ret;
+    }
+    Bool operator==(Integer a, Integer b){
+        Bool ret;
+        [-ret];
+        for(i,SIZE){
+            ret := or(ret,xor(a.val[i],b.val[i]));
+        }
+        ret := or(ret,xor(a.overflow,b.overflow));
+        return -ret;
+    }
+    Bool operator:!=(Integer a, Integer b){
+        Bool ret;
+        ret := a == b;
+        return -ret;
+    }   
+    void operator!=(Integer a, Integer b){
+        [a :!= b];
+    }
+    
+    Bool operator:>(Integer a, Integer b){
+        Bool ret, bb;
+        [-ret];
+        [-bb];
+        for(i,a.SIZE){
+            Bool buf, nret;
+            buf := a.val[a.SIZE-i - 1] :> b.val[a.SIZE-i - 1];
+            bb  := or(bb,a.val[a.SIZE-i - 1] :< b.val[a.SIZE-i - 1]);
+            [buf, -nret];
+            [-bb, -nret];
+            [-buf, bb, nret];
+            ret := or(ret, nret);
+        }
+        return ret;
+    }
+    Bool operator:<(Integer a, Integer b){
+        return b :> a;
+    }    
+    Bool operator:>=(Integer a, Integer b){
+        return or(a:>b,a==b);
+    }
+    Bool operator:<=(Integer a, Integer b){
+        return or(a:<b,a==b);
+    }
+    void operator>(Integer a, Integer b){
+        [a :> b];
+    }
+    void operator<(Integer a, Integer b){
+        [a :< b];
+    }
+    void operator>=(Integer a, Integer b){
+        [a :>= b];
+    }
+    void operator<=(Integer a, Integer b){
+        [a :<= b];
+    }
+
+    void getInteger(SysInt n){
+        for(i,SIZE){
+            val[i] := getBit(n,i);
+        }
+        [-overflow];
+    }
+}
+
+struct PairInt:(SysInt SIZE){
+    Integer:(SIZE) d,r;
+}
+
+PairInt divide(Integer a, Integer b){
+    Integer:(b.SIZE + b.SIZE-1) bb,aa;
+    PairInt:(b.SIZE) ret;
+    aa := a.upCast(b.SIZE + b.SIZE-1);
+    bb := b.upCast(b.SIZE + b.SIZE-1).lshift(b.SIZE-1);
+    for(i,b.SIZE){
+        Bool buf;
+        buf := aa :>= bb;
+        ret.d.val[b.SIZE - i - 1] := buf;
+        aa := aa - bb * buf;
+        bb := bb.rshift();
+    }
+    ret.r := aa;
+    [-ret.d.overflow];
+    return ret;
+}
+
+Integer toInteger(SysInt n, SysInt size){
+    Integer:(size) ret;
+    for(i,size){
+        ret.val[i] := getBit(n,i);
+    }
+    [-ret.overflow];
+    return ret;
+}
+
+
+struct DecStr:(SysInt LEN){
+    Integer:(4) str[LEN];
+    
+    void get(Integer x){
+        for(i,LEN){
+            str[i] := x%toInteger(10,x.SIZE);
+            x := x/toInteger(10,x.SIZE);
+        }
+    }
+    void setPalindrome(){
+        for(i,LEN){
+            str[i] = str[LEN-i - 1];
+        }
+    }
+}

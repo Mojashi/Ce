@@ -1,0 +1,14 @@
+import "graph.ce"
+
+Graph g,m;
+Integer MaxMatchingSize;
+
+void main(){
+    g.constructor();
+    g.countEdge() = toInteger(20);
+    MaxMatchingSize := toInteger(4);
+
+    m := g.getMatching();
+    m.countEdge() = MaxMatchingSize;
+    g.getVertexCoverSize() = MaxMatchingSize;
+}

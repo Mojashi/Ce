@@ -374,10 +374,10 @@ public:
 class ASTFor : public ASTNode{
     string ctname;
 public:
-    ASTFor(string _ctname, shared_ptr<ASTNode> nExpr, shared_ptr<ASTNode> stmt):ctname(_ctname){
+    ASTFor(string _ctname, shared_ptr<ASTNode> stExpr, shared_ptr<ASTNode> nExpr, shared_ptr<ASTNode> stmt):ctname(_ctname){
         shared_ptr<ASTNode> decCt(new ASTDeclareVar({integerStruct}, {},{ctname}));
 
-        setChild({decCt, nExpr, stmt});
+        setChild({decCt,stExpr, nExpr, stmt});
         nodetype = FORNODE;
     }
     shared_ptr<Variable> eval();

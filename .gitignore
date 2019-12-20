@@ -1,0 +1,12 @@
+*.o
+*.stackdump
+*.dot
+parse.tab.c
+parse.tab.h
+/Debug/*
+/Release/*
+cnf.dimacs
+conflict.log
+lex.yy.c
+result.txt
+/.vscode/*

@@ -1,0 +1,1956 @@
+Nonterminals useless in grammar
+
+   ped_types
+
+
+Terminals unused in grammar
+
+   CONST
+   MAXIMIZE
+   MINIMIZE
+   ELSE
+
+
+状態 55 conflicts: 2 shift/reduce
+状態 90 conflicts: 2 shift/reduce
+状態 91 conflicts: 2 shift/reduce
+状態 92 conflicts: 2 shift/reduce
+状態 93 conflicts: 2 shift/reduce
+状態 94 conflicts: 2 shift/reduce
+状態 95 conflicts: 2 shift/reduce
+状態 96 conflicts: 2 shift/reduce
+状態 97 conflicts: 2 shift/reduce
+状態 98 conflicts: 2 shift/reduce
+
+
+文法
+
+    0 $accept: program $end
+
+    1 program: members ENDOFFILE
+
+    2 members: members funcdef
+    3        | members structdef
+    4        | members NAME var_list SEMICOLON
+    5        | members NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON
+    6        | members PROP LBRACE stmt RBRACE
+    7        | members structdec SEMICOLON
+    8        | %empty
+
+    9 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE stmt RBRACE
+
+   10 structdec: STRUCT NAME
+
+   11 structdef: structdec LBRACE members RBRACE
+   12          | structdec COLON LPAREN argument_list RPAREN LBRACE members RBRACE
+
+   13 argument_list: NAME NAME
+   14              | NAME NAME COMMA argument_list
+   15              | %empty
+
+   16 var_list: array_var
+   17         | var_list COMMA array_var
+
+   18 array_var: NAME
+   19          | array_var LBRACKET expr RBRACKET
+
+   20 stmt: line stmt
+   21     | selection stmt
+   22     | %empty
+
+   23 selection: IF LPAREN expr RPAREN LBRACE stmt RBRACE
+
+   24 line: expr ASSIGN expr SEMICOLON
+   25     | LBRACKET expr_list RBRACKET SEMICOLON
+   26     | RETURN expr SEMICOLON
+   27     | NAME var_list SEMICOLON
+   28     | NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON
+   29     | expr SEMICOLON
+   30     | FOR LPAREN NAME COMMA expr RPAREN LBRACE stmt RBRACE
+   31     | FOR LPAREN NAME COMMA expr COMMA expr RPAREN LBRACE stmt RBRACE
+
+   32 expr_list: expr
+   33          | expr_list COMMA expr
+   34          | %empty
+
+   35 expr: expr SAME expr
+   36     | expr OP1 expr
+   37     | expr OP2 expr
+   38     | expr OP3 expr
+   39     | expr OP4 expr
+   40     | expr OP5 expr
+   41     | expr OP6 expr
+   42     | expr OP7 expr
+   43     | expr MINUS expr
+   44     | MINUS expr
+   45     | NUMBER
+   46     | expr PERIOD NAME LPAREN expr_list RPAREN
+   47     | LPAREN expr RPAREN
+   48     | NAME LPAREN expr_list RPAREN
+   49     | NAME
+   50     | expr PERIOD NAME
+   51     | expr LBRACKET expr RBRACKET
+
+
+出現位置の規則による終端
+
+$end (0) 0
+error (256)
+ASSIGN (258) 24
+NAME (259) 4 5 9 10 13 14 18 27 28 30 31 46 48 49 50
+NUMBER (260) 45
+LPAREN (261) 5 9 12 23 28 30 31 46 47 48
+RPAREN (262) 5 9 12 23 28 30 31 46 47 48
+IF (263) 23
+COMMA (264) 14 17 30 31 33
+RETURN (265) 26
+LBRACKET (266) 19 25 51
+RBRACKET (267) 19 25 51
+LBRACE (268) 6 9 11 12 23 30 31
+RBRACE (269) 6 9 11 12 23 30 31
+STRUCT (270) 10
+SEMICOLON (271) 4 5 7 24 25 26 27 28 29
+COLON (272) 5 12 28
+PERIOD (273) 46 50
+CONST (274)
+ENDOFFILE (275) 1
+FOR (276) 30 31
+MAXIMIZE (277)
+MINIMIZE (278)
+PROP (279) 6
+SAME (280) 35
+OP7 (281) 42
+OP6 (282) 41
+OP5 (283) 40
+OP4 (284) 39
+OP3 (285) 38
+MINUS (286) 43 44
+OP2 (287) 37
+OP1 (288) 36
+UMINUS (289)
+ELSE (290)
+
+
+出現位置の規則による非終端
+
+$accept (36)
+    左辺: 0
+program (37)
+    左辺: 1, 右辺: 0
+members (38)
+    左辺: 2 3 4 5 6 7 8, 右辺: 1 2 3 4 5 6 7 11 12
+funcdef (39)
+    左辺: 9, 右辺: 2
+structdec (40)
+    左辺: 10, 右辺: 7 11 12
+structdef (41)
+    左辺: 11 12, 右辺: 3
+argument_list (42)
+    左辺: 13 14 15, 右辺: 9 12 14
+var_list (43)
+    左辺: 16 17, 右辺: 4 5 17 27 28
+array_var (44)
+    左辺: 18 19, 右辺: 16 17 19
+stmt (45)
+    左辺: 20 21 22, 右辺: 6 9 20 21 23 30 31
+selection (46)
+    左辺: 23, 右辺: 21
+line (47)
+    左辺: 24 25 26 27 28 29 30 31, 右辺: 20
+expr_list (48)
+    左辺: 32 33 34, 右辺: 5 25 28 33 46 48
+expr (49)
+    左辺: 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51, 右辺:
+    19 23 24 26 29 30 31 32 33 35 36 37 38 39 40 41 42 43 44 46 47
+    50 51
+
+
+State 0
+
+    0 $accept: . program $end
+
+    $default  reduce using rule 8 (members)
+
+    program  go to state 1
+    members  go to state 2
+
+
+State 1
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 program: members . ENDOFFILE
+    2 members: members . funcdef
+    3        | members . structdef
+    4        | members . NAME var_list SEMICOLON
+    5        | members . NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON
+    6        | members . PROP LBRACE stmt RBRACE
+    7        | members . structdec SEMICOLON
+
+    NAME       shift, and go to state 4
+    STRUCT     shift, and go to state 5
+    ENDOFFILE  shift, and go to state 6
+    PROP       shift, and go to state 7
+
+    funcdef    go to state 8
+    structdec  go to state 9
+    structdef  go to state 10
+
+
+State 3
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 4
+
+    4 members: members NAME . var_list SEMICOLON
+    5        | members NAME . COLON LPAREN expr_list RPAREN var_list SEMICOLON
+    9 funcdef: NAME . NAME LPAREN argument_list RPAREN LBRACE stmt RBRACE
+
+    NAME   shift, and go to state 11
+    COLON  shift, and go to state 12
+
+    var_list   go to state 13
+    array_var  go to state 14
+
+
+State 5
+
+   10 structdec: STRUCT . NAME
+
+    NAME  shift, and go to state 15
+
+
+State 6
+
+    1 program: members ENDOFFILE .
+
+    $default  reduce using rule 1 (program)
+
+
+State 7
+
+    6 members: members PROP . LBRACE stmt RBRACE
+
+    LBRACE  shift, and go to state 16
+
+
+State 8
+
+    2 members: members funcdef .
+
+    $default  reduce using rule 2 (members)
+
+
+State 9
+
+    7 members: members structdec . SEMICOLON
+   11 structdef: structdec . LBRACE members RBRACE
+   12          | structdec . COLON LPAREN argument_list RPAREN LBRACE members RBRACE
+
+    LBRACE     shift, and go to state 17
+    SEMICOLON  shift, and go to state 18
+    COLON      shift, and go to state 19
+
+
+State 10
+
+    3 members: members structdef .
+
+    $default  reduce using rule 3 (members)
+
+
+State 11
+
+    9 funcdef: NAME NAME . LPAREN argument_list RPAREN LBRACE stmt RBRACE
+   18 array_var: NAME .
+
+    LPAREN  shift, and go to state 20
+
+    $default  reduce using rule 18 (array_var)
+
+
+State 12
+
+    5 members: members NAME COLON . LPAREN expr_list RPAREN var_list SEMICOLON
+
+    LPAREN  shift, and go to state 21
+
+
+State 13
+
+    4 members: members NAME var_list . SEMICOLON
+   17 var_list: var_list . COMMA array_var
+
+    COMMA      shift, and go to state 22
+    SEMICOLON  shift, and go to state 23
+
+
+State 14
+
+   16 var_list: array_var .
+   19 array_var: array_var . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 24
+
+    $default  reduce using rule 16 (var_list)
+
+
+State 15
+
+   10 structdec: STRUCT NAME .
+
+    $default  reduce using rule 10 (structdec)
+
+
+State 16
+
+    6 members: members PROP LBRACE . stmt RBRACE
+
+    NAME      shift, and go to state 25
+    NUMBER    shift, and go to state 26
+    LPAREN    shift, and go to state 27
+    IF        shift, and go to state 28
+    RETURN    shift, and go to state 29
+    LBRACKET  shift, and go to state 30
+    FOR       shift, and go to state 31
+    MINUS     shift, and go to state 32
+
+    $default  reduce using rule 22 (stmt)
+
+    stmt       go to state 33
+    selection  go to state 34
+    line       go to state 35
+    expr       go to state 36
+
+
+State 17
+
+   11 structdef: structdec LBRACE . members RBRACE
+
+    $default  reduce using rule 8 (members)
+
+    members  go to state 37
+
+
+State 18
+
+    7 members: members structdec SEMICOLON .
+
+    $default  reduce using rule 7 (members)
+
+
+State 19
+
+   12 structdef: structdec COLON . LPAREN argument_list RPAREN LBRACE members RBRACE
+
+    LPAREN  shift, and go to state 38
+
+
+State 20
+
+    9 funcdef: NAME NAME LPAREN . argument_list RPAREN LBRACE stmt RBRACE
+
+    NAME  shift, and go to state 39
+
+    $default  reduce using rule 15 (argument_list)
+
+    argument_list  go to state 40
+
+
+State 21
+
+    5 members: members NAME COLON LPAREN . expr_list RPAREN var_list SEMICOLON
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    $default  reduce using rule 34 (expr_list)
+
+    expr_list  go to state 42
+    expr       go to state 43
+
+
+State 22
+
+   17 var_list: var_list COMMA . array_var
+
+    NAME  shift, and go to state 44
+
+    array_var  go to state 45
+
+
+State 23
+
+    4 members: members NAME var_list SEMICOLON .
+
+    $default  reduce using rule 4 (members)
+
+
+State 24
+
+   19 array_var: array_var LBRACKET . expr RBRACKET
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 46
+
+
+State 25
+
+   27 line: NAME . var_list SEMICOLON
+   28     | NAME . COLON LPAREN expr_list RPAREN var_list SEMICOLON
+   48 expr: NAME . LPAREN expr_list RPAREN
+   49     | NAME .
+
+    NAME    shift, and go to state 44
+    LPAREN  shift, and go to state 47
+    COLON   shift, and go to state 48
+
+    $default  reduce using rule 49 (expr)
+
+    var_list   go to state 49
+    array_var  go to state 14
+
+
+State 26
+
+   45 expr: NUMBER .
+
+    $default  reduce using rule 45 (expr)
+
+
+State 27
+
+   47 expr: LPAREN . expr RPAREN
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 50
+
+
+State 28
+
+   23 selection: IF . LPAREN expr RPAREN LBRACE stmt RBRACE
+
+    LPAREN  shift, and go to state 51
+
+
+State 29
+
+   26 line: RETURN . expr SEMICOLON
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 52
+
+
+State 30
+
+   25 line: LBRACKET . expr_list RBRACKET SEMICOLON
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    $default  reduce using rule 34 (expr_list)
+
+    expr_list  go to state 53
+    expr       go to state 43
+
+
+State 31
+
+   30 line: FOR . LPAREN NAME COMMA expr RPAREN LBRACE stmt RBRACE
+   31     | FOR . LPAREN NAME COMMA expr COMMA expr RPAREN LBRACE stmt RBRACE
+
+    LPAREN  shift, and go to state 54
+
+
+State 32
+
+   44 expr: MINUS . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 55
+
+
+State 33
+
+    6 members: members PROP LBRACE stmt . RBRACE
+
+    RBRACE  shift, and go to state 56
+
+
+State 34
+
+   21 stmt: selection . stmt
+
+    NAME      shift, and go to state 25
+    NUMBER    shift, and go to state 26
+    LPAREN    shift, and go to state 27
+    IF        shift, and go to state 28
+    RETURN    shift, and go to state 29
+    LBRACKET  shift, and go to state 30
+    FOR       shift, and go to state 31
+    MINUS     shift, and go to state 32
+
+    $default  reduce using rule 22 (stmt)
+
+    stmt       go to state 57
+    selection  go to state 34
+    line       go to state 35
+    expr       go to state 36
+
+
+State 35
+
+   20 stmt: line . stmt
+
+    NAME      shift, and go to state 25
+    NUMBER    shift, and go to state 26
+    LPAREN    shift, and go to state 27
+    IF        shift, and go to state 28
+    RETURN    shift, and go to state 29
+    LBRACKET  shift, and go to state 30
+    FOR       shift, and go to state 31
+    MINUS     shift, and go to state 32
+
+    $default  reduce using rule 22 (stmt)
+
+    stmt       go to state 58
+    selection  go to state 34
+    line       go to state 35
+    expr       go to state 36
+
+
+State 36
+
+   24 line: expr . ASSIGN expr SEMICOLON
+   29     | expr . SEMICOLON
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    ASSIGN     shift, and go to state 59
+    LBRACKET   shift, and go to state 60
+    SEMICOLON  shift, and go to state 61
+    PERIOD     shift, and go to state 62
+    SAME       shift, and go to state 63
+    OP7        shift, and go to state 64
+    OP6        shift, and go to state 65
+    OP5        shift, and go to state 66
+    OP4        shift, and go to state 67
+    OP3        shift, and go to state 68
+    MINUS      shift, and go to state 69
+    OP2        shift, and go to state 70
+    OP1        shift, and go to state 71
+
+
+State 37
+
+    2 members: members . funcdef
+    3        | members . structdef
+    4        | members . NAME var_list SEMICOLON
+    5        | members . NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON
+    6        | members . PROP LBRACE stmt RBRACE
+    7        | members . structdec SEMICOLON
+   11 structdef: structdec LBRACE members . RBRACE
+
+    NAME    shift, and go to state 4
+    RBRACE  shift, and go to state 72
+    STRUCT  shift, and go to state 5
+    PROP    shift, and go to state 7
+
+    funcdef    go to state 8
+    structdec  go to state 9
+    structdef  go to state 10
+
+
+State 38
+
+   12 structdef: structdec COLON LPAREN . argument_list RPAREN LBRACE members RBRACE
+
+    NAME  shift, and go to state 39
+
+    $default  reduce using rule 15 (argument_list)
+
+    argument_list  go to state 73
+
+
+State 39
+
+   13 argument_list: NAME . NAME
+   14              | NAME . NAME COMMA argument_list
+
+    NAME  shift, and go to state 74
+
+
+State 40
+
+    9 funcdef: NAME NAME LPAREN argument_list . RPAREN LBRACE stmt RBRACE
+
+    RPAREN  shift, and go to state 75
+
+
+State 41
+
+   48 expr: NAME . LPAREN expr_list RPAREN
+   49     | NAME .
+
+    LPAREN  shift, and go to state 47
+
+    $default  reduce using rule 49 (expr)
+
+
+State 42
+
+    5 members: members NAME COLON LPAREN expr_list . RPAREN var_list SEMICOLON
+   33 expr_list: expr_list . COMMA expr
+
+    RPAREN  shift, and go to state 76
+    COMMA   shift, and go to state 77
+
+
+State 43
+
+   32 expr_list: expr .
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    $default  reduce using rule 32 (expr_list)
+
+
+State 44
+
+   18 array_var: NAME .
+
+    $default  reduce using rule 18 (array_var)
+
+
+State 45
+
+   17 var_list: var_list COMMA array_var .
+   19 array_var: array_var . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 24
+
+    $default  reduce using rule 17 (var_list)
+
+
+State 46
+
+   19 array_var: array_var LBRACKET expr . RBRACKET
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    RBRACKET  shift, and go to state 78
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+
+State 47
+
+   48 expr: NAME LPAREN . expr_list RPAREN
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    $default  reduce using rule 34 (expr_list)
+
+    expr_list  go to state 79
+    expr       go to state 43
+
+
+State 48
+
+   28 line: NAME COLON . LPAREN expr_list RPAREN var_list SEMICOLON
+
+    LPAREN  shift, and go to state 80
+
+
+State 49
+
+   17 var_list: var_list . COMMA array_var
+   27 line: NAME var_list . SEMICOLON
+
+    COMMA      shift, and go to state 22
+    SEMICOLON  shift, and go to state 81
+
+
+State 50
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   47     | LPAREN expr . RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    RPAREN    shift, and go to state 82
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+
+State 51
+
+   23 selection: IF LPAREN . expr RPAREN LBRACE stmt RBRACE
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 83
+
+
+State 52
+
+   26 line: RETURN expr . SEMICOLON
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET   shift, and go to state 60
+    SEMICOLON  shift, and go to state 84
+    PERIOD     shift, and go to state 62
+    SAME       shift, and go to state 63
+    OP7        shift, and go to state 64
+    OP6        shift, and go to state 65
+    OP5        shift, and go to state 66
+    OP4        shift, and go to state 67
+    OP3        shift, and go to state 68
+    MINUS      shift, and go to state 69
+    OP2        shift, and go to state 70
+    OP1        shift, and go to state 71
+
+
+State 53
+
+   25 line: LBRACKET expr_list . RBRACKET SEMICOLON
+   33 expr_list: expr_list . COMMA expr
+
+    COMMA     shift, and go to state 77
+    RBRACKET  shift, and go to state 85
+
+
+State 54
+
+   30 line: FOR LPAREN . NAME COMMA expr RPAREN LBRACE stmt RBRACE
+   31     | FOR LPAREN . NAME COMMA expr COMMA expr RPAREN LBRACE stmt RBRACE
+
+    NAME  shift, and go to state 86
+
+
+State 55
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   44     | MINUS expr .
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+
+    LBRACKET  [reduce using rule 44 (expr)]
+    PERIOD    [reduce using rule 44 (expr)]
+    $default  reduce using rule 44 (expr)
+
+
+State 56
+
+    6 members: members PROP LBRACE stmt RBRACE .
+
+    $default  reduce using rule 6 (members)
+
+
+State 57
+
+   21 stmt: selection stmt .
+
+    $default  reduce using rule 21 (stmt)
+
+
+State 58
+
+   20 stmt: line stmt .
+
+    $default  reduce using rule 20 (stmt)
+
+
+State 59
+
+   24 line: expr ASSIGN . expr SEMICOLON
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 87
+
+
+State 60
+
+   51 expr: expr LBRACKET . expr RBRACKET
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 88
+
+
+State 61
+
+   29 line: expr SEMICOLON .
+
+    $default  reduce using rule 29 (line)
+
+
+State 62
+
+   46 expr: expr PERIOD . NAME LPAREN expr_list RPAREN
+   50     | expr PERIOD . NAME
+
+    NAME  shift, and go to state 89
+
+
+State 63
+
+   35 expr: expr SAME . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 90
+
+
+State 64
+
+   42 expr: expr OP7 . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 91
+
+
+State 65
+
+   41 expr: expr OP6 . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 92
+
+
+State 66
+
+   40 expr: expr OP5 . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 93
+
+
+State 67
+
+   39 expr: expr OP4 . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 94
+
+
+State 68
+
+   38 expr: expr OP3 . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 95
+
+
+State 69
+
+   43 expr: expr MINUS . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 96
+
+
+State 70
+
+   37 expr: expr OP2 . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 97
+
+
+State 71
+
+   36 expr: expr OP1 . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 98
+
+
+State 72
+
+   11 structdef: structdec LBRACE members RBRACE .
+
+    $default  reduce using rule 11 (structdef)
+
+
+State 73
+
+   12 structdef: structdec COLON LPAREN argument_list . RPAREN LBRACE members RBRACE
+
+    RPAREN  shift, and go to state 99
+
+
+State 74
+
+   13 argument_list: NAME NAME .
+   14              | NAME NAME . COMMA argument_list
+
+    COMMA  shift, and go to state 100
+
+    $default  reduce using rule 13 (argument_list)
+
+
+State 75
+
+    9 funcdef: NAME NAME LPAREN argument_list RPAREN . LBRACE stmt RBRACE
+
+    LBRACE  shift, and go to state 101
+
+
+State 76
+
+    5 members: members NAME COLON LPAREN expr_list RPAREN . var_list SEMICOLON
+
+    NAME  shift, and go to state 44
+
+    var_list   go to state 102
+    array_var  go to state 14
+
+
+State 77
+
+   33 expr_list: expr_list COMMA . expr
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 103
+
+
+State 78
+
+   19 array_var: array_var LBRACKET expr RBRACKET .
+
+    $default  reduce using rule 19 (array_var)
+
+
+State 79
+
+   33 expr_list: expr_list . COMMA expr
+   48 expr: NAME LPAREN expr_list . RPAREN
+
+    RPAREN  shift, and go to state 104
+    COMMA   shift, and go to state 77
+
+
+State 80
+
+   28 line: NAME COLON LPAREN . expr_list RPAREN var_list SEMICOLON
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    $default  reduce using rule 34 (expr_list)
+
+    expr_list  go to state 105
+    expr       go to state 43
+
+
+State 81
+
+   27 line: NAME var_list SEMICOLON .
+
+    $default  reduce using rule 27 (line)
+
+
+State 82
+
+   47 expr: LPAREN expr RPAREN .
+
+    $default  reduce using rule 47 (expr)
+
+
+State 83
+
+   23 selection: IF LPAREN expr . RPAREN LBRACE stmt RBRACE
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    RPAREN    shift, and go to state 106
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+
+State 84
+
+   26 line: RETURN expr SEMICOLON .
+
+    $default  reduce using rule 26 (line)
+
+
+State 85
+
+   25 line: LBRACKET expr_list RBRACKET . SEMICOLON
+
+    SEMICOLON  shift, and go to state 107
+
+
+State 86
+
+   30 line: FOR LPAREN NAME . COMMA expr RPAREN LBRACE stmt RBRACE
+   31     | FOR LPAREN NAME . COMMA expr COMMA expr RPAREN LBRACE stmt RBRACE
+
+    COMMA  shift, and go to state 108
+
+
+State 87
+
+   24 line: expr ASSIGN expr . SEMICOLON
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET   shift, and go to state 60
+    SEMICOLON  shift, and go to state 109
+    PERIOD     shift, and go to state 62
+    SAME       shift, and go to state 63
+    OP7        shift, and go to state 64
+    OP6        shift, and go to state 65
+    OP5        shift, and go to state 66
+    OP4        shift, and go to state 67
+    OP3        shift, and go to state 68
+    MINUS      shift, and go to state 69
+    OP2        shift, and go to state 70
+    OP1        shift, and go to state 71
+
+
+State 88
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+   51     | expr LBRACKET expr . RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    RBRACKET  shift, and go to state 110
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+
+State 89
+
+   46 expr: expr PERIOD NAME . LPAREN expr_list RPAREN
+   50     | expr PERIOD NAME .
+
+    LPAREN  shift, and go to state 111
+
+    $default  reduce using rule 50 (expr)
+
+
+State 90
+
+   35 expr: expr . SAME expr
+   35     | expr SAME expr .
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 35 (expr)]
+    PERIOD    [reduce using rule 35 (expr)]
+    $default  reduce using rule 35 (expr)
+
+
+State 91
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   42     | expr OP7 expr .
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 42 (expr)]
+    PERIOD    [reduce using rule 42 (expr)]
+    $default  reduce using rule 42 (expr)
+
+
+State 92
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   41     | expr OP6 expr .
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 41 (expr)]
+    PERIOD    [reduce using rule 41 (expr)]
+    $default  reduce using rule 41 (expr)
+
+
+State 93
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   40     | expr OP5 expr .
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 40 (expr)]
+    PERIOD    [reduce using rule 40 (expr)]
+    $default  reduce using rule 40 (expr)
+
+
+State 94
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   39     | expr OP4 expr .
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 39 (expr)]
+    PERIOD    [reduce using rule 39 (expr)]
+    $default  reduce using rule 39 (expr)
+
+
+State 95
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   38     | expr OP3 expr .
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 38 (expr)]
+    PERIOD    [reduce using rule 38 (expr)]
+    $default  reduce using rule 38 (expr)
+
+
+State 96
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   43     | expr MINUS expr .
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 43 (expr)]
+    PERIOD    [reduce using rule 43 (expr)]
+    $default  reduce using rule 43 (expr)
+
+
+State 97
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   37     | expr OP2 expr .
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    OP1       shift, and go to state 71
+
+    LBRACKET  [reduce using rule 37 (expr)]
+    PERIOD    [reduce using rule 37 (expr)]
+    $default  reduce using rule 37 (expr)
+
+
+State 98
+
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   36     | expr OP1 expr .
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+
+    LBRACKET  [reduce using rule 36 (expr)]
+    PERIOD    [reduce using rule 36 (expr)]
+    $default  reduce using rule 36 (expr)
+
+
+State 99
+
+   12 structdef: structdec COLON LPAREN argument_list RPAREN . LBRACE members RBRACE
+
+    LBRACE  shift, and go to state 112
+
+
+State 100
+
+   14 argument_list: NAME NAME COMMA . argument_list
+
+    NAME  shift, and go to state 39
+
+    $default  reduce using rule 15 (argument_list)
+
+    argument_list  go to state 113
+
+
+State 101
+
+    9 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE . stmt RBRACE
+
+    NAME      shift, and go to state 25
+    NUMBER    shift, and go to state 26
+    LPAREN    shift, and go to state 27
+    IF        shift, and go to state 28
+    RETURN    shift, and go to state 29
+    LBRACKET  shift, and go to state 30
+    FOR       shift, and go to state 31
+    MINUS     shift, and go to state 32
+
+    $default  reduce using rule 22 (stmt)
+
+    stmt       go to state 114
+    selection  go to state 34
+    line       go to state 35
+    expr       go to state 36
+
+
+State 102
+
+    5 members: members NAME COLON LPAREN expr_list RPAREN var_list . SEMICOLON
+   17 var_list: var_list . COMMA array_var
+
+    COMMA      shift, and go to state 22
+    SEMICOLON  shift, and go to state 115
+
+
+State 103
+
+   33 expr_list: expr_list COMMA expr .
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+    $default  reduce using rule 33 (expr_list)
+
+
+State 104
+
+   48 expr: NAME LPAREN expr_list RPAREN .
+
+    $default  reduce using rule 48 (expr)
+
+
+State 105
+
+   28 line: NAME COLON LPAREN expr_list . RPAREN var_list SEMICOLON
+   33 expr_list: expr_list . COMMA expr
+
+    RPAREN  shift, and go to state 116
+    COMMA   shift, and go to state 77
+
+
+State 106
+
+   23 selection: IF LPAREN expr RPAREN . LBRACE stmt RBRACE
+
+    LBRACE  shift, and go to state 117
+
+
+State 107
+
+   25 line: LBRACKET expr_list RBRACKET SEMICOLON .
+
+    $default  reduce using rule 25 (line)
+
+
+State 108
+
+   30 line: FOR LPAREN NAME COMMA . expr RPAREN LBRACE stmt RBRACE
+   31     | FOR LPAREN NAME COMMA . expr COMMA expr RPAREN LBRACE stmt RBRACE
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 118
+
+
+State 109
+
+   24 line: expr ASSIGN expr SEMICOLON .
+
+    $default  reduce using rule 24 (line)
+
+
+State 110
+
+   51 expr: expr LBRACKET expr RBRACKET .
+
+    $default  reduce using rule 51 (expr)
+
+
+State 111
+
+   46 expr: expr PERIOD NAME LPAREN . expr_list RPAREN
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    $default  reduce using rule 34 (expr_list)
+
+    expr_list  go to state 119
+    expr       go to state 43
+
+
+State 112
+
+   12 structdef: structdec COLON LPAREN argument_list RPAREN LBRACE . members RBRACE
+
+    $default  reduce using rule 8 (members)
+
+    members  go to state 120
+
+
+State 113
+
+   14 argument_list: NAME NAME COMMA argument_list .
+
+    $default  reduce using rule 14 (argument_list)
+
+
+State 114
+
+    9 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE stmt . RBRACE
+
+    RBRACE  shift, and go to state 121
+
+
+State 115
+
+    5 members: members NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON .
+
+    $default  reduce using rule 5 (members)
+
+
+State 116
+
+   28 line: NAME COLON LPAREN expr_list RPAREN . var_list SEMICOLON
+
+    NAME  shift, and go to state 44
+
+    var_list   go to state 122
+    array_var  go to state 14
+
+
+State 117
+
+   23 selection: IF LPAREN expr RPAREN LBRACE . stmt RBRACE
+
+    NAME      shift, and go to state 25
+    NUMBER    shift, and go to state 26
+    LPAREN    shift, and go to state 27
+    IF        shift, and go to state 28
+    RETURN    shift, and go to state 29
+    LBRACKET  shift, and go to state 30
+    FOR       shift, and go to state 31
+    MINUS     shift, and go to state 32
+
+    $default  reduce using rule 22 (stmt)
+
+    stmt       go to state 123
+    selection  go to state 34
+    line       go to state 35
+    expr       go to state 36
+
+
+State 118
+
+   30 line: FOR LPAREN NAME COMMA expr . RPAREN LBRACE stmt RBRACE
+   31     | FOR LPAREN NAME COMMA expr . COMMA expr RPAREN LBRACE stmt RBRACE
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    RPAREN    shift, and go to state 124
+    COMMA     shift, and go to state 125
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+
+State 119
+
+   33 expr_list: expr_list . COMMA expr
+   46 expr: expr PERIOD NAME LPAREN expr_list . RPAREN
+
+    RPAREN  shift, and go to state 126
+    COMMA   shift, and go to state 77
+
+
+State 120
+
+    2 members: members . funcdef
+    3        | members . structdef
+    4        | members . NAME var_list SEMICOLON
+    5        | members . NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON
+    6        | members . PROP LBRACE stmt RBRACE
+    7        | members . structdec SEMICOLON
+   12 structdef: structdec COLON LPAREN argument_list RPAREN LBRACE members . RBRACE
+
+    NAME    shift, and go to state 4
+    RBRACE  shift, and go to state 127
+    STRUCT  shift, and go to state 5
+    PROP    shift, and go to state 7
+
+    funcdef    go to state 8
+    structdec  go to state 9
+    structdef  go to state 10
+
+
+State 121
+
+    9 funcdef: NAME NAME LPAREN argument_list RPAREN LBRACE stmt RBRACE .
+
+    $default  reduce using rule 9 (funcdef)
+
+
+State 122
+
+   17 var_list: var_list . COMMA array_var
+   28 line: NAME COLON LPAREN expr_list RPAREN var_list . SEMICOLON
+
+    COMMA      shift, and go to state 22
+    SEMICOLON  shift, and go to state 128
+
+
+State 123
+
+   23 selection: IF LPAREN expr RPAREN LBRACE stmt . RBRACE
+
+    RBRACE  shift, and go to state 129
+
+
+State 124
+
+   30 line: FOR LPAREN NAME COMMA expr RPAREN . LBRACE stmt RBRACE
+
+    LBRACE  shift, and go to state 130
+
+
+State 125
+
+   31 line: FOR LPAREN NAME COMMA expr COMMA . expr RPAREN LBRACE stmt RBRACE
+
+    NAME    shift, and go to state 41
+    NUMBER  shift, and go to state 26
+    LPAREN  shift, and go to state 27
+    MINUS   shift, and go to state 32
+
+    expr  go to state 131
+
+
+State 126
+
+   46 expr: expr PERIOD NAME LPAREN expr_list RPAREN .
+
+    $default  reduce using rule 46 (expr)
+
+
+State 127
+
+   12 structdef: structdec COLON LPAREN argument_list RPAREN LBRACE members RBRACE .
+
+    $default  reduce using rule 12 (structdef)
+
+
+State 128
+
+   28 line: NAME COLON LPAREN expr_list RPAREN var_list SEMICOLON .
+
+    $default  reduce using rule 28 (line)
+
+
+State 129
+
+   23 selection: IF LPAREN expr RPAREN LBRACE stmt RBRACE .
+
+    $default  reduce using rule 23 (selection)
+
+
+State 130
+
+   30 line: FOR LPAREN NAME COMMA expr RPAREN LBRACE . stmt RBRACE
+
+    NAME      shift, and go to state 25
+    NUMBER    shift, and go to state 26
+    LPAREN    shift, and go to state 27
+    IF        shift, and go to state 28
+    RETURN    shift, and go to state 29
+    LBRACKET  shift, and go to state 30
+    FOR       shift, and go to state 31
+    MINUS     shift, and go to state 32
+
+    $default  reduce using rule 22 (stmt)
+
+    stmt       go to state 132
+    selection  go to state 34
+    line       go to state 35
+    expr       go to state 36
+
+
+State 131
+
+   31 line: FOR LPAREN NAME COMMA expr COMMA expr . RPAREN LBRACE stmt RBRACE
+   35 expr: expr . SAME expr
+   36     | expr . OP1 expr
+   37     | expr . OP2 expr
+   38     | expr . OP3 expr
+   39     | expr . OP4 expr
+   40     | expr . OP5 expr
+   41     | expr . OP6 expr
+   42     | expr . OP7 expr
+   43     | expr . MINUS expr
+   46     | expr . PERIOD NAME LPAREN expr_list RPAREN
+   50     | expr . PERIOD NAME
+   51     | expr . LBRACKET expr RBRACKET
+
+    RPAREN    shift, and go to state 133
+    LBRACKET  shift, and go to state 60
+    PERIOD    shift, and go to state 62
+    SAME      shift, and go to state 63
+    OP7       shift, and go to state 64
+    OP6       shift, and go to state 65
+    OP5       shift, and go to state 66
+    OP4       shift, and go to state 67
+    OP3       shift, and go to state 68
+    MINUS     shift, and go to state 69
+    OP2       shift, and go to state 70
+    OP1       shift, and go to state 71
+
+
+State 132
+
+   30 line: FOR LPAREN NAME COMMA expr RPAREN LBRACE stmt . RBRACE
+
+    RBRACE  shift, and go to state 134
+
+
+State 133
+
+   31 line: FOR LPAREN NAME COMMA expr COMMA expr RPAREN . LBRACE stmt RBRACE
+
+    LBRACE  shift, and go to state 135
+
+
+State 134
+
+   30 line: FOR LPAREN NAME COMMA expr RPAREN LBRACE stmt RBRACE .
+
+    $default  reduce using rule 30 (line)
+
+
+State 135
+
+   31 line: FOR LPAREN NAME COMMA expr COMMA expr RPAREN LBRACE . stmt RBRACE
+
+    NAME      shift, and go to state 25
+    NUMBER    shift, and go to state 26
+    LPAREN    shift, and go to state 27
+    IF        shift, and go to state 28
+    RETURN    shift, and go to state 29
+    LBRACKET  shift, and go to state 30
+    FOR       shift, and go to state 31
+    MINUS     shift, and go to state 32
+
+    $default  reduce using rule 22 (stmt)
+
+    stmt       go to state 136
+    selection  go to state 34
+    line       go to state 35
+    expr       go to state 36
+
+
+State 136
+
+   31 line: FOR LPAREN NAME COMMA expr COMMA expr RPAREN LBRACE stmt . RBRACE
+
+    RBRACE  shift, and go to state 137
+
+
+State 137
+
+   31 line: FOR LPAREN NAME COMMA expr COMMA expr RPAREN LBRACE stmt RBRACE .
+
+    $default  reduce using rule 31 (line)

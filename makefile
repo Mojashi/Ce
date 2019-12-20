@@ -13,8 +13,9 @@ LEXFLAGS = -Wno-unused
 
 LEXDEBUG = -d
 YACCDEBUG = -vtd --graph --debug
+YACCRELEASE = -d
 LEXOPTION = 
-YACCOPTION = 
+YACCOPTION =
 
 OBJS = $(OUTDIR)main.o $(OUTDIR)ast.o $(OUTDIR)parse.tab.o $(OUTDIR)lex.yy.o
 
@@ -28,6 +29,7 @@ Debug: all
 .PHONY	: Release
 Release	: CFLAGS+=$(CRELEASEFLAGS)
 Release	: OUTDIR=$(RELEASEDIR)
+Release: YACCOPTION=$(YACCRELEASE)
 Release: all
 
 all : $(TARGET)

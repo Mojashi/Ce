@@ -2,7 +2,7 @@ CCC = g++
 LEX = flex
 YACC = bison
 
-TARGET =Ce.exe
+TARGET =ce.exe
 OUTDIR =
 DEBUGDIR=./Debug/
 RELEASEDIR=./Release/
@@ -16,8 +16,9 @@ YACCDEBUG = -vtd --graph --debug
 YACCRELEASE = -d
 LEXOPTION = 
 YACCOPTION =
+PYTHONOPTION = -L"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\libs" -I"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\include" -lpython37
 
-OBJS = $(OUTDIR)main.o $(OUTDIR)ast.o $(OUTDIR)parse.tab.o $(OUTDIR)lex.yy.o
+OBJS = $(OUTDIR)main.o $(OUTDIR)ast.o $(OUTDIR)parse.tab.o $(OUTDIR)lex.yy.o $(OUTDIR)builtIn.o $(OUTDIR)formatresult.o
 
 .PHONY: Debug
 Debug: CFLAGS+=$(CDEBUGFLAGS)
@@ -34,16 +35,22 @@ Release: all
 
 all : $(TARGET)
 $(TARGET) : $(OBJS)
-	$(CCC) $(CFLAGS) -o $(OUTDIR)Ce $(OBJS)
+	$(CCC) $(CFLAGS) -o $(OUTDIR)ce $(OBJS) $(PYTHONOPTION)
 
-main.o: main.cpp parse.y scan.l parse.tab.c lex.yy.c graphviz.h CNF.h
-	$(CCC) $(CFLAGS) -c main.cpp -o $(OUTDIR)main.o
+main.o: main.cpp parse.y scan.l parse.tab.c lex.yy.c graphviz.h CNF.h 
+	$(CCC) $(CFLAGS) -c main.cpp -o $(OUTDIR)main.o 
 
 parse.tab.c: parse.y ast.h
 	$(YACC) $(YACCOPTION) parse.y
 
 ast.o: ast.cpp ast.h
 	$(CCC) $(CFLAGS) -c ast.cpp -o $(OUTDIR)ast.o
+
+builtIn.o: builtIn.cpp builtIn.h
+	$(CCC) $(CFLAGS) -c builtIn.cpp -o $(OUTDIR)builtIn.o
+
+formatresult.o: formatresult.cpp formatresult.h
+	$(CCC) $(CFLAGS) -c formatresult.cpp -o $(OUTDIR)formatresult.o $(PYTHONOPTION)
 
 parse.tab.o: parse.tab.c
 	$(CCC) $(CFLAGS) -c parse.tab.c -o $(OUTDIR)parse.tab.o

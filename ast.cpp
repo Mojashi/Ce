@@ -13,9 +13,9 @@ shared_ptr<Variable> currentScope;
 
 map<string, shared_ptr<Variable>> localVar;
 
-string concatIdent(list<string> ident){
+string concatIdent(list<string> ident, char sp){
     string ret;
-    for(auto str : ident) ret += str+",";
+    for(auto str : ident) ret += sp+str;
     return ret;
 }
 

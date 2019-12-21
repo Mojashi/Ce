@@ -8,7 +8,7 @@
             "name": "(gdb) 起動",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Debug/Ce.exe",
+            "program": "${workspaceFolder}/Debug/ce.exe",
             "args": ["test.ce"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

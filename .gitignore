@@ -10,3 +10,4 @@
 /lex.yy.c
 /result.txt
 /.vscode/*
+/fmt/__pychache__/*

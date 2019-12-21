@@ -24,7 +24,7 @@ typedef pair<shared_ptr<Structure>, list<shared_ptr<ASTNode>>> pedStruct;
 extern shared_ptr<Structure> boolStruct;
 extern shared_ptr<Structure> integerStruct;
 
-string concatIdent(list<string> ident);
+string concatIdent(list<string> ident, char sp = ',');
 bool isSameType(shared_ptr<Structure> a, shared_ptr<Structure> b);
 bool argumentTypeCheck(list<pair<shared_ptr<Structure>, string>> args, list<shared_ptr<Variable>> params);
 
@@ -76,6 +76,12 @@ public:
         return ptr;
     }
     BuiltInStructs getBuiltInType(){return builtInType;}
+    shared_ptr<Structure> findStruct(list<string> ident){
+        if(ident.size() == 0) return getPtr();
+        if(structs.count(ident.front()))
+            return structs[ident.front()]->findStruct(list<string>(++ident.begin(), ident.end()));
+        return shared_ptr<Structure>();
+    }
     map<string, shared_ptr<Structure>> getStructs(){return structs;}
     map<string, pedStruct> getVariables(){return variables;}
     map<string, list<shared_ptr<Function>>> getFunctions(){return functions;}

@@ -53,7 +53,8 @@
         "__split_buffer": "cpp",
         "deque": "cpp",
         "queue": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "set": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

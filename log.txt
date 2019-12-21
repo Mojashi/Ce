@@ -18,11 +18,11 @@ c ==============================================================================
 c restarts              : 1
 c duplicate learnts_cnf : 0
 c duplicate learnts_min : 0
-c conflicts             : 65             (417 /sec)
-c decisions             : 256            (0.00 % random) (1641 /sec)
-c propagations          : 9217           (59083 /sec)
+c conflicts             : 65             (380 /sec)
+c decisions             : 256            (0.00 % random) (1497 /sec)
+c propagations          : 9217           (53901 /sec)
 c conflict literals     : 305            (18.23 % deleted)
 c backtracks            : 64             (NCB 100% , CB 0%)
-c CPU time              : 0.156 s
+c CPU time              : 0.171 s
 
 s UNSATISFIABLE

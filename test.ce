@@ -1,0 +1,56 @@
+
+import "stl/integer.ce"
+struct Sudoku{
+    Integer:(4) mat[9][9];
+    prop{
+        for(i,9){for(j,9){
+            [-mat[i][j].overflow];
+            mat[i][j] < toInteger(10,4);
+            mat[i][j] > toInteger(0,4);
+            for(k,j + 1, 9){
+                mat[i][j] != mat[i][k];
+                mat[j][i] != mat[k][i];
+        }}}
+        for(x,3){for(y,3){
+            for(i,9){for(j,i+1,9){
+                mat[x*3 + i/3][y*3 + i%3] != mat[x*3 + j/3][y*3 + j%3];
+            }}
+        }}
+    }
+
+    void set(SysInt i, SysInt j, Integer x){
+        mat[i][j] = x;
+    }
+}
+
+Sudoku sudoku;
+void main(){
+    sudoku.set(0,0,toInteger(8,4));
+    sudoku.set(0,5,toInteger(5,4));
+    sudoku.set(0,6,toInteger(1,4));
+    sudoku.set(1,2,toInteger(1,4));
+    sudoku.set(1,6,toInteger(8,4));
+    sudoku.set(2,1,toInteger(4,4));
+    sudoku.set(2,3,toInteger(2,4));
+    sudoku.set(2,7,toInteger(9,4));
+    sudoku.set(3,4,toInteger(3,4));
+    sudoku.set(3,8,toInteger(2,4));
+    sudoku.set(4,0,toInteger(1,4));
+    sudoku.set(4,1,toInteger(2,4));
+    sudoku.set(4,2,toInteger(3,4));
+    sudoku.set(4,3,toInteger(4,4));
+    sudoku.set(4,5,toInteger(6,4));
+    sudoku.set(4,6,toInteger(7,4));
+    sudoku.set(4,7,toInteger(8,4));
+    sudoku.set(4,8,toInteger(9,4));
+    sudoku.set(5,0,toInteger(6,4));
+    sudoku.set(5,4,toInteger(1,4));
+    sudoku.set(6,1,toInteger(8,4));
+    sudoku.set(6,5,toInteger(9,4));
+    sudoku.set(6,7,toInteger(5,4));
+    sudoku.set(7,2,toInteger(2,4));
+    sudoku.set(7,6,toInteger(4,4));
+    sudoku.set(8,2,toInteger(7,4));
+    sudoku.set(8,3,toInteger(6,4));
+    sudoku.set(8,8,toInteger(1,4));
+}

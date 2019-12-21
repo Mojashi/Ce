@@ -78,7 +78,9 @@ int main(int argc, char const *argv[]){
     }
     builtInAf();
 #ifndef NO_PYTHON
+    cout << "load formatters" << endl;
     FmtInit();
+    cout << "successflly loaded" << endl;
 #endif
 
 

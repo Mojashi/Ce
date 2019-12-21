@@ -17,28 +17,45 @@ YACCRELEASE = -d
 LEXOPTION = 
 YACCOPTION =
 PYTHONOPTION = -L"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\libs" -I"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\include" -lpython37
+NOPYOPTION = -DNO_PYTHON
+OBJS = $(OUTDIR)main.o $(OUTDIR)ast.o $(OUTDIR)parse.tab.o $(OUTDIR)lex.yy.o $(OUTDIR)builtIn.o
+PYOBJ = $(OUTDIR)formatresult.o
 
-OBJS = $(OUTDIR)main.o $(OUTDIR)ast.o $(OUTDIR)parse.tab.o $(OUTDIR)lex.yy.o $(OUTDIR)builtIn.o $(OUTDIR)formatresult.o
-
-.PHONY: Debug
-Debug: CFLAGS+=$(CDEBUGFLAGS)
+.PHONY: Debug Release NPDebug NPRelease
+Debug: CFLAGS+= $(CDEBUGFLAGS)
 Debug: OUTDIR=$(DEBUGDIR)
 Debug: YACCOPTION=$(YACCDEBUG)
 Debug: LEXOPTION=$(LEXDEBUG)
+Debug: OBJS+=$(PYOBJ)
+Debug: formatresult.o
 Debug: all
 
-.PHONY	: Release
 Release	: CFLAGS+=$(CRELEASEFLAGS)
 Release	: OUTDIR=$(RELEASEDIR)
 Release: YACCOPTION=$(YACCRELEASE)
+Release: OBJS += $(PYOBJ)
+Release: formatresult.o
 Release: all
+
+NPDebug: CFLAGS+=$(CDEBUGFLAGS) $(NOPYOPTION)
+NPDebug: OUTDIR=$(DEBUGDIR)
+NPDebug: YACCOPTION=$(YACCDEBUG)
+NPDebug: LEXOPTION=$(LEXDEBUG)
+NPDebug: PYTHONOPTION=
+NPDebug: all
+
+NPRelease	: CFLAGS+=$(CRELEASEFLAGS) $(NOPYOPTION)
+NPRelease	: OUTDIR=$(RELEASEDIR)
+NPRelease: YACCOPTION=$(YACCRELEASE)
+NPRelease: PYTHONOPTION=
+NPRelease: all
 
 all : $(TARGET)
 $(TARGET) : $(OBJS)
 	$(CCC) $(CFLAGS) -o $(OUTDIR)ce $(OBJS) $(PYTHONOPTION)
 
 main.o: main.cpp parse.y scan.l parse.tab.c lex.yy.c graphviz.h CNF.h 
-	$(CCC) $(CFLAGS) -c main.cpp -o $(OUTDIR)main.o 
+	$(CCC) $(CFLAGS) -c main.cpp -o $(OUTDIR)main.o
 
 parse.tab.c: parse.y ast.h
 	$(YACC) $(YACCOPTION) parse.y

@@ -84,19 +84,18 @@ void Fmtoutput(shared_ptr<Variable> var, list<string> ident){
     else{
         if(var->getType()->getBuiltInType() == BOOLSTRUCT){
                 cout << concatIdent(ident, '.') + ":";
-            cout << getBool(var);
+            cout << getBool(var) << endl;
         }
         else if(var->getType()->getBuiltInType() == INTEGERSTRUCT){
                 cout << concatIdent(ident, '.') + ":";
             int num = ((BoolVariable*)var.get())->getlitNum();
-            cout << num;
+            cout << num << endl;
         }
         else{
             for(auto ch : var->getVariables()){
                 list<string> ident2 = ident;
                 ident2.push_back(ch.first);
                 Fmtoutput(ch.second, ident2);
-                cout << endl;
             }
         }
     }

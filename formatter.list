@@ -1,2 +1,3 @@
 Integer:fmt.integerfmt;integerfmt
 Sudoku:fmt.sudokufmt;sudokufmt
+DecStr:fmt.decstrfmt;decstrfmt

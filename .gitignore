@@ -1,13 +1,13 @@
 *.o
 *.stackdump
 *.dot
-/parse.tab.c
-/parse.tab.h
+/source/parse.tab.c
+/source/parse.tab.h
 /Debug/*
 /Release/*
 /cnf.dimacs
 /conflict.log
-/lex.yy.c
+/source/lex.yy.c
 /result.txt
 /.vscode
 /fmt/__pychache__/

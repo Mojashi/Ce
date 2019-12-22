@@ -9,7 +9,7 @@
 /conflict.log
 /lex.yy.c
 /result.txt
-/.vscode/*
-/fmt/__pychache__/*
+/.vscode
+/fmt/__pychache__/
 /solver
-/__pycache__
+__pycache__/

@@ -86,4 +86,4 @@ clean:
 	rm -f $(SOURCEDIR)parse.tab.h
 	rm -f parse.output
 	rm -f */*.gcda */*.gcno */*.bb */*.bbg */*.da */*.gcov
-	rm -f */*.dot *.dot *.log result.txt log.txt 
+	rm -f */*.dot *.dot *.log result.txt log.txt cnf.dimacs

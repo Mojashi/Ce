@@ -45,7 +45,7 @@ solver
 ### 制約プログラミングとは
 複数の変数間での制約を記述してそれを満たす変数の値を見つけるというプログラミングパラダイム（？）です。例えば、
 
-$x,y,z \in \mathbb{Z} \\ 1 \le xz + y \le 100 \\ 40 \le y \le 60\\ x \equiv 0 (mod 3) \\ z^2 = 100$
+<img src="https://latex.codecogs.com/gif.latex?$x,y,z&space;\in&space;\mathbb{Z}&space;\\&space;1&space;\le&space;xz&space;&plus;&space;y&space;\le&space;100&space;\\&space;40&space;\le&space;y&space;\le&space;60&space;\\&space;x&space;\equiv&space;0&space;(mod&space;3)&space;\\&space;z^2&space;=&space;100$"/>
 
 みたいな制約があってこれを満たすx,y,zを求める。とかが制約プログラミング。これを記述するための言語が制約プログラミング言語です。
 Ceでは、変数がTrue/Falseのみを持つ場合しか扱えないのですが、整数などは当然bool変数の組み合わせで表現できるので表現可能です。（上記の問題もとける）

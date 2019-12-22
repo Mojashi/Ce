@@ -12,3 +12,4 @@
 /.vscode/*
 /fmt/__pychache__/*
 /solver
+/__pycache__

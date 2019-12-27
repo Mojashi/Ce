@@ -410,7 +410,7 @@ shared_ptr<Variable> ASTOPIf::eval(){
     vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
     shared_ptr<Variable> ev = cv[0]->eval();
     int evbool = ((BoolVariable*)(ev.get()))->getlitNum();
-    if(evbool){
+    if(evbool && cv[1]){
         cv[1]->eval();
     }
     return shared_ptr<Variable>();
@@ -424,6 +424,7 @@ shared_ptr<Variable> ASTCNFIf::eval(){
     shared_ptr<Variable> ev = cv[0]->eval();
     Literal evbool = ((BoolVariable*)(ev.get()))->getlitNum();
 
+    if(cv[1]){
     chHisQue.push_back(map<shared_ptr<Variable>, Literal>());
 
     cnf.pushPreCls(-evbool);
@@ -434,10 +435,11 @@ shared_ptr<Variable> ASTCNFIf::eval(){
     chHisQue.pop_back();
 
     for(auto var : ced){
+        if(var.first.use_count() == 1) continue;
         Literal b = var.second;
         Literal a = ((BoolVariable*)var.first.get())->getlitNum();
         ((BoolVariable*)var.first.get())->setlitNum(cnf.MUX(a,b, evbool));
     }
-
+    }
     return shared_ptr<Variable>();
 }

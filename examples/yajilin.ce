@@ -2,8 +2,8 @@ import "stl/integer.ce"
 import "stl/boolop.ce"
 
 struct Yajilin:(SysInt H, SysInt W, SysInt SIZE){
-    Bool block[H][W], arrow[H][W], plane[H][W], next[H][W][4];
-    Integer:(SIZE) num;
+    Bool block[H][W], arrow[H][W], blank[H][W], next[H][W][4];
+    Integer:(SIZE) num[H][W];
 
     Init{
         for(i, H*W){
@@ -13,40 +13,70 @@ struct Yajilin:(SysInt H, SysInt W, SysInt SIZE){
     Prop{
         for(i, H*W){
             SysInt x,y;
+            Bool iZero;
             y := i/H; x := i%H;
-            [conStart[y][x],-or(next[y][x][0], or(next[y][x][1], or(next[y][x][2], next[y][x][3])))];
-            for(s,4){ for(t,s+1,4){//nextはひとつ
+            iZero := num[y][x]:==toInteger(0,SIZE);
+            [-num[y][x].overflow];
+
+            for(s,4){ for(t,s+1,4){//nextはたかだかひとつ
                 [-next[y][x][s], -next[y][x][t]];
             }}
-            
-            Bool buf2;
-            buf := start[y][x];
-            [-buf2];
-            if(y :> 0){
-                buf2 := or(buf2, next[y-1][x][2]);
-                [-next[y][x][0], -next[y-1][x][2]];
-                if[next[y-1][x][2]]
-                    {num[y][x] = num[y-1][x] + toInteger(1, SIZE);};
-                
-                buf := or(buf,and(next[y-1][x][2], conStart[y-1][x]));}
             if(y :< H-1){
-                buf2 := or(buf2, next[y+1][x][0]);
-                [-next[y][x][2], -next[y+1][x][0]];
-                buf := or(buf,and(next[y+1][x][0], conStart[y+1][x]));}
+                if[block[y][x]]{ [-block[y + 1][x]]; }
+            }
+            if(x :< W-1){
+                if[block[y][x]]{ [-block[y][x + 1]]; }
+            }
+
+            Bool jZero;
+            for(j, i + 1, H*W){
+                jZero := num[j/W][j%W]:==toInteger(0,SIZE);
+                [-blank[y][x], -blank[j/W][j%W],-iZero,-jZero];
+            }
+            
+            Bool existNext, existBefo;
+            [-existNext];[-existBefo];
+            if(y :> 0){
+                existNext := or(existNext, next[y][x][0]);
+                existBefo := or(existBefo, next[y-1][x][2]);
+                if[next[y-1][x][2]]{
+                    [iZero, num[y][x] :== num[y-1][x] + toInteger(1, SIZE)];
+                }    
+            }
+            if(y :< H-1){
+                existNext := or(existNext, next[y][x][2]);
+                existBefo := or(existBefo, next[y+1][x][0]);
+                if[next[y+1][x][0]]{
+                    [iZero, num[y][x] :== num[y+1][x] + toInteger(1, SIZE)];
+                }    
+            }
             if(x :> 0){   
-                buf2 := or(buf2, next[y][x-1][1]);
-                [-next[y][x][3], -next[y][x-1][1]];
-                buf := or(buf,and(next[y][x-1][1], conStart[y][x-1]));}
+                existNext := or(existNext, next[y][x][3]);
+                existBefo := or(existBefo, next[y][x-1][1]);
+                if[next[y][x-1][1]]{
+                    [iZero, num[y][x] :== num[y][x-1] + toInteger(1, SIZE)];
+                }    
+            }
             if(x :< W-1){ 
-                buf2 := or(buf2, next[y][x+1][3]);
-                [-next[y][x][1], -next[y][x+1][3]];
-                buf := or(buf,and(next[y][x+1][3], conStart[y][x+1]));}
-                
-            [buf2,-conStart[y][x]];
-            [-start[y][x], -buf2];
-            [conStart[y][x], block[y][x], arrow[y][x]];
-            [-conStart[y][x], -block[y][x]];
-            [-conStart[y][x], -arrow[y][x]];
+                existNext := or(existNext, next[y][x][1]);
+                existBefo := or(existBefo, next[y][x+1][3]);
+                if[next[y][x+1][3]]{
+                    [iZero, num[y][x] :== num[y][x+1] + toInteger(1, SIZE)];
+                }    
+            }
+
+            if[blank[y][x]] { 
+                [existBefo];
+                [existNext];
+            }
+            if[-blank[y][x]]{
+                [-existNext];
+                [-existBefo];
+                num[y][x] = toInteger(0,SIZE);
+            }
+            [blank[y][x], block[y][x], arrow[y][x]];
+            [-blank[y][x], -block[y][x]];
+            [-blank[y][x], -arrow[y][x]];
             [-arrow[y][x], -block[y][x]];
         }
     }
@@ -74,7 +104,7 @@ struct Yajilin:(SysInt H, SysInt W, SysInt SIZE){
     }
 }
 
-Yajilin:(7,7,4) yaji;
+Yajilin:(7,7,6) yaji;
 
 void main(){
     yaji.setArrow(1,2,1,0);

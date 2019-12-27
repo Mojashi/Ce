@@ -172,7 +172,7 @@ struct Integer:(SysInt SIZE){
         ret.overflow := or(carry,a.overflow);
         return ret;
     }
-    Bool operator==(Integer a, Integer b){
+    Bool operator:==(Integer a, Integer b){
         Bool ret;
         [-ret];
         for(i,SIZE){
@@ -183,7 +183,7 @@ struct Integer:(SysInt SIZE){
     }
     Bool operator:!=(Integer a, Integer b){
         Bool ret;
-        ret := a == b;
+        ret := a :== b;
         return -ret;
     }   
     void operator!=(Integer a, Integer b){
@@ -209,10 +209,10 @@ struct Integer:(SysInt SIZE){
         return b :> a;
     }    
     Bool operator:>=(Integer a, Integer b){
-        return or(a:>b,a==b);
+        return or(a:>b,a:==b);
     }
     Bool operator:<=(Integer a, Integer b){
-        return or(a:<b,a==b);
+        return or(a:<b,a:==b);
     }
     void operator>(Integer a, Integer b){
         [a :> b];

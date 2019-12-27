@@ -1,12 +1,95 @@
 import "stl/integer.ce"
-    
-Integer:(4) x,y;
-Bool a;
-void main(){
-    x.getInteger(10);
-    y.getInteger(11);
-    if[a]{
-        y := x + toInteger(4, 4);
+import "stl/boolop.ce"
+
+struct Yajilin:(SysInt H, SysInt W, SysInt SIZE){
+    Bool block[H][W], arrow[H][W], blank[H][W], next[H][W][4];
+    Integer:(SIZE) num[H][W];
+
+    Init{
+        for(i, H*W){
+            [-arrow[i/H][i%H]];
+        }
     }
-    
+    Prop{
+        for(i, H*W){
+            SysInt x,y;
+            Bool iZero;
+            y := i/H; x := i%H;
+            iZero := num[y][x]:==toInteger(0,SIZE);
+            [-num[y][x].overflow];
+
+            [-blank[y][x],or(next[y][x][0], or(next[y][x][1], or(next[y][x][2], next[y][x][3])))];
+            for(s,4){ for(t,s+1,4){//nextはひとつ
+                [-next[y][x][s], -next[y][x][t]];
+            }}
+
+            Bool jZero;
+            for(j, i + 1, H*W){
+                jZero := num[j/W][j%W]:==toInteger(0,SIZE);
+                [-blank[y][x], -blank[j/W][j%W],-iZero,-jZero];
+            }
+            
+            if(y :> 0){
+                [-next[y][x][0], -next[y-1][x][2]];
+                if[next[y-1][x][2]]{
+                    [iZero, num[y][x] :== num[y-1][x] + toInteger(1, SIZE)];
+                }    
+            }
+            if(y :< H-1){
+                [-next[y][x][2], -next[y+1][x][0]];    
+                if[next[y+1][x][0]]{
+                    [iZero, num[y][x] = num[y+1][x] + toInteger(1, SIZE)];
+                }    
+            }
+            if(x :> 0){   
+                [-next[y][x][3], -next[y][x-1][1]];
+                if[next[y][x-1][1]]{
+                    [iZero, num[y][x] = num[y][x-1] + toInteger(1, SIZE)];
+                }    
+            }
+            if(x :< W-1){ 
+                [-next[y][x][1], -next[y][x+1][3]];
+                if[next[y][x+1][3]]{
+                    [iZero, num[y][x] = num[y][x+1] + toInteger(1, SIZE)];
+                }    
+            }
+                
+            [blank[y][x], block[y][x], arrow[y][x]];
+            [-blank[y][x], -block[y][x]];
+            [-blank[y][x], -arrow[y][x]];
+            [-arrow[y][x], -block[y][x]];
+        }
+    }
+
+    // n:numOfBlocks dir:arrow direction 0=>up 1=>right 2=>down 3=>left
+    void setArrow(SysInt y, SysInt x, SysInt n, SysInt dir){
+        Bool nbool;
+        arrow[y][x] := nbool;
+        [arrow[y][x]];
+        Integer:(SIZE) count;
+        count.getInteger(0);
+        if(dir :== 0){for(i,0,y){
+            count := count + block[i][x];
+        }}
+        if(dir :== 1){for(i,x,W){
+            count := count + block[y][i];
+        }}
+        if(dir :== 2){for(i,y,H){
+            count := count + block[i][x];
+        }}
+        if(dir :== 3){for(i,0,x){
+            count := count + block[y][i];
+        }}
+        count = toInteger(n, SIZE);
+    }
+}
+
+Yajilin:(7,7,4) yaji;
+
+void main(){
+    yaji.setArrow(1,2,1,0);
+    yaji.setArrow(1,5,1,3);
+    yaji.setArrow(4,1,1,0);
+    yaji.setArrow(4,3,2,1);
+    yaji.setArrow(6,2,0,3);
 }

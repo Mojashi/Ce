@@ -5,8 +5,8 @@ Bool a;
 void main(){
     x.getInteger(10);
     y.getInteger(11);
-    if[a](y){
-        y = x + toInteger(1, 4);
+    if[a]{
+        y := x + toInteger(4, 4);
     }
     
 }

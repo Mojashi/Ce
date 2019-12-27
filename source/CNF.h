@@ -61,6 +61,25 @@ public:
 		addClause({ -a, b });
 	}
 
+	int MUX(Literal a, Literal b, Literal cond){
+		//in: a b c
+		//out: d
+		// if(c) d = a;
+		// else  d = b;
+		/* 
+		[c,b,-d]
+		[c,-b,d]
+		[-c,a,-d]
+		[-c,-a,d]
+		*/
+		Literal d = getNewVar();
+		addClause({cond, b,-d});
+		addClause({cond, -b,d});
+		addClause({-cond, a,-d});
+		addClause({-cond, -a,d});
+		return d;
+	}
+
 	int NotEqual(Literal a, Literal b) {
 		Literal ret = getNewVar();
 		addClause({ -a,-b,-ret });

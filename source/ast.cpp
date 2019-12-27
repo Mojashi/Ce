@@ -1,6 +1,8 @@
 #include "ast.h"
 
 #include <iostream>
+#include <queue>
+#include <set>
 #include <utility>
 
 using std::cerr;
@@ -12,6 +14,7 @@ extern CNF cnf;
 shared_ptr<Variable> currentScope;
 
 map<string, shared_ptr<Variable>> localVar;
+list<map<shared_ptr<Variable>, Literal>> chHisQue;
 
 string concatIdent(list<string> ident, char sp){
     string ret;
@@ -22,6 +25,13 @@ string concatIdent(list<string> ident, char sp){
 void Variable::assign(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
     if(getType() == boolStruct || getType() == integerStruct){
+        if(getType() == boolStruct){
+            for(auto& itr : chHisQue){
+                if(itr.count(getPtr()) == 0){
+                    itr[getPtr()] = ((BoolVariable*)this)->getlitNum();
+                }
+            }
+        }
         reinterpret_cast<BoolVariable*>(this)->setlitNum(reinterpret_cast<BoolVariable*>(var.get())->getlitNum());
     }
     else{
@@ -271,6 +281,7 @@ shared_ptr<Variable> ASTAssignment::eval(){
         cerr << "lvalue and rvalue types are different" << endl;
         exit(0);
     }
+    
     leftVal->assign(res);
     return res;
 }
@@ -412,8 +423,21 @@ shared_ptr<Variable> ASTCNFIf::eval(){
     vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
     shared_ptr<Variable> ev = cv[0]->eval();
     Literal evbool = ((BoolVariable*)(ev.get()))->getlitNum();
+
+    chHisQue.push_back(map<shared_ptr<Variable>, Literal>());
+
     cnf.pushPreCls(-evbool);
     cv[1]->eval();
     cnf.popPreCls();
+
+    map<shared_ptr<Variable>, Literal> ced = chHisQue.back();
+    chHisQue.pop_back();
+
+    for(auto var : ced){
+        Literal b = var.second;
+        Literal a = ((BoolVariable*)var.first.get())->getlitNum();
+        ((BoolVariable*)var.first.get())->setlitNum(cnf.MUX(a,b, evbool));
+    }
+
     return shared_ptr<Variable>();
 }

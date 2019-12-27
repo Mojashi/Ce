@@ -76,7 +76,7 @@ int getBool(shared_ptr<Variable> var){
 void Fmtoutput(shared_ptr<Variable> var, list<string> ident){
     curVar = var;
     if(funcs.count(var->getType())){
-                cout << concatIdent(ident, '.') + ":";
+        cout << concatIdent(ident, '.') + ":"<<flush;
         PyObject *pArg = PyTuple_New(1);
         PyTuple_SetItem(pArg, 0, FmtconvStruct(var));
         PyObject_CallObject(funcs[var->getType()], pArg);

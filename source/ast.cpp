@@ -1,6 +1,8 @@
 #include "ast.h"
 
 #include <iostream>
+#include <queue>
+#include <set>
 #include <utility>
 
 using std::cerr;
@@ -12,6 +14,7 @@ extern CNF cnf;
 shared_ptr<Variable> currentScope;
 
 map<string, shared_ptr<Variable>> localVar;
+list<map<shared_ptr<Variable>, Literal>> chHisQue;
 
 string concatIdent(list<string> ident, char sp){
     string ret;
@@ -22,6 +25,13 @@ string concatIdent(list<string> ident, char sp){
 void Variable::assign(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
     if(getType() == boolStruct || getType() == integerStruct){
+        if(getType() == boolStruct){
+            for(auto& itr : chHisQue){
+                if(itr.count(getPtr()) == 0){
+                    itr[getPtr()] = ((BoolVariable*)this)->getlitNum();
+                }
+            }
+        }
         reinterpret_cast<BoolVariable*>(this)->setlitNum(reinterpret_cast<BoolVariable*>(var.get())->getlitNum());
     }
     else{
@@ -77,9 +87,10 @@ shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent, list<sh
         ret->setVariable(itrArg->second,*itrPar);
     }
     ret->makeMembs();
-    shared_ptr<Function> propFunc = ret->getFunction("PROPERTYFUNCTION", {});
-    if(propFunc){
-        InsFunction ins{ret, propFunc};
+
+    shared_ptr<Function> initFunc = ret->getFunction("INITIALIZEFUNCTION", {});
+    if(initFunc){
+        InsFunction ins{ret, initFunc};
         ins.call({});
     }
     localVar = cvLocalVar;
@@ -270,6 +281,7 @@ shared_ptr<Variable> ASTAssignment::eval(){
         cerr << "lvalue and rvalue types are different" << endl;
         exit(0);
     }
+    
     leftVal->assign(res);
     return res;
 }
@@ -287,19 +299,28 @@ shared_ptr<Variable> ASTSame::eval(){
     l->sameConst(r);
     return shared_ptr<Variable>();
 }
+void enumBool(shared_ptr<Variable> var, Clause &cl){
+    if(var->getType()->getBuiltInType() == ARRAYSTRUCT){
+        for(auto ch : var->getVariables()){
+            enumBool(ch.second, cl);
+        }
+    }
+    else if(var->getType()->getBuiltInType() == BOOLSTRUCT)
+        cl.push_back(((BoolVariable*)(var.get()))->getlitNum());
+    else {
+        cerr << "invalid expr type" << endl;
+        exit(0);
+    }
+}
 
 shared_ptr<Variable> ASTAddConst::eval(){
 #ifdef DEBUG
     cerr<<nodeTypeNames[getNodeType()]<<endl;
 #endif
-    vector<Literal> clause;
+    Clause clause;
     for(shared_ptr<ASTNode> expr : child){
         shared_ptr<Variable> var = expr->eval();
-        if(var->getType() != boolStruct){
-            cerr << "invalid expr type" << endl;
-            exit(0);
-        }
-        clause.push_back(((BoolVariable*)(var.get()))->getlitNum());
+        enumBool(var, clause);
     }
     cnf.addClause(clause);
     return shared_ptr<Variable>();
@@ -379,5 +400,46 @@ shared_ptr<Variable> ASTFor::eval(){
         localVar = cvLocalVar;
     }
     localVar.erase(ctname);
+    return shared_ptr<Variable>();
+}
+
+shared_ptr<Variable> ASTOPIf::eval(){
+#ifdef DEBUG
+    cerr<<nodeTypeNames[getNodeType()]<<endl;
+#endif
+    vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
+    shared_ptr<Variable> ev = cv[0]->eval();
+    int evbool = ((BoolVariable*)(ev.get()))->getlitNum();
+    if(evbool && cv[1]){
+        cv[1]->eval();
+    }
+    return shared_ptr<Variable>();
+}
+
+shared_ptr<Variable> ASTCNFIf::eval(){
+#ifdef DEBUG
+    cerr<<nodeTypeNames[getNodeType()]<<endl;
+#endif
+    vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
+    shared_ptr<Variable> ev = cv[0]->eval();
+    Literal evbool = ((BoolVariable*)(ev.get()))->getlitNum();
+
+    if(cv[1]){
+    chHisQue.push_back(map<shared_ptr<Variable>, Literal>());
+
+    cnf.pushPreCls(-evbool);
+    cv[1]->eval();
+    cnf.popPreCls();
+
+    map<shared_ptr<Variable>, Literal> ced = chHisQue.back();
+    chHisQue.pop_back();
+
+    for(auto var : ced){
+        if(var.first.use_count() == 1) continue;
+        Literal b = var.second;
+        Literal a = ((BoolVariable*)var.first.get())->getlitNum();
+        ((BoolVariable*)var.first.get())->setlitNum(cnf.MUX(a,b, evbool));
+    }
+    }
     return shared_ptr<Variable>();
 }

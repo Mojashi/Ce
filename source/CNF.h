@@ -19,12 +19,27 @@ public:
 	static const Literal True = 1;
 	vector<Clause> cls;
 	int varCount = 0;
+	Clause preCls;
 
 	int addClause(const Clause& cl) {
 		if (find(cl.begin(), cl.end(), 0) != cl.end())
 			cout << "Assert literal zero" << endl;
-		cls.push_back(cl);
+		if(preCls.size()) {
+			Clause buf(cl);
+			buf.insert(buf.begin(),preCls.begin(), preCls.end());
+			cls.push_back(buf);
+		}	
+		else
+			cls.push_back(cl);
 		return cls.size() - 1;
+	}
+
+	void pushPreCls(Literal lit){
+		preCls.push_back(lit);
+	}
+
+	void popPreCls(){
+		preCls.erase(--preCls.end());
 	}
 
 	void remClause(int clNum){
@@ -44,6 +59,25 @@ public:
 	void setVal(Literal a, Literal b) { // a=b
 		addClause({ a, -b });
 		addClause({ -a, b });
+	}
+
+	int MUX(Literal a, Literal b, Literal cond){
+		//in: a b c
+		//out: d
+		// if(c) d = a;
+		// else  d = b;
+		/* 
+		[c,b,-d]
+		[c,-b,d]
+		[-c,a,-d]
+		[-c,-a,d]
+		*/
+		Literal d = getNewVar();
+		addClause({cond, b,-d});
+		addClause({cond, -b,d});
+		addClause({-cond, a,-d});
+		addClause({-cond, -a,d});
+		return d;
 	}
 
 	int NotEqual(Literal a, Literal b) {

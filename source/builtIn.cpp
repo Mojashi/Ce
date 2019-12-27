@@ -3,7 +3,7 @@
 extern shared_ptr<Structure> godStruct;
 extern shared_ptr<Variable> godVar;
 extern CNF cnf;
-shared_ptr<Structure> boolStruct, integerStruct;
+shared_ptr<Structure> boolStruct, integerStruct, clauseStruct;
 shared_ptr<Function> getBitFunc, setMaxObjFunc, setMinObjFunc;
 extern shared_ptr<Variable> objVar;
 extern int objType;
@@ -14,6 +14,20 @@ void builtInBef(){
     
     integerStruct = (new IntegerStructure())->getPtr();
     integerStruct->setName("SysInt");
+
+    // clauseStruct = (new ArrayStructure())->getPtr();
+    // clauseStruct->setName("Clause");
+    // shared_ptr<ASTNode> appendBoolAST(new ASTLambda(
+    //     [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+    //         ArrayVariable *arVar = (ArrayVariable*)curScope.get();
+    //         int sz = arVar->getVariables().size();
+    //         arVar->setVariable(to_string(sz), localVar["x"]);
+    //         return shared_ptr<Variable>();
+    //     }
+    // ));
+    // shared_ptr<Function> appendFunc(new Function(clauseStruct, "append",{std::make_pair(boolStruct, "x")},appendBoolAST));
+    //clauseStruct->addFunction(appendFunc);
+
     shared_ptr<ASTNode> intPlusAST(new ASTLambda(
         [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
             shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
@@ -64,6 +78,61 @@ void builtInBef(){
     ));
     shared_ptr<Function> modFunc(new Function(integerStruct, "operator%",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intmodAST));
     integerStruct->addFunction(modFunc);
+
+    shared_ptr<ASTNode> intGAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()>((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> greatFunc(new Function(integerStruct, "operator:>",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intGAST));
+    integerStruct->addFunction(greatFunc);
+    
+    shared_ptr<ASTNode> intLAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()<((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> lessFunc(new Function(integerStruct, "operator:<",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intLAST));
+    integerStruct->addFunction(lessFunc);
+
+    shared_ptr<ASTNode> intGEAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()>=((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> greatEFunc(new Function(integerStruct, "operator:>=",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intGEAST));
+    integerStruct->addFunction(greatEFunc);
+    
+    shared_ptr<ASTNode> intLEAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()<=((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> lessEFunc(new Function(integerStruct, "operator:<=",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intLEAST));
+    integerStruct->addFunction(lessEFunc);
+    
+    shared_ptr<ASTNode> intEAST(new ASTLambda(
+        [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+            shared_ptr<Variable> ret = integerStruct->getInstance(curScope,{});
+            localVar["ret"] = ret;
+            ((BoolVariable*)ret.get())->setlitNum(((BoolVariable*)(localVar["x"].get()))->getlitNum()==((BoolVariable*)(localVar["y"].get()))->getlitNum());
+            return ret;
+        }
+    ));
+    shared_ptr<Function> eqFunc(new Function(integerStruct, "operator:==",{std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "y")},intEAST));
+    integerStruct->addFunction(eqFunc);
     
 
     shared_ptr<ASTNode> notFuncAst(new ASTLambda(
@@ -93,6 +162,19 @@ void builtInAf(){
     ));
     getBitFunc = shared_ptr<Function>(new Function(boolStruct, "getBit", {std::make_pair(integerStruct, "x"),std::make_pair(integerStruct, "idx")}, getBitAst));
 	godStruct->addFunction(getBitFunc);
+    
+    // shared_ptr<ASTNode> justOneAst(new ASTLambda(
+    //     [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
+    //         shared_ptr<Variable> ret = boolStruct->getInstance(curScope,{});
+    //         localVar["ret"] = ret;
+    //         int x = ((BoolVariable*)(localVar["x"].get()))->getlitNum(), idx = ((BoolVariable*)(localVar["idx"].get()))->getlitNum();
+
+    //         ((BoolVariable*)ret.get())->setlitNum((x >> idx) & 1 ? 1 : -1);
+    //         return ret;
+    //     }
+    // ));
+    // justOneFunc = shared_ptr<Function>(new Function(boolStruct, "justone", {std::make_pair(ArrayStruct, "x")}, justOneAst));
+	// godStruct->addFunction(justOneFunc);
 	
     shared_ptr<ASTNode> setMaxAst(new ASTLambda(
         [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){

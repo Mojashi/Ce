@@ -18,10 +18,15 @@ struct Yajilin:(SysInt H, SysInt W, SysInt SIZE){
             iZero := num[y][x]:==toInteger(0,SIZE);
             [-num[y][x].overflow];
 
-            [-blank[y][x],or(next[y][x][0], or(next[y][x][1], or(next[y][x][2], next[y][x][3])))];
-            for(s,4){ for(t,s+1,4){//nextはひとつ
+            for(s,4){ for(t,s+1,4){//nextはたかだかひとつ
                 [-next[y][x][s], -next[y][x][t]];
             }}
+            if(y :< H-1){
+                if[block[y][x]]{ [-block[y + 1][x]]; }
+            }
+            if(x :< W-1){
+                if[block[y][x]]{ [-block[y][x + 1]]; }
+            }
 
             Bool jZero;
             for(j, i + 1, H*W){
@@ -29,31 +34,46 @@ struct Yajilin:(SysInt H, SysInt W, SysInt SIZE){
                 [-blank[y][x], -blank[j/W][j%W],-iZero,-jZero];
             }
             
+            Bool existNext, existBefo;
+            [-existNext];[-existBefo];
             if(y :> 0){
-                [-next[y][x][0], -next[y-1][x][2]];
+                existNext := or(existNext, next[y][x][0]);
+                existBefo := or(existBefo, next[y-1][x][2]);
                 if[next[y-1][x][2]]{
                     [iZero, num[y][x] :== num[y-1][x] + toInteger(1, SIZE)];
                 }    
             }
             if(y :< H-1){
-                [-next[y][x][2], -next[y+1][x][0]];    
+                existNext := or(existNext, next[y][x][2]);
+                existBefo := or(existBefo, next[y+1][x][0]);
                 if[next[y+1][x][0]]{
-                    [iZero, num[y][x] = num[y+1][x] + toInteger(1, SIZE)];
+                    [iZero, num[y][x] :== num[y+1][x] + toInteger(1, SIZE)];
                 }    
             }
             if(x :> 0){   
-                [-next[y][x][3], -next[y][x-1][1]];
+                existNext := or(existNext, next[y][x][3]);
+                existBefo := or(existBefo, next[y][x-1][1]);
                 if[next[y][x-1][1]]{
-                    [iZero, num[y][x] = num[y][x-1] + toInteger(1, SIZE)];
+                    [iZero, num[y][x] :== num[y][x-1] + toInteger(1, SIZE)];
                 }    
             }
             if(x :< W-1){ 
-                [-next[y][x][1], -next[y][x+1][3]];
+                existNext := or(existNext, next[y][x][1]);
+                existBefo := or(existBefo, next[y][x+1][3]);
                 if[next[y][x+1][3]]{
-                    [iZero, num[y][x] = num[y][x+1] + toInteger(1, SIZE)];
+                    [iZero, num[y][x] :== num[y][x+1] + toInteger(1, SIZE)];
                 }    
             }
-                
+
+            if[blank[y][x]] { 
+                [existBefo];
+                [existNext];
+            }
+            if[-blank[y][x]]{
+                [-existNext];
+                [-existBefo];
+                num[y][x] = toInteger(0,SIZE);
+            }
             [blank[y][x], block[y][x], arrow[y][x]];
             [-blank[y][x], -block[y][x]];
             [-blank[y][x], -arrow[y][x]];
@@ -84,7 +104,7 @@ struct Yajilin:(SysInt H, SysInt W, SysInt SIZE){
     }
 }
 
-Yajilin:(7,7,4) yaji;
+Yajilin:(7,7,6) yaji;
 
 void main(){
     yaji.setArrow(1,2,1,0);

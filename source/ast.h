@@ -175,6 +175,22 @@ public:
     shared_ptr<Structure> getType(){return structure;}
     void assign(shared_ptr<Variable> var);
     
+    void setProp(){
+        shared_ptr<Function> propFunc = getFunction("PROPERTYFUNCTION", {});
+        if(propFunc){
+            InsFunction ins{getPtr(), propFunc};
+            ins.call({});
+        }
+    }
+    void setPropRecursive(){
+        setProp();
+        for(auto ch : variables){
+            ch.second->setPropRecursive();
+        }
+    }
+    ~Variable(){
+        setProp();
+    }
 };
 
 
@@ -258,7 +274,9 @@ enum NodeType{
     INTEGERNODE,
     VARIABLENODE,
     LAMBDANODE,
-    FORNODE
+    FORNODE,
+    OPIFNODE,
+    CNFIFNODE
 };
 
 static const char nodeTypeNames[][20] = {
@@ -272,7 +290,9 @@ static const char nodeTypeNames[][20] = {
     "INTEGERNODE",
     "VARIABLENODE",
     "LAMBDANODE",
-    "FORNODE"
+    "FORNODE",
+    "OPIFNODE"
+    "CNFIFNODE"
 };
 
 class ASTNode{
@@ -386,6 +406,25 @@ public:
 
         setChild({decCt,stExpr, nExpr, stmt});
         nodetype = FORNODE;
+    }
+    shared_ptr<Variable> eval();
+};
+
+class ASTOPIf : public ASTNode{
+    
+public:
+    ASTOPIf(shared_ptr<ASTNode> cond, shared_ptr<ASTNode> stmt){
+        setChild({cond,stmt});
+        nodetype = OPIFNODE;
+    }
+    shared_ptr<Variable> eval();
+};
+
+class ASTCNFIf : public ASTNode{
+public:
+    ASTCNFIf(shared_ptr<ASTNode> cond, shared_ptr<ASTNode> stmt){
+        setChild({cond,stmt});
+        nodetype = CNFIFNODE;
     }
     shared_ptr<Variable> eval();
 };

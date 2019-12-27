@@ -1,17 +1,12 @@
 import "stl/integer.ce"
     
-Integer:(8) x,y,z;
+Integer:(4) x,y;
+Bool a;
 void main(){
-    toInteger(1,8) <= x*z + y;
-    x*z + y <= toInteger(100,8);
+    x.getInteger(10);
+    y.getInteger(11);
+    if[a](y){
+        y = x + toInteger(1, 4);
+    }
     
-    toInteger(40,8) <= y;
-    y <= toInteger(60,8);
-    
-    x%toInteger(3,8) = toInteger(0,8);
-    z*z = toInteger(100,8);
-    
-    [-x.overflow];
-    [-y.overflow];
-    [-z.overflow];
 }

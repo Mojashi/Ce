@@ -19,12 +19,27 @@ public:
 	static const Literal True = 1;
 	vector<Clause> cls;
 	int varCount = 0;
+	Clause preCls;
 
 	int addClause(const Clause& cl) {
 		if (find(cl.begin(), cl.end(), 0) != cl.end())
 			cout << "Assert literal zero" << endl;
-		cls.push_back(cl);
+		if(preCls.size()) {
+			Clause buf(cl);
+			buf.insert(buf.begin(),preCls.begin(), preCls.end());
+			cls.push_back(buf);
+		}	
+		else
+			cls.push_back(cl);
 		return cls.size() - 1;
+	}
+
+	void pushPreCls(Literal lit){
+		preCls.push_back(lit);
+	}
+
+	void popPreCls(){
+		preCls.erase(--preCls.end());
 	}
 
 	void remClause(int clNum){

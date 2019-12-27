@@ -100,6 +100,7 @@ shared_ptr<Structure> findStruct(string name){
 	%token FOR
 	%token MAXIMIZE
 	%token MINIMIZE
+	%token INIT
 	%token PROP
 
 	%left SAME
@@ -116,7 +117,7 @@ shared_ptr<Structure> findStruct(string name){
 
 	%type<ary> array_var
 	%type<arys> var_list
-	%type<ast> expr line selection stmt
+	%type<ast> expr line stmt
 	%type<func> funcdef
 	%type<memb> members structdef structdec
 	%type<vars> argument_list
@@ -166,6 +167,11 @@ shared_ptr<Structure> findStruct(string name){
 			delete $2;
 			delete $5;
 			delete $7;
+		}
+		| members INIT LBRACE stmt RBRACE{
+			$$ = $1;
+			shared_ptr<Function> initFunc(new Function(shared_ptr<Structure>(), "INITIALIZEFUNCTION", {}, shared_ptr<ASTNode>($4)));
+			$$->addFunction(initFunc);
 		}
 		| members PROP LBRACE stmt RBRACE{
 			$$ = $1;
@@ -261,19 +267,15 @@ shared_ptr<Structure> findStruct(string name){
 			
 			$$ = new ASTNode({shared_ptr<ASTNode>($1), shared_ptr<ASTNode>($2)});
 		}
-		| selection stmt {
-			yyerror("IF statement is not implemented.");
-			$$ = new ASTNode();
-		}
 		
 		| { $$ = NULL; } // No-op
 	;
 	
-	selection 
-		: IF LPAREN expr RPAREN LBRACE stmt RBRACE {
-			$$ = new ASTNode({shared_ptr<ASTNode>($3), shared_ptr<ASTNode>($6)});
-		}
-		;
+	// selection 
+	// 	: IF LPAREN expr RPAREN LBRACE stmt RBRACE {
+	// 		$$ = new ASTNode({shared_ptr<ASTNode>($3), shared_ptr<ASTNode>($6)});
+	// 	}
+	// 	;
 
 
 	line    
@@ -330,6 +332,12 @@ shared_ptr<Structure> findStruct(string name){
 		| FOR LPAREN NAME COMMA expr COMMA expr RPAREN LBRACE stmt RBRACE{
 			$$ = (ASTNode*) (new ASTFor(*$3, shared_ptr<ASTNode>($5), shared_ptr<ASTNode>($7), shared_ptr<ASTNode>($10)));
 			delete $3;
+		}
+		| IF LPAREN expr RPAREN LBRACE stmt RBRACE{
+			$$ = (ASTNode*) (new ASTOPIf(shared_ptr<ASTNode>($3), shared_ptr<ASTNode>($6)));
+		}
+		| IF LBRACKET expr RBRACKET LBRACE stmt RBRACE{
+			$$ = (ASTNode*) (new ASTCNFIf(shared_ptr<ASTNode>($3), shared_ptr<ASTNode>($6)));
 		}
 	;
 

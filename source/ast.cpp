@@ -77,9 +77,10 @@ shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent, list<sh
         ret->setVariable(itrArg->second,*itrPar);
     }
     ret->makeMembs();
-    shared_ptr<Function> propFunc = ret->getFunction("PROPERTYFUNCTION", {});
-    if(propFunc){
-        InsFunction ins{ret, propFunc};
+
+    shared_ptr<Function> initFunc = ret->getFunction("INITIALIZEFUNCTION", {});
+    if(initFunc){
+        InsFunction ins{ret, initFunc};
         ins.call({});
     }
     localVar = cvLocalVar;
@@ -287,19 +288,28 @@ shared_ptr<Variable> ASTSame::eval(){
     l->sameConst(r);
     return shared_ptr<Variable>();
 }
+void enumBool(shared_ptr<Variable> var, Clause &cl){
+    if(var->getType()->getBuiltInType() == ARRAYSTRUCT){
+        for(auto ch : var->getVariables()){
+            enumBool(ch.second, cl);
+        }
+    }
+    else if(var->getType()->getBuiltInType() == BOOLSTRUCT)
+        cl.push_back(((BoolVariable*)(var.get()))->getlitNum());
+    else {
+        cerr << "invalid expr type" << endl;
+        exit(0);
+    }
+}
 
 shared_ptr<Variable> ASTAddConst::eval(){
 #ifdef DEBUG
     cerr<<nodeTypeNames[getNodeType()]<<endl;
 #endif
-    vector<Literal> clause;
+    Clause clause;
     for(shared_ptr<ASTNode> expr : child){
         shared_ptr<Variable> var = expr->eval();
-        if(var->getType() != boolStruct){
-            cerr << "invalid expr type" << endl;
-            exit(0);
-        }
-        clause.push_back(((BoolVariable*)(var.get()))->getlitNum());
+        enumBool(var, clause);
     }
     cnf.addClause(clause);
     return shared_ptr<Variable>();
@@ -379,5 +389,31 @@ shared_ptr<Variable> ASTFor::eval(){
         localVar = cvLocalVar;
     }
     localVar.erase(ctname);
+    return shared_ptr<Variable>();
+}
+
+shared_ptr<Variable> ASTOPIf::eval(){
+#ifdef DEBUG
+    cerr<<nodeTypeNames[getNodeType()]<<endl;
+#endif
+    vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
+    shared_ptr<Variable> ev = cv[0]->eval();
+    int evbool = ((BoolVariable*)(ev.get()))->getlitNum();
+    if(evbool){
+        cv[1]->eval();
+    }
+    return shared_ptr<Variable>();
+}
+
+shared_ptr<Variable> ASTCNFIf::eval(){
+#ifdef DEBUG
+    cerr<<nodeTypeNames[getNodeType()]<<endl;
+#endif
+    vector<shared_ptr<ASTNode>> cv(child.begin(), child.end());
+    shared_ptr<Variable> ev = cv[0]->eval();
+    Literal evbool = ((BoolVariable*)(ev.get()))->getlitNum();
+    cnf.pushPreCls(-evbool);
+    cv[1]->eval();
+    cnf.popPreCls();
     return shared_ptr<Variable>();
 }

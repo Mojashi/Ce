@@ -72,7 +72,8 @@ float       {digits}"."{digits}
 "struct"     { return STRUCT; }
 "return"   { return RETURN; }
 "const"     {return CONST;}
-"prop"		{return PROP;}
+"Prop"		{return PROP;}
+"Init"		{return INIT;}
 "["        { return LBRACKET; }
 "]"        { return RBRACKET; }
 "{"        { return LBRACE; }

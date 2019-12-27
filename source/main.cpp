@@ -92,6 +92,8 @@ int main(int argc, char const *argv[]){
     InsFunction mainFunc = {godVar, godVar->getFunction("main").front()};
     mainFunc.call({});
     
+    godVar->setPropRecursive();
+
     while(1){
         std::vector<bool> ans;
         if(objType == 0){

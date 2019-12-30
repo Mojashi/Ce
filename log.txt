@@ -1,0 +1,24 @@
+WARNING! DIMACS header mismatch: wrong number of variables.
+c This is MapleLCMDistChronoBT-DL.
+c WARNING: for repeatability, setting FPU to use double precision
+c ============================[ Problem Statistics ]=============================
+c |                                                                             |
+c |  Number of variables:          6729                                         |
+c |  Number of clauses:            1450                                         |
+c |  Parse time:                   0.00 s                                       |
+c |  Simplification time:          0.00 s                                       |
+c |                                                                             |
+c ===============================================================================
+c Solved by simplification
+c restarts              : 0
+c duplicate learnts_cnf : 0
+c duplicate learnts_min : 0
+c conflicts             : 0              (-nan /sec)
+c decisions             : 0              (-nan % random) (-nan /sec)
+c propagations          : 1040           (inf /sec)
+c conflict literals     : 0              (-nan % deleted)
+c backtracks            : 0              (NCB -nan% , CB -nan%)
+c Memory used           : 11.00 MB
+c CPU time              : 0 s
+
+s UNSATISFIABLE

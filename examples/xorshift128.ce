@@ -19,9 +19,11 @@ struct xorshift128{
 Integer:(32) next;
 xorshift128 rand;
 void main(){
+    //直近４個の出力から
     rand.next() = toInteger(448488982,32);
     rand.next() = toInteger(643481932,32);
     rand.next() = toInteger(934407046,32);
     rand.next() = toInteger(723553448,32);
+    //次の出力を予測する
     next := rand.next();
 }

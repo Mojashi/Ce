@@ -47,14 +47,16 @@ float       {digits}"."{digits}
 	BEGIN(0);
 }
 ":="        { return ASSIGN; }
-":"?("<"|"<="|">"|">="|"=="|"!=") {
-	yylval.name = new string(yytext); return OP7; }
-":"?("&")			{
+":"?("<<"|">>")			{
 	yylval.name = new string(yytext);return OP4;}
-":"?("^")			{
+":"?("<"|"<="|">"|">="|"=="|"!=") {
+	yylval.name = new string(yytext); return OP8; }
+":"?("&")			{
 	yylval.name = new string(yytext);return OP5;}
-":"?("|")			{
+":"?("^")			{
 	yylval.name = new string(yytext);return OP6;}
+":"?("|")			{
+	yylval.name = new string(yytext);return OP7;}
 "="			{
 	yylval.name = new string(yytext);return SAME;}
 ":"?("+")        {
@@ -86,7 +88,7 @@ float       {digits}"."{digits}
             if ( !YY_CURRENT_BUFFER )
 				return ENDOFFILE;}
 
-{name}|"operator":?[!+-/*%><=][=]?    {
+{name}|"operator":?[!+-/*\^%><=][<>=]?    {
       		yylval.name = new string(yytext);
 			return NAME; 
 		}

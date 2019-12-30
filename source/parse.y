@@ -104,6 +104,7 @@ shared_ptr<Structure> findStruct(string name){
 	%token PROP
 
 	%left SAME
+	%left<name> OP8
 	%left<name> OP7
 	%left<name> OP6
 	%left<name> OP5
@@ -375,6 +376,9 @@ shared_ptr<Structure> findStruct(string name){
 			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
 			}
 		| expr OP7 expr 	{ 
+			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
+			}
+		| expr OP8 expr 	{ 
 			$$ = (ASTNode*)(new ASTCallFunction("operator" + *$2, {shared_ptr<ASTNode>($1),shared_ptr<ASTNode>($3)}));
 			}
 		| expr MINUS expr 	{ 

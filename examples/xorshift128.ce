@@ -1,0 +1,27 @@
+import "stl/integer.ce"
+
+struct xorshift128{
+    Integer:(32) x,y,z,w;
+    
+    Integer next(){
+        Integer:(32) t;
+        t := x ^ (x << 11);
+        x := y; y := z; z := w;
+        w := (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+
+        Bool buf;
+        [-buf];
+        w.overflow := buf;
+        return w;
+    }
+}
+
+Integer:(32) next;
+xorshift128 rand;
+void main(){
+    rand.next() = toInteger(448488982,32);
+    rand.next() = toInteger(643481932,32);
+    rand.next() = toInteger(934407046,32);
+    rand.next() = toInteger(723553448,32);
+    next := rand.next();
+}

@@ -73,6 +73,17 @@ struct Integer:(SysInt SIZE){
         ret.overflow := overflow;
         return ret;
     }
+    Integer rshift(SysInt n){
+        Integer:(SIZE) ret;
+        for(i,SIZE - n){
+            ret.val[SIZE - 1 - n - i] := val[SIZE - 1 - i];
+        }
+        for(i,n){
+            [-ret.val[SIZE - 1 - i]];
+        }
+        ret.overflow := overflow;
+        return ret;
+    }
     Integer lshift(){
         Integer:(SIZE) ret;
         for(i,SIZE - 1){
@@ -172,6 +183,15 @@ struct Integer:(SysInt SIZE){
         ret.overflow := or(carry,a.overflow);
         return ret;
     }
+    Integer operator^(Integer a, Integer b){
+        Integer:(SIZE) ret;
+        ret.overflow := or(a.overflow, b.overflow);
+        for(i,a.SIZE){
+            ret.val[i] := xor(a.val[i],b.val[i]);
+        }
+        return ret;
+    }
+
     Bool operator:==(Integer a, Integer b){
         Bool ret;
         [-ret];
@@ -188,6 +208,14 @@ struct Integer:(SysInt SIZE){
     }   
     void operator!=(Integer a, Integer b){
         [a :!= b];
+    }
+
+    Integer operator<<(Integer a, SysInt b){
+        return a.lshift(b);
+    }
+
+    Integer operator>>(Integer a, SysInt b){
+        return a.rshift(b);
     }
     
     Bool operator:>(Integer a, Integer b){

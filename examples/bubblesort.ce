@@ -1,0 +1,30 @@
+//バブルソートの正当性を確かめる。UNSATなら判例が存在しないのでこのバブルソートは正しいことになる。
+
+import "stl/integer.ce"
+
+Integer:(8) in[10]; 
+
+void main(){
+    for(i,10) { [-in[i].overflow]; }
+
+//バブルソートするだけ
+    for(i,10){
+        for(j,i){
+            if[in[i] :< in[j]]{
+                Integer:(8) temp;
+                temp := in[i];
+                in[i] := in[j];
+                in[j] := temp;
+            }
+        }
+    }
+
+//失敗条件
+    Bool failed;
+    [-failed];
+    for(i,9){
+        failed := or(failed, in[i] :> in[i + 1]);
+    }
+//失敗するように設定したので、UNSATならバブルソートは正しい。
+    [failed];
+}

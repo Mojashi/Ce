@@ -3,22 +3,28 @@ c This is MapleLCMDistChronoBT-DL.
 c WARNING: for repeatability, setting FPU to use double precision
 c ============================[ Problem Statistics ]=============================
 c |                                                                             |
-c |  Number of variables:          6729                                         |
-c |  Number of clauses:            1450                                         |
-c |  Parse time:                   0.00 s                                       |
-c |  Simplification time:          0.00 s                                       |
+c |  Number of variables:         12340                                         |
+c |  Number of clauses:           11229                                         |
+c |  Parse time:                   0.01 s                                       |
+c |  Eliminated clauses:           0.14 Mb                                      |
+c Reduced to 1569 vars, 6336 cls (grow=0)
+c No iterative elimination performed. (vars=1569, c/v ratio=4.0)
+c |  Simplification time:          0.01 s                                       |
 c |                                                                             |
+c ============================[ Search Statistics ]==============================
+c | Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+c |           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
 c ===============================================================================
-c Solved by simplification
-c restarts              : 0
+c ===============================================================================
+c restarts              : 491
 c duplicate learnts_cnf : 0
-c duplicate learnts_min : 0
-c conflicts             : 0              (-nan /sec)
-c decisions             : 0              (-nan % random) (-nan /sec)
-c propagations          : 1040           (inf /sec)
-c conflict literals     : 0              (-nan % deleted)
-c backtracks            : 0              (NCB -nan% , CB -nan%)
-c Memory used           : 11.00 MB
-c CPU time              : 0 s
+c duplicate learnts_min : 139
+c conflicts             : 136303         (11355 /sec)
+c decisions             : 365582         (0.00 % random) (30455 /sec)
+c propagations          : 14313320       (1192379 /sec)
+c conflict literals     : 7508326        (23.84 % deleted)
+c backtracks            : 136302         (NCB 100% , CB 0%)
+c Memory used           : 39.00 MB
+c CPU time              : 12.004 s
 
 s UNSATISFIABLE

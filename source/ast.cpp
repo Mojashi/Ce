@@ -32,7 +32,7 @@ void Variable::assign(shared_ptr<Variable> var){
                 }
             }
         }
-        reinterpret_cast<BoolVariable*>(this)->setlitNum(reinterpret_cast<BoolVariable*>(var.get())->getlitNum());
+        ((BoolVariable*)this)->setlitNum(((BoolVariable*)(var.get()))->getlitNum());
     }
     else{
         for(auto memb : variables){

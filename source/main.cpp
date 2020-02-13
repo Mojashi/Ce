@@ -63,11 +63,46 @@ void banSolution(shared_ptr<Variable> var, vector<bool>& ans, Clause& cl){
     }
 }
 
+void outputSuppleInfo(string fname){
+    ofstream ofs(fname);
+    int n = godVar->setVarNumber(0);
+
+    ofs << n << endl;
+
+    map<shared_ptr<Structure>, vector<int>> stcs;
+
+    function<void(shared_ptr<Variable>)> dfs = [&](shared_ptr<Variable> cur){
+        int curNum = cur->getVarNumber();
+
+        stcs[cur->getType()].push_back(curNum);
+
+        for(auto ch : cur->getVariables()){
+            ofs << curNum << " " << ch.second->getVarNumber() << "\n";
+        }
+        for(auto ch : cur->getVariables()){
+            dfs(ch.second);
+        }
+    };
+ 
+    dfs(godVar);
+
+    for(auto stc : stcs){
+        ofs << stc.second.size() << "\n";
+        for(auto num : stc.second){
+            ofs << num << " ";
+        }
+        ofs << "\n";
+    }
+
+    ofs.close();
+}
+
 int main(int argc, char const *argv[]){
 #ifdef DEBUG
 	extern int yydebug;
 	yydebug = 1;
 #endif
+    FmtInit();
 
     builtInBef();
     if(argc > 1)
@@ -79,7 +114,6 @@ int main(int argc, char const *argv[]){
     builtInAf();
 #ifndef NO_PYTHON
     cout << "load formatters" << endl;
-    FmtInit();
     cout << "successflly loaded" << endl;
 #endif
 

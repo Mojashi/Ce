@@ -125,6 +125,7 @@ public:
 };
 
 class Variable{
+    int varNum;
 protected:
     shared_ptr<Variable> parent;
     shared_ptr<Structure> structure;
@@ -136,6 +137,14 @@ public:
 #ifdef DEBUG
         cerr << "gen instance " + structure->getName() << endl;
 #endif
+    }
+    int getVarNumber(){return varNum;}
+    int setVarNumber(int fr){
+        varNum = fr++;
+        for(auto ch : variables){
+            fr = ch.second->setVarNumber(fr);
+        }
+        return fr;
     }
 
     shared_ptr<Variable> getParent(){return parent;}

@@ -1,8 +1,8 @@
-
 import "stl/integer.ce"
+
 struct Sudoku{
     Integer:(4) mat[9][9];
-    prop{
+    Prop{
         for(i,9){for(j,9){
             [-mat[i][j].overflow];
             mat[i][j] < toInteger(10,4);

@@ -65,11 +65,12 @@ void banSolution(shared_ptr<Variable> var, vector<bool>& ans, Clause& cl){
 
 void outputSuppleInfo(string fname){
     ofstream ofs(fname);
-    int n = godVar->setVarNumber(0);
+    int n = godVar->setVarNumber(0), m = 0;
+
+    string buf;
+    map<shared_ptr<Structure>, vector<int>> stcs;
 
     ofs << n << endl;
-
-    map<shared_ptr<Structure>, vector<int>> stcs;
 
     function<void(shared_ptr<Variable>)> dfs = [&](shared_ptr<Variable> cur){
         int curNum = cur->getVarNumber();
@@ -78,16 +79,17 @@ void outputSuppleInfo(string fname){
 
         for(auto ch : cur->getVariables()){
             ofs << curNum << " " << ch.second->getVarNumber() << "\n";
+            m++;
         }
         for(auto ch : cur->getVariables()){
             dfs(ch.second);
         }
     };
- 
+
     dfs(godVar);
 
     for(auto stc : stcs){
-        ofs << stc.second.size() << "\n";
+        ofs <<  "\n" << stc.second.size() << "\n";
         for(auto num : stc.second){
             ofs << num << " ";
         }
@@ -102,7 +104,6 @@ int main(int argc, char const *argv[]){
 	extern int yydebug;
 	yydebug = 1;
 #endif
-    FmtInit();
 
     builtInBef();
     if(argc > 1)
@@ -112,8 +113,10 @@ int main(int argc, char const *argv[]){
         std::cout << "syntax ERROR!!" << std::endl;
     }
     builtInAf();
+
 #ifndef NO_PYTHON
     cout << "load formatters" << endl;
+    FmtInit();
     cout << "successflly loaded" << endl;
 #endif
 
@@ -128,6 +131,7 @@ int main(int argc, char const *argv[]){
     
     godVar->setPropRecursive();
 
+    outputSuppleInfo("supInfo.txt");
     while(1){
         std::vector<bool> ans;
         if(objType == 0){

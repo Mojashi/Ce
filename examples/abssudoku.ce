@@ -1,31 +1,42 @@
 
 import "stl/integer.ce"
-struct Sudoku{
-    Integer:(4) mat[9][9];
-    Prop{
-        for(i,9){for(j,9){
-            [-mat[i][j].overflow];
-            mat[i][j] < toInteger(10,4);
-            mat[i][j] > toInteger(0,4);
-            for(k,j + 1, 9){
-                mat[i][j] != mat[i][k];
-                mat[j][i] != mat[k][i];
-        }}}
-        for(x,3){for(y,3){
-            for(i,9){for(j,i+1,9){
-                mat[x*3 + i/3][y*3 + i%3] != mat[x*3 + j/3][y*3 + j%3];
-            }}
-        }}
-    }
 
-    void set(SysInt i, SysInt j, Integer x){
-        mat[i][j] = x;
+struct Box:(SysInt W, SysInt SIZE){
+    Integer:(SIZE) mat[W][W];
+
+    Prop{
+        for(i,W*W){
+            [-mat[i/W][i%W].overflow];
+            mat[i/W][i%W] < toInteger(W*W + 1,SIZE);
+            mat[i/W][i%W] > toInteger(0,SIZE);
+
+            for(j,i+1,W*W){
+                mat[i/W][i%W] != mat[j/W][j%W];
+            }
+        }
     }
 }
 
-Sudoku sudoku;
+struct ASudoku:(SysInt W, SysInt SIZE){
+    Box:(W,SIZE) mat[W][W];
+    
+    Prop{
+        for(i,W*W){
+            for(j,W*W){
+            for(k,j + 1, W*W){
+                mat[i/W][j/W].mat[i%W][j%W] != mat[i/W][k/W].mat[i%W][k%W];
+                mat[j/W][i/W].mat[j%W][i%W] != mat[k/W][i/W].mat[k%W][i%W];
+        }}}
+    }
+
+    void set(SysInt i, SysInt j, Integer x){
+        mat[i/W][j/W].mat[i%W][j%W] = x;
+    }
+}
+
+ASudoku:(4,5) sudoku;
 void main(){
-    sudoku.set(0,0,toInteger(8,4));
+    /*sudoku.set(0,0,toInteger(8,4));
     sudoku.set(0,5,toInteger(5,4));
     sudoku.set(0,6,toInteger(1,4));
     sudoku.set(1,2,toInteger(1,4));
@@ -52,5 +63,5 @@ void main(){
     sudoku.set(7,6,toInteger(4,4));
     sudoku.set(8,2,toInteger(7,4));
     sudoku.set(8,3,toInteger(6,4));
-    sudoku.set(8,8,toInteger(1,4));
+    sudoku.set(8,8,toInteger(1,4));*/
 }

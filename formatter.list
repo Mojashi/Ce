@@ -1,4 +1,5 @@
 Integer:fmt.integerfmt;integerfmt
 Sudoku:fmt.sudokufmt;sudokufmt
+ASudoku:fmt.Asudokufmt;Asudokufmt
 DecStr:fmt.decstrfmt;decstrfmt
 Yajilin:fmt.yajilinfmt;yajilinfmt

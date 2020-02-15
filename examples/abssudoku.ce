@@ -2,13 +2,15 @@
 import "stl/integer.ce"
 
 struct Box:(SysInt W, SysInt SIZE){
-    Integer:(SIZE) mat[W][W];
-
+    Integer:(SIZE) mat[W][W], Max, Min;
     Prop{
+        Max = toInteger(W*W,SIZE);
+        Min = toInteger(0,SIZE);
+
         for(i,W*W){
             [-mat[i/W][i%W].overflow];
-            mat[i/W][i%W] < toInteger(W*W + 1,SIZE);
-            mat[i/W][i%W] > toInteger(0,SIZE);
+            mat[i/W][i%W] <= Max;
+            mat[i/W][i%W] > Min;
 
             for(j,i+1,W*W){
                 mat[i/W][i%W] != mat[j/W][j%W];
@@ -34,34 +36,6 @@ struct ASudoku:(SysInt W, SysInt SIZE){
     }
 }
 
-ASudoku:(4,5) sudoku;
+ASudoku:(3,4) sudoku;
 void main(){
-    /*sudoku.set(0,0,toInteger(8,4));
-    sudoku.set(0,5,toInteger(5,4));
-    sudoku.set(0,6,toInteger(1,4));
-    sudoku.set(1,2,toInteger(1,4));
-    sudoku.set(1,6,toInteger(8,4));
-    sudoku.set(2,1,toInteger(4,4));
-    sudoku.set(2,3,toInteger(2,4));
-    sudoku.set(2,7,toInteger(9,4));
-    sudoku.set(3,4,toInteger(3,4));
-    sudoku.set(3,8,toInteger(2,4));
-    sudoku.set(4,0,toInteger(1,4));
-    sudoku.set(4,1,toInteger(2,4));
-    sudoku.set(4,2,toInteger(3,4));
-    sudoku.set(4,3,toInteger(4,4));
-    sudoku.set(4,5,toInteger(6,4));
-    sudoku.set(4,6,toInteger(7,4));
-    sudoku.set(4,7,toInteger(8,4));
-    sudoku.set(4,8,toInteger(9,4));
-    sudoku.set(5,0,toInteger(6,4));
-    sudoku.set(5,4,toInteger(1,4));
-    sudoku.set(6,1,toInteger(8,4));
-    sudoku.set(6,5,toInteger(9,4));
-    sudoku.set(6,7,toInteger(5,4));
-    sudoku.set(7,2,toInteger(2,4));
-    sudoku.set(7,6,toInteger(4,4));
-    sudoku.set(8,2,toInteger(7,4));
-    sudoku.set(8,3,toInteger(6,4));
-    sudoku.set(8,8,toInteger(1,4));*/
 }

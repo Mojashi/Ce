@@ -15,6 +15,8 @@ using std::weak_ptr;
 using std::shared_ptr;
 extern CNF cnf;
 
+extern int curStcNum;
+
 class Structure;
 class Variable;
 class ASTNode;
@@ -187,6 +189,7 @@ public:
     void setProp(){
         shared_ptr<Function> propFunc = getFunction("PROPERTYFUNCTION", {});
         if(propFunc){
+            curStcNum = varNum;
             InsFunction ins{getPtr(), propFunc};
             ins.call({});
         }

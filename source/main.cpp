@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "ast.h"
 #include "parse.tab.h"
 #include "graphviz.h"
@@ -63,9 +64,9 @@ void banSolution(shared_ptr<Variable> var, vector<bool>& ans, Clause& cl){
     }
 }
 
-void outputSuppleInfo(string fname){
+void outputSuppleInfo(string fname, int n){
     ofstream ofs(fname);
-    int n = godVar->setVarNumber(0), m = 0;
+    int m = 0;
 
     string buf;
     map<shared_ptr<Structure>, vector<int>> stcs;
@@ -96,6 +97,12 @@ void outputSuppleInfo(string fname){
         ofs << "\n";
     }
 
+    ofs << cnf.stcNums.size() << endl;
+    for(auto num : cnf.stcNums){
+        ofs << num << " ";
+    }
+    ofs << endl;
+
     ofs.close();
 }
 
@@ -125,13 +132,15 @@ int main(int argc, char const *argv[]){
     cout << "output graph.dot" << endl;
     godVar = godStruct->getInstance(shared_ptr<Variable>(),{});
 
+    int numOfStruct = godVar->setVarNumber(0);
+    
     std::cout << "Executing main function" << endl;
     InsFunction mainFunc = {godVar, godVar->getFunction("main").front()};
     mainFunc.call({});
     
     godVar->setPropRecursive();
 
-    outputSuppleInfo("supInfo.txt");
+    outputSuppleInfo("supInfo.txt", numOfStruct);
     while(1){
         std::vector<bool> ans;
         if(objType == 0){
@@ -146,24 +155,25 @@ int main(int argc, char const *argv[]){
             }
         }
         else if(objType == 1){
-            CNF cnf2 = cnf;
-            int sz = objVar->getVariable("val")->getVariables().size();
-            for(int i = sz - 1;0 <= i; i--){
-                int clNum = cnf2.addClause({(Literal)((BoolVariable*)(objVar->getVariable("val")->getVariable(to_string(i)).get()))->getlitNum()});
-                ans = cnf2.solve();
-                cout << (ans.size() > 0 )<< endl;
-                if(!ans.size()) cnf2.remClause(clNum);
-            }
-            ans = cnf2.solve();
-            if(ans.size()){
-                outputResult(godVar, ans, "");
-                cout << "objVar:";
-                outputResult(objVar, ans, "");
-            }
-            else {
-                cout << "UNSAT" << endl;
-                break;
-            }
+            assert(false);
+            // CNF cnf2 = cnf;
+            // int sz = objVar->getVariable("val")->getVariables().size();
+            // for(int i = sz - 1;0 <= i; i--){
+            //     int clNum = cnf2.addClause({(Literal)((BoolVariable*)(objVar->getVariable("val")->getVariable(to_string(i)).get()))->getlitNum()});
+            //     ans = cnf2.solve();
+            //     cout << (ans.size() > 0 )<< endl;
+            //     if(!ans.size()) cnf2.remClause(clNum);
+            // }
+            // ans = cnf2.solve();
+            // if(ans.size()){
+            //     outputResult(godVar, ans, "");
+            //     cout << "objVar:";
+            //     outputResult(objVar, ans, "");
+            // }
+            // else {
+            //     cout << "UNSAT" << endl;
+            //     break;
+            // }
         }
 
         int retry = 0;
@@ -173,7 +183,7 @@ int main(int argc, char const *argv[]){
 
         Clause cl;
         banSolution(godVar, ans, cl);
-        cnf.addClause(cl);
+        cnf.addClause(cl, 0);
     };
     return 0;
 }

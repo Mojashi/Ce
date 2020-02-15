@@ -11,6 +11,8 @@ using std::endl;
 extern Structure godStruct;
 extern Variable godVar;
 extern CNF cnf;
+int curStcNum = 0;
+
 shared_ptr<Variable> currentScope;
 
 map<string, shared_ptr<Variable>> localVar;
@@ -45,8 +47,8 @@ void Variable::sameConst(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
     if(getType() == boolStruct){
         Literal a = ((BoolVariable*)this)->getlitNum(),b = ((BoolVariable*)(var.get()))->getlitNum();
-        cnf.addClause({a,-b});
-        cnf.addClause({-a,b});
+        cnf.addClause({a,-b}, curStcNum);
+        cnf.addClause({-a,b}, curStcNum);
     }
     else{
         for(auto memb : variables){
@@ -322,7 +324,7 @@ shared_ptr<Variable> ASTAddConst::eval(){
         shared_ptr<Variable> var = expr->eval();
         enumBool(var, clause);
     }
-    cnf.addClause(clause);
+    cnf.addClause(clause, curStcNum);
     return shared_ptr<Variable>();
 }
 
@@ -438,7 +440,7 @@ shared_ptr<Variable> ASTCNFIf::eval(){
         if(var.first.use_count() == 1) continue;
         Literal b = var.second;
         Literal a = ((BoolVariable*)var.first.get())->getlitNum();
-        ((BoolVariable*)var.first.get())->setlitNum(cnf.MUX(a,b, evbool));
+        ((BoolVariable*)var.first.get())->setlitNum(cnf.MUX(a,b, evbool, curStcNum));
     }
     }
     return shared_ptr<Variable>();

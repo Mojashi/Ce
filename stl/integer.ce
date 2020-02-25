@@ -193,13 +193,13 @@ struct Integer:(SysInt SIZE){
     }
 
     Bool operator:==(Integer a, Integer b){
-        Bool ret;
-        [-ret];
+        Bool ret[SIZE + 2];
+        [-ret[0]];
         for(i,SIZE){
-            ret := or(ret,xor(a.val[i],b.val[i]));
+            ret[i + 1] := or(ret[i],xor(a.val[i],b.val[i]));
         }
-        ret := or(ret,xor(a.overflow,b.overflow));
-        return -ret;
+        ret[SIZE + 1] := or(ret[SIZE],xor(a.overflow,b.overflow));
+        return -ret[SIZE + 1];
     }
     Bool operator:!=(Integer a, Integer b){
         Bool ret;
@@ -219,19 +219,19 @@ struct Integer:(SysInt SIZE){
     }
     
     Bool operator:>(Integer a, Integer b){
-        Bool ret, bb;
-        [-ret];
-        [-bb];
+        Bool ret[a.SIZE + 1], bb[a.SIZE + 1];
+        [-ret[0]];
+        [-bb[0]];
         for(i,a.SIZE){
             Bool buf, nret;
             buf := a.val[a.SIZE-i - 1] :> b.val[a.SIZE-i - 1];
-            bb  := or(bb,a.val[a.SIZE-i - 1] :< b.val[a.SIZE-i - 1]);
+            bb[i + 1] := or(bb[i],a.val[a.SIZE-i - 1] :< b.val[a.SIZE-i - 1]);
             [buf, -nret];
-            [-bb, -nret];
-            [-buf, bb, nret];
-            ret := or(ret, nret);
+            [-bb[i + 1], -nret];
+            [-buf, bb[i + 1], nret];
+            ret[i + 1] := or(ret[i], nret);
         }
-        return ret;
+        return ret[a.SIZE];
     }
     Bool operator:<(Integer a, Integer b){
         return b :> a;

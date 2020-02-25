@@ -14,14 +14,17 @@ using std::map;
 using std::weak_ptr;
 using std::shared_ptr;
 extern CNF cnf;
-
-extern int curStcNum;
-
 class Structure;
 class Variable;
 class ASTNode;
 class BoolVariable;
 
+extern shared_ptr<Variable> godVar;
+extern Variable* curPropVar;
+extern int nOfVar;
+extern map<shared_ptr<Structure>, vector<int>> stcs;
+extern vector<pair<int,int>> edges;
+extern map<int,int> litToVar;
 typedef pair<shared_ptr<Structure>, list<shared_ptr<ASTNode>>> pedStruct;
 
 extern shared_ptr<Structure> boolStruct;
@@ -127,28 +130,26 @@ public:
 };
 
 class Variable{
-    int varNum;
+    int varNum = -1;
 protected:
     shared_ptr<Variable> parent;
     shared_ptr<Structure> structure;
     map<string, shared_ptr<Variable>> variables;
     weak_ptr<Variable> selfPtr;
-    
+    vector<shared_ptr<BoolVariable>> tmpBools;
 public:
     Variable(shared_ptr<Variable> _parent,shared_ptr<Structure> _structure) : parent(_parent), structure(_structure) {
 #ifdef DEBUG
         cerr << "gen instance " + structure->getName() << endl;
 #endif
     }
-    int getVarNumber(){return varNum;}
-    int setVarNumber(int fr){
-        varNum = fr++;
-        for(auto ch : variables){
-            fr = ch.second->setVarNumber(fr);
-        }
-        return fr;
+    int getVarNumber(){
+        if(varNum == -1)
+            varNum = nOfVar++;    
+        return varNum;
     }
-
+    void addTmpBool(shared_ptr<BoolVariable> var);
+    vector<shared_ptr<BoolVariable>> getTmpBools(){return tmpBools;}
     shared_ptr<Variable> getParent(){return parent;}
     void makeMembs();
     virtual shared_ptr<Variable> copy(){
@@ -186,18 +187,13 @@ public:
     shared_ptr<Structure> getType(){return structure;}
     void assign(shared_ptr<Variable> var);
     
-    void setProp(){
-        shared_ptr<Function> propFunc = getFunction("PROPERTYFUNCTION", {});
-        if(propFunc){
-            curStcNum = varNum;
-            InsFunction ins{getPtr(), propFunc};
-            ins.call({});
-        }
-    }
+    void setProp();
     void setPropRecursive(){
         setProp();
         for(auto ch : variables){
+            auto tmp = curPropVar;
             ch.second->setPropRecursive();
+            curPropVar = tmp;
         }
     }
     ~Variable(){
@@ -210,6 +206,7 @@ class BoolStructure : public Structure{
 public:
     BoolStructure(){builtInType = BOOLSTRUCT;}
     shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent, list<shared_ptr<Variable>> thParams);
+    shared_ptr<Variable> getInstance(shared_ptr<Variable> _parent, list<shared_ptr<Variable>> thParams, int lNum);
 };
 
 class IntegerStructure : public Structure{

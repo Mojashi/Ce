@@ -9,14 +9,39 @@ using std::cerr;
 using std::endl;
 
 extern Structure godStruct;
-extern Variable godVar;
 extern CNF cnf;
-int curStcNum = 0;
+Variable* curPropVar = NULL;
 
 shared_ptr<Variable> currentScope;
 
 map<string, shared_ptr<Variable>> localVar;
 list<map<shared_ptr<Variable>, Literal>> chHisQue;
+
+    void Variable::addTmpBool(shared_ptr<BoolVariable> var){
+        tmpBools.push_back(var);
+    }
+
+    void Variable::setProp(){
+        shared_ptr<Function> propFunc = getFunction("PROPERTYFUNCTION", {});
+        if(this == godVar.get())
+            propFunc = getFunction("main", {});
+        if(propFunc){
+            stcs[getType()].push_back(getVarNumber());
+            if(curPropVar)
+                edges.push_back({curPropVar->getVarNumber(), getVarNumber()});
+            curPropVar = this;
+            InsFunction ins{getPtr(), propFunc};
+            ins.call({});
+        }
+        else if(getType() == boolStruct){
+            int lNum = ((BoolVariable*)(this))->getlitNum();
+            if(lNum > 1 && litToVar.count(lNum) == 0){
+                stcs[getType()].push_back(getVarNumber());
+                litToVar[lNum] = getVarNumber();
+                edges.push_back({curPropVar->getVarNumber(), getVarNumber()});
+            }
+        }
+    }
 
 string concatIdent(list<string> ident, char sp){
     string ret;
@@ -47,8 +72,8 @@ void Variable::sameConst(shared_ptr<Variable> var){
     if(var->getType() != getType()) return;
     if(getType() == boolStruct){
         Literal a = ((BoolVariable*)this)->getlitNum(),b = ((BoolVariable*)(var.get()))->getlitNum();
-        cnf.addClause({a,-b}, curStcNum);
-        cnf.addClause({-a,b}, curStcNum);
+        cnf.addClause({a,-b}, curPropVar->getVarNumber());
+        cnf.addClause({-a,b}, curPropVar->getVarNumber());
     }
     else{
         for(auto memb : variables){
@@ -100,11 +125,15 @@ shared_ptr<Variable> Structure::getInstance(shared_ptr<Variable> parent, list<sh
     return ret;
 }
 
-shared_ptr<Variable> BoolStructure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams){
+shared_ptr<Variable> BoolStructure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams, int lNum){
     BoolVariable* var = new BoolVariable(parent, getPtr());
-    var->setlitNum(cnf.getNewVar());
+    var->setlitNum(lNum);
     return var->getPtr();
 }
+shared_ptr<Variable> BoolStructure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams){
+    return getInstance(parent, thParams, cnf.getNewVar());
+}
+
 shared_ptr<Variable> IntegerStructure::getInstance(shared_ptr<Variable> parent, list<shared_ptr<Variable>> thParams){
     BoolVariable* var = new BoolVariable(parent, getPtr());
     var->setlitNum(0);
@@ -222,7 +251,7 @@ shared_ptr<Variable> ASTNode::eval(){
 
 shared_ptr<Variable> ASTCallFunction::eval(){
 #ifdef DEBUG
-    cerr<<nodeTypeNames[getNodeType()]<<endl;
+    cerr<<nodeTypeNames[getNodeType()]<< ":" << name << endl;
 #endif
     list<shared_ptr<Variable>> params;
     for(auto param : child){
@@ -241,7 +270,12 @@ shared_ptr<Variable> ASTCallFunction::eval(){
         cerr << "not found function named "<<name << endl;
         exit(0);
     }
-    return func.call(params);
+    auto ret = func.call(params);
+
+#ifdef DEBUG
+    cerr<<"END:"<< name <<endl;
+#endif
+    return ret;
 }
 
 shared_ptr<Variable> ASTIfStatement::eval(){
@@ -269,7 +303,14 @@ shared_ptr<Variable> ASTDeclareVar::eval(){
             cerr << "a variable named \"" << *name << "\" has already declared" << endl;
             exit(0);
         }
-        localVar[*name] = (*type)->getInstance(currentScope, evedParams);
+        auto var = localVar[*name] = (*type)->getInstance(currentScope, evedParams);
+        // if((*type)->getBuiltInType() == BOOLSTRUCT){
+        //     int lNum = static_pointer_cast<BoolVariable>(var)->getlitNum();
+        //     if(lNum > 0){
+        //         litToVar[lNum] = var->getVarNumber();
+        //         edges.push_back({curPropVar->getVarNumber(), var->getVarNumber()});
+        //     }
+        // }
     }
     return shared_ptr<Variable>();
 }
@@ -324,7 +365,7 @@ shared_ptr<Variable> ASTAddConst::eval(){
         shared_ptr<Variable> var = expr->eval();
         enumBool(var, clause);
     }
-    cnf.addClause(clause, curStcNum);
+    cnf.addClause(clause, curPropVar->getVarNumber());
     return shared_ptr<Variable>();
 }
 
@@ -440,7 +481,7 @@ shared_ptr<Variable> ASTCNFIf::eval(){
         if(var.first.use_count() == 1) continue;
         Literal b = var.second;
         Literal a = ((BoolVariable*)var.first.get())->getlitNum();
-        ((BoolVariable*)var.first.get())->setlitNum(cnf.MUX(a,b, evbool, curStcNum));
+        ((BoolVariable*)var.first.get())->setlitNum(cnf.MUX(a,b, evbool, curPropVar->getVarNumber()));
     }
     }
     return shared_ptr<Variable>();

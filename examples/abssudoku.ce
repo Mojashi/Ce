@@ -36,6 +36,6 @@ struct ASudoku:(SysInt W, SysInt SIZE){
     }
 }
 
-ASudoku:(3,4) sudoku;
+ASudoku:(4,5) sudoku;
 void main(){
 }

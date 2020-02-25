@@ -137,9 +137,8 @@ void builtInBef(){
 
     shared_ptr<ASTNode> notFuncAst(new ASTLambda(
         [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
-            shared_ptr<Variable> ret = boolStruct->getInstance(curScope,{});
+            shared_ptr<Variable> ret = ((BoolStructure*)boolStruct.get())->getInstance(curScope,{},-((BoolVariable*)(localVar["x"].get()))->getlitNum());
             localVar["ret"] = ret;
-            ((BoolVariable*)ret.get())->setlitNum(-((BoolVariable*)(localVar["x"].get()))->getlitNum());
             return ret;
         }
     ));
@@ -152,11 +151,10 @@ void builtInAf(){
     
     shared_ptr<ASTNode> getBitAst(new ASTLambda(
         [](shared_ptr<Variable> curScope, map<string, shared_ptr<Variable>>& localVar){
-            shared_ptr<Variable> ret = boolStruct->getInstance(curScope,{});
-            localVar["ret"] = ret;
             int x = ((BoolVariable*)(localVar["x"].get()))->getlitNum(), idx = ((BoolVariable*)(localVar["idx"].get()))->getlitNum();
+            shared_ptr<Variable> ret = ((BoolStructure*)boolStruct.get())->getInstance(curScope,{},(x >> idx) & 1 ? 1 : -1);
+            localVar["ret"] = ret;
 
-            ((BoolVariable*)ret.get())->setlitNum((x >> idx) & 1 ? 1 : -1);
             return ret;
         }
     ));

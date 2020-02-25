@@ -88,11 +88,13 @@ public:
 		ofstream ofs(filename.c_str());
 
 		ofs << "p cnf " << varCount << " " << cls.size() << endl;
+		int ct = 0;
 		for (auto cl : cls) {
 			for (auto lit : cl) {
 				ofs << lit << " ";
 			}
-			ofs << 0 << endl;
+			ofs << 0 << stcNums[ct] << endl;
+			ct++;
 		}
 		ofs.close();
 	}

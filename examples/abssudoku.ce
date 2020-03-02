@@ -19,15 +19,26 @@ struct Box:(SysInt W, SysInt SIZE){
     }
 }
 
+struct Row:(SysInt W, SysInt SIZE){
+    Box:(W,SIZE) mat[W];
+
+    Prop{
+        for(i,W){
+            for(j,W*W){
+            for(k,j + 1, W*W){
+                mat[j/W].mat[i][j%W] != mat[k/W].mat[i][k%W];
+        }}}
+    }
+}
+
 struct ASudoku:(SysInt W, SysInt SIZE){
-    Box:(W,SIZE) mat[W][W];
+    Row:(W,SIZE) mat[W];
     
     Prop{
         for(i,W*W){
             for(j,W*W){
             for(k,j + 1, W*W){
-                mat[i/W][j/W].mat[i%W][j%W] != mat[i/W][k/W].mat[i%W][k%W];
-                mat[j/W][i/W].mat[j%W][i%W] != mat[k/W][i/W].mat[k%W][i%W];
+                mat[j/W].mat[i/W].mat[j%W][i%W] != mat[k/W].mat[i/W].mat[k%W][i%W];
         }}}
     }
 

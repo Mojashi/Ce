@@ -93,7 +93,7 @@ public:
 			for (auto lit : cl) {
 				ofs << lit << " ";
 			}
-			ofs << 0 << stcNums[ct] << endl;
+			ofs << 0 << endl;
 			ct++;
 		}
 		ofs.close();

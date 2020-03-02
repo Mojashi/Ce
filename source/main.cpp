@@ -115,7 +115,7 @@ void outputSuppleInfo(string fname){
 
     ofs << stcs.size() << endl;
     for(auto stc : stcs){
-        ofs <<  "\n" << stc.second.size() << "\n";
+        ofs <<  "\n" << stc.second.size()  << "\n";
         for(auto num : stc.second){
             ofs << num << " ";
         }

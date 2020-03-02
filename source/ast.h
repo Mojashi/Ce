@@ -188,14 +188,7 @@ public:
     void assign(shared_ptr<Variable> var);
     
     void setProp();
-    void setPropRecursive(){
-        setProp();
-        for(auto ch : variables){
-            auto tmp = curPropVar;
-            ch.second->setPropRecursive();
-            curPropVar = tmp;
-        }
-    }
+    void setPropRecursive();
     ~Variable(){
         setProp();
     }

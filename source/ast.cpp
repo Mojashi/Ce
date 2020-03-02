@@ -14,6 +14,8 @@ Variable* curPropVar = NULL;
 
 shared_ptr<Variable> currentScope;
 
+map<shared_ptr<Structure>, int> stcSize;
+
 map<string, shared_ptr<Variable>> localVar;
 list<map<shared_ptr<Variable>, Literal>> chHisQue;
 
@@ -26,21 +28,39 @@ list<map<shared_ptr<Variable>, Literal>> chHisQue;
         if(this == godVar.get())
             propFunc = getFunction("main", {});
         if(propFunc){
-            stcs[getType()].push_back(getVarNumber());
-            if(curPropVar)
-                edges.push_back({curPropVar->getVarNumber(), getVarNumber()});
-            curPropVar = this;
             InsFunction ins{getPtr(), propFunc};
             ins.call({});
         }
-        else if(getType() == boolStruct){
-            int lNum = ((BoolVariable*)(this))->getlitNum();
-            if(lNum > 1 && litToVar.count(lNum) == 0){
-                stcs[getType()].push_back(getVarNumber());
-                litToVar[lNum] = getVarNumber();
-                edges.push_back({curPropVar->getVarNumber(), getVarNumber()});
-            }
+    }
+
+
+    void Variable::setPropRecursive(){
+        if(getType() == integerStruct) return;
+
+        int befNum = nOfVar;
+        if(getType() == boolStruct) 
+            litToVar[((BoolVariable*)(this))->getlitNum()] = getVarNumber();
+
+        stcs[getType()].push_back(getVarNumber());
+        if(curPropVar)
+            edges.push_back({curPropVar->getVarNumber(), getVarNumber()});
+        curPropVar = this;
+
+        setProp();
+        for(auto ch : variables){
+            auto tmp = curPropVar;
+            ch.second->setPropRecursive();
+            curPropVar = tmp;
         }
+ 
+        if(stcSize.count(getType()) == 0){
+            stcSize[getType()] = nOfVar - befNum;
+            cout << getType()->getName() << ":" << stcSize[getType()] << endl;
+        }
+        else if(stcSize[getType()] != nOfVar - befNum){
+            assert(1);
+        }
+
     }
 
 string concatIdent(list<string> ident, char sp){
@@ -213,7 +233,7 @@ InsFunction findFunction(list<string> ident,list<shared_ptr<Variable>> params){
             shared_ptr<Function> fv = cur->getFunction(ident.front(), params);
             if(fv)
                 return {cur, fv};
-            cur = cur->getParent();
+             cur = cur->getParent();
         }
 
         if(ident.size() == 1 && ident.front().substr(0,8) == "operator"){
@@ -304,13 +324,17 @@ shared_ptr<Variable> ASTDeclareVar::eval(){
             exit(0);
         }
         auto var = localVar[*name] = (*type)->getInstance(currentScope, evedParams);
-        // if((*type)->getBuiltInType() == BOOLSTRUCT){
+        if((*type) == boolStruct){
+            litToVar[static_pointer_cast<BoolVariable>(var)->getlitNum()] = var->getVarNumber();
+            stcs[var->getType()].push_back(var->getVarNumber());
+            edges.push_back({curPropVar->getVarNumber(), var->getVarNumber()});
+            //curPropVar->addTmpBool(static_pointer_cast<BoolVariable>(var));
         //     int lNum = static_pointer_cast<BoolVariable>(var)->getlitNum();
         //     if(lNum > 0){
         //         litToVar[lNum] = var->getVarNumber();
         //         edges.push_back({curPropVar->getVarNumber(), var->getVarNumber()});
         //     }
-        // }
+        }
     }
     return shared_ptr<Variable>();
 }

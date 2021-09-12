@@ -1,4 +1,4 @@
-import "graph.ce"
+import "stl/graph.ce"
 
 Graph g,m;
 Integer MaxMatchingSize;

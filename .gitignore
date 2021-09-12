@@ -3,8 +3,8 @@
 *.dot
 /source/parse.tab.c
 /source/parse.tab.h
-/Debug/*
-/Release/*
+Debug/
+Release/
 /cnf.dimacs
 /conflict.log
 /source/lex.yy.c
@@ -13,3 +13,6 @@
 /fmt/__pychache__/
 /solver
 __pycache__/
+log.txt
+MapleLCMDiscChronoBT-DL-v3
+MapleLCMDiscChronoBT-DL-v3.zip

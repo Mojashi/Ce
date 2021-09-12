@@ -17,7 +17,7 @@ YACCDEBUG = -vtd --graph --debug
 YACCRELEASE = -d
 LEXOPTION = 
 YACCOPTION =
-PYTHON =python3.8
+PYTHON =python3.9
 PYTHONOPTION =  -l$(PYTHON) $(shell $(PYTHON)-config --cflags --ldflags)
 NOPYOPTION = -DNO_PYTHON
 OBJS = $(OUTDIR)main.o $(OUTDIR)ast.o $(OUTDIR)parse.tab.o $(OUTDIR)lex.yy.o $(OUTDIR)builtIn.o
@@ -32,8 +32,8 @@ Debug: OBJS+=$(PYOBJ)
 Debug: formatresult.o
 Debug: all
 
-Release	: CFLAGS+=$(CRELEASEFLAGS)
-Release	: OUTDIR+=$(RELEASEDIR)
+Release: CFLAGS+=$(CRELEASEFLAGS)
+Release: OUTDIR+=$(RELEASEDIR)
 Release: YACCOPTION=$(YACCRELEASE)
 Release: OBJS += $(PYOBJ)
 Release: formatresult.o
@@ -52,7 +52,14 @@ NPRelease: YACCOPTION=$(YACCRELEASE)
 NPRelease: PYTHONOPTION=
 NPRelease: all
 
-all : $(TARGET)
+
+init:
+	mkdir Release Debug &&\
+	wget http://sat-race-2019.ciirc.cvut.cz/solvers/MapleLCMDiscChronoBT-DL-v3.zip &&\
+	unzip MapleLCMDiscChronoBT-DL-v3.zip &&\
+	cd MapleLCMDiscChronoBT-DL-v3 && sh starexec_build && cp ./bin/MapleLCMDistChrBt-DL-v3 ../solver
+
+all: $(TARGET)
 $(TARGET) : $(OBJS)
 	$(CCC) $(CFLAGS) -o $(OUTDIR)ce $(OBJS) $(PYTHONOPTION)
 

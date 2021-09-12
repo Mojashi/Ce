@@ -4,7 +4,7 @@ SATEncodingをやりやすくするための言語です。
 experimentalブランチは特殊な高速化をしています
 ## 導入
 ### 本体を持ってくる
-```sh=
+```sh
 git clone https://github.com/Mojashi/Ce.git
 cd Ce
 make init
@@ -16,7 +16,7 @@ PYTHON=python3.8
 ```
 となっている部分を普段使ってるバージョンに変えましょう。
 面倒だったら
-```sh=
+```sh
 make NPRelease
 ```
 とするとpythonに依存せずビルドできますが、その場合一部の機能（出力のフォーマッタ）が制限されます。
@@ -24,12 +24,10 @@ make NPRelease
 最終的にCe/solver、Ce/Release/ceが存在してれば良さそうです。
 
 導入できたと思ったら
-```sh=
+```sh
 ./Release/ce ./examples/sudoku.ce
 ```
 をして実行結果を眺めましょう。
-
-導入めんどくさいですね、考えておきます。
 
 ## できること
 ### 制約プログラミングとは

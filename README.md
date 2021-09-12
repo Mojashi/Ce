@@ -5,9 +5,10 @@ experimentalブランチは特殊な高速化をしています
 ## 導入
 ### 本体を持ってくる
 ```sh
-    $git clone https://github.com/Mojashi/Ce.git
-    $cd Ce
-    $make Release
+git clone https://github.com/Mojashi/Ce.git
+cd Ce
+make init
+make Release
 ```
 でできると思うんですけどpythonを中で使っていてリンクがややこしいのでできないかも。ミスったらmakefileを開いて、
 ```
@@ -20,25 +21,11 @@ experimentalブランチは特殊な高速化をしています
 ```
 とするとpythonに依存せずビルドできますが、その場合一部の機能（出力のフォーマッタ）が制限されます。
 
-### お好みのSATsolverを持ってくる
-Ceはあくまでプログラムを符号化するところをやるだけで、それをSolveしてくれるプログラムが別途必要です。ここではMapleDiscChronoBT-DL-v3というソルバを使いましょう。ありがとうMapleSAT。
-
-http://sat-race-2019.ciirc.cvut.cz/solvers/MapleLCMDiscChronoBT-DL-v3.zip
-解凍して出てくるstarexec_buildがビルドのためのシェルスクリプトになってるので叩きます
-```sh
-    $sh starexec_build
-```
-./bin/MapleLCMDistChrBt-DL-v3
-ができているはずです。
-これを
-solver
-にリネームしてCeのディレクトリ直下に持って行きましょう。
-
 最終的にCe/solver、Ce/Release/ceが存在してれば良さそうです。
 
 導入できたと思ったら
 ```sh
-    $./Release/ce ./examples/sudoku.ce
+    ./Release/ce ./examples/sudoku.ce
 ```
 をして実行結果を眺めましょう。
 
